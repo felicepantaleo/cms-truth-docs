@@ -1,0 +1,44 @@
+site_name: CMS MC-Truth Graph
+site_description: A single, navigable, physics-oriented truth graph for CMS (PhysicsTools/TruthInfo)
+site_author: Felice Pantaleo (CERN)
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - toc.integrate
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+
+nav:
+  - Home: index.md
+  - Data model: data-model.md
+  - Findings & changes: findings.md
+  - Replacing truth objects: replacing-truth-objects.md
+  - Validation: validation.md
+  - Pileup: pileup.md
+  - Optimization: optimization.md
+  - Roadmap: roadmap.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.emoji
