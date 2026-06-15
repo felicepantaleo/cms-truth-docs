@@ -36,9 +36,14 @@ Particle ↔ Vertex** graph built by `TruthLogicalGraphProducer` from the raw gr
 - GEN and SIM particles/vertices are **merged** when robustly associated; a merged
   particle takes its production vertex from its **immediate GEN production vertex**
   (see [Findings](findings.md)). Intermediate GEN-only copies can be collapsed.
-- **Vertex roles** (`VertexRole`): `Normal`, `Upstream`, `UnderlyingEvent` —
-  artificial source vertices summarize cut activity and carry the genEvent/eventId
-  so overlaid pile-up graphs stay distinguishable.
+- **Vertex roles** (`VertexRole`): `Normal`, `Interaction`, `Upstream`,
+  `UnderlyingEvent`. When a selection truncates the upstream history, each
+  interaction is summarized by one artificial `Interaction` source vertex that
+  fans out (through artificial connector particles) to its `Upstream`
+  (ISR/hard-scatter) and `UnderlyingEvent` sub-vertices, so the whole interaction
+  descends from a single node — the signal is everything reachable from the signal
+  `Interaction` vertex, and each overlaid pile-up interaction gets its own. All
+  carry the genEvent/eventId of the activity they summarize.
 - **Hitless SIM subgraphs are pruned** (`postProcessing.dropHitlessSimSubgraphs`,
   default on): every SIM particle whose calorimeter + tracker sim-hit subgraph is
   empty is removed together with its whole downstream subtree, so the logical graph

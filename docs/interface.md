@@ -91,13 +91,21 @@ propagated far enough.
 `bool isArtificial() const` decode `role`. The roles are:
 
 - `VertexRole::Normal` — a real GEN/SIM vertex.
-- `VertexRole::Upstream` — an artificial source vertex summarizing the truncated
+- `VertexRole::Interaction` — the per-interaction artificial source vertex. It is
+  the single root of one interaction and fans out, through artificial connector
+  particles, to that interaction's `Upstream` and `UnderlyingEvent` sub-vertices.
+- `VertexRole::Upstream` — an artificial vertex summarizing the truncated
   production context of the selected roots (ISR / beam / initial-state activity).
-- `VertexRole::UnderlyingEvent` — an artificial source vertex collecting stable
+- `VertexRole::UnderlyingEvent` — an artificial vertex collecting stable
   final-state particles that are in no selected subgraph (underlying event).
 
 Artificial vertices carry the `genEvent`/`eventId` of the activity they summarize,
-so overlaid pile-up graphs stay distinguishable.
+so overlaid pile-up graphs stay distinguishable: the signal is everything reachable
+from the signal `Interaction` vertex, and each pile-up interaction gets its own.
+The `Interaction → {Upstream, UnderlyingEvent}` links go through artificial
+connector particles (`genNode = simNode = -1`, `pdgId = 0`), so a consumer that
+walks particles will encounter them — filter on `isArtificial()` vertices or the
+connector `pdgId` if you need only real particles.
 
 ## `truth::Particle`
 

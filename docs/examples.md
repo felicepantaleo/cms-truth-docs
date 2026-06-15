@@ -35,24 +35,30 @@ neutrinos (invisible energy), charged tracks, and electromagnetic/hadronic showe
 
 The image below is the GEN-level decay structure of one event — the ten taus and
 their immediate decay products, before the Geant4 shower — with one deliberate
-feature: **all ten taus hang off a single artificial "signal" upstream vertex**
-(red, on the left). That one vertex is what lets you say *exactly* what is signal
-and what is not: the signal is, by definition, everything reachable from it. When
-pile-up is overlaid, each extra interaction gets its own artificial source vertex,
-so signal vs pile-up becomes a plain reachability test rather than a guess. (The
-full *detectable* logical graph for this sample has ~10<sup>4</sup> nodes once every
-hit-leaving shower secondary is attached; the GEN core is the didactic part, and the
-[hit index](data-model.md) is what links each of these particles to its detector
-footprint.)
+feature: **all ten taus descend from a single artificial "signal" interaction
+vertex** (red, on the left). Each interaction is summarized by one `Interaction`
+source vertex that fans out, through artificial connector particles, to an
+`Upstream` (ISR / hard-scatter) vertex and — when there is one — an
+`UnderlyingEvent` vertex; the ten taus hang off this event's Upstream node. That
+single interaction vertex is what lets you say *exactly* what is signal and what is
+not: the signal is, by definition, everything reachable from it. When pile-up is
+overlaid, **each extra interaction gets its own Interaction vertex**, so signal vs
+pile-up becomes a plain reachability test rather than a guess. (This TenTau gun has
+no underlying event, so only the Upstream branch appears; the full *detectable*
+logical graph has ~10<sup>4</sup> nodes once every hit-leaving shower secondary is
+attached — the GEN core is the didactic part, and the [hit index](data-model.md)
+links each particle to its detector footprint.)
 
-![TenTau: ten taus from a single artificial signal upstream vertex](img/tentau_signal.svg)
+![TenTau: ten taus descending from a single artificial signal interaction vertex](img/tentau_signal.svg)
 
 What to look at:
 
-- **One signal vertex, ten τ branches.** The red box is the artificial upstream
-  vertex; its ten outgoing edges are the ten τ particles (gold, pdgId ±15). It
-  carries the signal provenance (bunch crossing 0, event 0), so descending from it
-  enumerates the whole signal and nothing else.
+- **One interaction vertex, then the upstream node, then ten τ branches.** The red
+  box is the per-interaction `Interaction` vertex; the orange box is its `Upstream`
+  child (reached through an artificial connector particle), and the Upstream node's
+  ten outgoing edges are the ten τ particles (gold, pdgId ±15). All three artificial
+  nodes carry the signal provenance (bunch crossing 0, event 0), so descending from
+  the Interaction vertex enumerates the whole signal and nothing else.
 - **The varied decay modes.** Following each τ to its decay products you find the
   full menu: hadronic τ → π<sup>±</sup> (π<sup>0</sup>, K…) ν<sub>τ</sub> in both
   1-prong and 3-prong topologies, plus a leptonic τ → μ ν<sub>μ</sub> ν<sub>τ</sub>
@@ -65,8 +71,8 @@ What to look at:
 How the **Branch** selection produces this: the view is cut with
 `seedPdgIds = {15, -15}`, `seedParentDepth = 0` and `keepStableSpectators = false`,
 keeping each τ and its downstream subtree; with `attachSelectionSources = true`
-(the default) the truncated upstream is summarized into the single shared signal
-vertex. With the standalone dumper that is
+(the default) the truncated upstream is summarized into the single per-interaction
+Interaction → Upstream structure. With the standalone dumper that is
 
 ```bash
 cmsRun dumpTruthGraphsFromGENSIMRECO_cfg.py file:step3.root \
