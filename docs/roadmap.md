@@ -38,12 +38,17 @@ producers. Old-vs-new is bit-identical except summed sim-hit energies, which agr
 to float reassociation (~1e-7 rel; the new detId-sorted sum is deterministic, the
 old hash-bucket sum was not). See [Optimization → Implemented](optimization.md#implemented-commit-fce7b87314b).
 
-Remaining, in suggested order:
+Also done: **H2** (`f523cd1ace0`, visited-set LCA, 138× on a 262k-particle tree),
+**M5** (`d2a67b5cb0c`, DetId→RecHit map as a sorted vector, ~6×) and **M7**
+(`1d3b7b5e7d3`, path-compressed collapse walk).
 
-1. **H2** — drop the dense LCA distance matrix (iterate the visited set; reuse one
-   `dist` buffer). Builds on H1.
-2. **M3 / M4 / M5** — shrink the persisted raw/mixed graph, the subgraph hit CSR,
-   and the DetId→RecHit map (the flagged pileup scaling risk).
+Remaining (deliberate changes, not mechanical — see [Optimization](optimization.md)):
+
+1. **M3** — sparse, layout-agnostic association storage in `TruthGraph` (a single
+   base range is unsafe for the accumulator's per-sub-event node layout).
+2. **M4** — subgraph hit-storage reduction; needs the compute-on-read vs
+   store-coalesced contract decision (start by dropping `recHitIndex`).
+3. **M1 / M6 / L1–L5** cleanup.
 
 ## Housekeeping
 

@@ -1,11 +1,13 @@
 # Optimization review
 
 A performance/quality pass over the package (CPU, memory, storage, readability,
-comments). Findings are **prioritized and actionable**. The four high-priority
-items **H1, H3, H4, H5 are implemented** (commit `fce7b87314b`); the remaining
-items are pending (see the [Roadmap](roadmap.md)). The persistent-data design is
-sound — the items below are concentrated in the navigation layer, the hit-index
-builder, and two robustness fixes in the mixing producers.
+comments). Findings are **prioritized and actionable**. Implemented so far:
+**H1, H3, H4, H5** (`fce7b87314b`), **H2** (`f523cd1ace0`), **M5** (`d2a67b5cb0c`)
+and **M7** (`1d3b7b5e7d3`). Still open: the storage items **M3/M4** (reclassified
+below as deliberate design changes, not mechanical fixes) and the **M1/M6/L**
+cleanup (see the [Roadmap](roadmap.md)). The persistent-data design is sound — the
+items below are concentrated in the navigation layer, the hit-index builder, and
+two robustness fixes in the mixing producers.
 
 ## Already well done (keep)
 
@@ -73,11 +75,11 @@ consistent, clean DAG. `code-format` + `code-checks` clean.
 ## Medium priority
 
 - **M1** — `Branch` reruns a full BFS `traverse()` on every accessor; `invisibleEnergy()` runs it **twice** (`p4`+`visibleP4`). Compute `stableLeaves()` once and derive all kinematics in one pass; offer an opt-in materialized branch for loops over many branches.
-- **M3** — `TruthGraph` stores `simTrackToGen`/`simTrackToVtx` (SimTrack-only) and `simVtxToGen` (SimVertex-only) full-length over **all** nodes; size them to the SimTrack/SimVertex ranges (bases already computed) to shrink the persisted raw/mixed product.
-- **M4** — the subgraph hit CSR re-stores `{detId, recHitIndex, energy}` for every ancestor (≈ Σ subtree hits ≫ distinct hits). Store subgraph spans as **indices into the direct-hit storage**, and/or drop `recHitIndex` (re-resolvable from the DetId map). Largest hit-index storage contributor; scales with shower depth.
-- **M5** — `SimHitToRecHitMapProducer` ships an `unordered_map` with one entry per RecHit (millions for Phase-2 HGCal); a sorted `vector<pair>` + `lower_bound` is far more compact/cache-friendly for build-once/lookup-many.
-- **M6** — `TruthGraphProducer::produce` / `TruthLogicalGraphProducer::produce` are ~450/480-line functions; extract phases (`fillGenNodes`, `buildGenToSimAssociations`, `collectEdges`) into the anonymous namespace for testability and to reuse the H5 scatter.
-- **M7** — `collapseIntermediateGenParticleChains` representative walk is O(N) per particle (O(N²) worst case); path-compress (memoize representatives).
+- **M3** ⏸ **deferred (needs design, not mechanical)** — `TruthGraph` stores `simTrackToGen`/`simTrackToVtx`/`simVtxToGen` full-length over **all** nodes. Ranging them by a single base requires SimTrack/SimVertex nodes to be **contiguous**, which holds for the signal `TruthGraphProducer` but **not** for the accumulator's per-sub-event layout — so a naive range would silently corrupt the mixed/pileup associations. The layout-agnostic fix is sparse sorted `vector<pair<nodeId,target>>` + binary search (like M5), keeping the `nodeSim*` accessor API; it touches `TruthGraph.h`, all three producers and the dictionary. Worth doing, but as a deliberate change with the topology audit as the guard.
+- **M4** ⏸ **deferred (contract change)** — the subgraph hit CSR re-stores `{detId, recHitIndex, energy}` for every ancestor (≈ Σ subtree hits). Storing subgraph spans as indices into the direct-hit storage breaks the `O(1)` contiguous coalesced span that the `Branch` view and `BranchHitAssociator` merge-join rely on (a coalesced subgraph hit sums energies across descendants, so it is not a single direct-hit index). This needs a contract decision (compute-on-read vs store-coalesced); the cheap safe sub-part (drop `recHitIndex` from subgraph storage, re-resolve from the DetId map) is the recommended first step.
+- **M5** ✅ **done** (`d2a67b5cb0c`) — `DetIdRecHitMap` is now a sorted `vector<pair>` + binary search (`add`/`finalize`/`find`); ~6× smaller (8 B/entry vs ~48), cache-friendly lookups. Measured 23104 entries on a PU0 TTbar event; scales to a ~120 MB saving at PU200. Branch-replacement validator bit-identical.
+- **M6** ⬜ — `TruthGraphProducer::produce` / `TruthLogicalGraphProducer::produce` are ~450/480-line functions; extract phases for testability.
+- **M7** ✅ **done** (`1d3b7b5e7d3`) — `collapseIntermediateGenParticleChains` representative walk path-compressed (O(N²)→amortized O(N)); identical representatives. Worst-case microbench (200k-particle chain): 32415 ms → 1.9 ms.
 
 ## Low priority
 
@@ -93,8 +95,11 @@ consistent, clean DAG. `code-format` + `code-checks` clean.
 2. ~~**H5** (mixing-producer CSR scatter + `isConsistent`) — correctness landmine in the largest product; quick mechanical fix.~~ **Done** (`fce7b87314b`).
 3. ~~**H3 + H4** (hit-index `unordered_map`-per-particle; flat inverted index) — biggest memory/cache wins in the hottest producers.~~ **Done** (`fce7b87314b`); H4 = index-flattening only, all-particles default kept on purpose.
 
-**Remaining:**
+4. ~~**H2** (LCA dense matrix)~~ **Done** (`f523cd1ace0`) — visited-set BFS, no dense `k×N` matrix. Microbench (262k-particle tree, 3000 two-input queries): 988.8 µs → 7.2 µs/query (**138×**), 2 MB/query scratch eliminated, identical results.
+5. ~~**M5**~~ **Done** (`d2a67b5cb0c`) and ~~**M7**~~ **Done** (`1d3b7b5e7d3`) — see above.
 
-4. **H2** (LCA dense matrix) on top of H1 — iterate only the visited set, reuse one `dist` buffer.
-5. Storage items **M3 / M4 / M5** together — they shrink the persisted raw/mixed graph and hit index, the flagged scaling risk for pileup.
-6. The readability/robustness items (**M6 / M7**, **L1–L5**) as cleanup.
+**Remaining (each a deliberate change, not a mechanical fix):**
+
+6. **M3** (sparse association storage) — layout-agnostic sorted-pair rework; guard with the topology audit.
+7. **M4** (subgraph hit storage) — needs the compute-on-read vs store-coalesced contract decision; start with dropping `recHitIndex`.
+8. **M1 / M6** and **L1–L5** as cleanup.
