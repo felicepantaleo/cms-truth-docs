@@ -30,16 +30,19 @@ What is done, and what is next.
 
 ## Next — optimization (from the [review](optimization.md))
 
-In suggested order:
+**H1, H3, H4 and H5 are done** (commit `fce7b87314b`): allocation-free graph
+traversals; flat `vector<Hit>`+coalesce hit-index builder; flat sorted CSR inverted
+index in `BranchHitAssociator` (binary search, all-particles default kept on
+purpose); counting-sort cursor CSR scatter + `isConsistent()` in the mixing
+producers. Old-vs-new is bit-identical except summed sim-hit energies, which agree
+to float reassociation (~1e-7 rel; the new detId-sorted sum is deterministic, the
+old hash-bucket sum was not). See [Optimization → Implemented](optimization.md#implemented-commit-fce7b87314b).
 
-1. **H1** — remove the per-node allocation in `parentsOf`/`childrenOf` (O(N²)→O(V+E)
-   on every BFS query).
-2. **H5** — replace the `order`-permutation CSR scatter in the mixing producers with
-   the proven cursor pattern; add `isConsistent()` to the accumulator.
-3. **H3 + H4** — replace the `unordered_map`-per-particle hit-index builder and the
-   all-particles inverted index with flat sorted structures.
-4. **H2** — drop the dense LCA distance matrix.
-5. **M3 / M4 / M5** — shrink the persisted raw/mixed graph, the subgraph hit CSR,
+Remaining, in suggested order:
+
+1. **H2** — drop the dense LCA distance matrix (iterate the visited set; reuse one
+   `dist` buffer). Builds on H1.
+2. **M3 / M4 / M5** — shrink the persisted raw/mixed graph, the subgraph hit CSR,
    and the DetId→RecHit map (the flagged pileup scaling risk).
 
 ## Housekeeping

@@ -1,10 +1,11 @@
 # Optimization review
 
 A performance/quality pass over the package (CPU, memory, storage, readability,
-comments). Findings are **prioritized and actionable**; none are applied yet (see
-the [Roadmap](roadmap.md)). The persistent-data design is sound — the items below
-are concentrated in the navigation layer, the hit-index builder, and two
-robustness fixes in the mixing producers.
+comments). Findings are **prioritized and actionable**. The four high-priority
+items **H1, H3, H4, H5 are implemented** (commit `fce7b87314b`); the remaining
+items are pending (see the [Roadmap](roadmap.md)). The persistent-data design is
+sound — the items below are concentrated in the navigation layer, the hit-index
+builder, and two robustness fixes in the mixing producers.
 
 ## Already well done (keep)
 
@@ -21,11 +22,53 @@ robustness fixes in the mixing producers.
 
 | # | Issue | Fix | Impact |
 |---|---|---|---|
-| **H1** | `parentsOf`/`childrenOf` (`Graph.cc:218-256`) allocate + zero-fill a `vector(nParticles)` dedup buffer **and** return a heap vector — and every BFS (`ancestors`, `descendants`, `firstAncestorWithPdgId`, `firstCommonAncestor`, `lowestCommonAncestor`) calls them per dequeued node → **O(N²) time + allocation** | span-returning core helpers that push into a caller buffer (degree is tiny; dedup with a linear scan); BFS keeps its own single `visited` array | **Order-of-magnitude** speedup on every ancestor/descendant/LCA query; the single most important finding |
-| **H2** | `firstCommonAncestorOf`/`lowestCommonAncestor` scan all `nParticles`; LCA allocates a dense `k×N` int distance matrix | iterate only the visited set; reuse one `dist` buffer + per-ancestor hit counts | Large for pileup-size events; the "which particle did this jet come from" hot path |
-| **H3** | `LogicalGraphHitIndexBuilder` keeps **one `unordered_map` per particle × 4 channels** (`~4·nParticles` hash tables); subgraph aggregation re-hashes each hit ~depth times | per-particle `vector<Hit>` + sort/coalesce; aggregate subgraphs by k-way merge of children's sorted spans | Large alloc/cache win in the **hottest** producer (full calo+tracker hit volume) |
-| **H4** | `BranchHitAssociator` with default (empty) candidate roots treats **every** particle as a root and inserts every ancestor's subgraph hits into the inverted index ≈ O(hits×depth) | don't default to all particles (use direct-hit owners / selector roots); flat sorted `vector<pair<detId,root>>` + binary search | Large memory/CPU win on the documented default path |
-| **H5** | The mixing producers (`TruthGraphAccumulator.cc:311-327`, `TruthGraphMixedProducer.cc:179-196`) build CSR via an `order`-permutation scatter (fragile; relies on non-stable sort matching offsets); the accumulator never calls `isConsistent()` before `put` | use the proven `cursor=offsets; pos=cursor[src]++` scatter (as in `buildCSR`); add `isConsistent()` to the accumulator | Removes a correctness landmine in the **largest** product (mixed signal+pileup); drops an O(E log E) sort |
+| **H1** ✅ | `parentsOf`/`childrenOf` (`Graph.cc:218-256`) allocate + zero-fill a `vector(nParticles)` dedup buffer **and** return a heap vector — and every BFS (`ancestors`, `descendants`, `firstAncestorWithPdgId`, `firstCommonAncestor`, `lowestCommonAncestor`) calls them per dequeued node → **O(N²) time + allocation** | span-returning core helpers that push into a caller buffer (degree is tiny; dedup with a linear scan); BFS keeps its own single `visited` array | **Order-of-magnitude** speedup on every ancestor/descendant/LCA query; the single most important finding |
+| **H2** ⬜ | `firstCommonAncestorOf`/`lowestCommonAncestor` scan all `nParticles`; LCA allocates a dense `k×N` int distance matrix | iterate only the visited set; reuse one `dist` buffer + per-ancestor hit counts | Large for pileup-size events; the "which particle did this jet come from" hot path |
+| **H3** ✅ | `LogicalGraphHitIndexBuilder` keeps **one `unordered_map` per particle × 4 channels** (`~4·nParticles` hash tables); subgraph aggregation re-hashes each hit ~depth times | per-particle `vector<Hit>` + sort/coalesce; aggregate subgraphs by k-way merge of children's sorted spans | Large alloc/cache win in the **hottest** producer (full calo+tracker hit volume) |
+| **H4** ✅ | `BranchHitAssociator` with default (empty) candidate roots treats **every** particle as a root and inserts every ancestor's subgraph hits into the inverted index ≈ O(hits×depth) | don't default to all particles (use direct-hit owners / selector roots); flat sorted `vector<pair<detId,root>>` + binary search | Large memory/CPU win on the documented default path |
+| **H5** ✅ | The mixing producers (`TruthGraphAccumulator.cc:311-327`, `TruthGraphMixedProducer.cc:179-196`) build CSR via an `order`-permutation scatter (fragile; relies on non-stable sort matching offsets); the accumulator never calls `isConsistent()` before `put` | use the proven `cursor=offsets; pos=cursor[src]++` scatter (as in `buildCSR`); add `isConsistent()` to the accumulator | Removes a correctness landmine in the **largest** product (mixed signal+pileup); drops an O(E log E) sort |
+
+### Implemented (commit `fce7b87314b`)
+
+H1, H3, H4 and H5 landed as one pure-performance commit on top of Phase-B B1.
+What was done, and where it deviated from the proposal above:
+
+- **H1** — `parentsOf`/`childrenOf` now delegate to allocation-free
+  `appendParents`/`appendChildren` cores that push immediate-neighbour ids into a
+  caller buffer (callers that need uniqueness do a tiny linear dedup); the
+  BFS/LCA traversals (`ancestorsOf`, `descendantsOf`, `firstAncestorWithPdgIdOf`,
+  `firstCommonAncestorOf`, `lowestCommonAncestor`) reuse a single buffer plus
+  their own `dist`/`seen` array instead of allocating a `vector(nParticles)` per
+  dequeued node. Returned sets and order are unchanged.
+- **H3** — the four per-particle `unordered_map<detId, accumulator>` hit maps are
+  replaced by flat `vector<Hit>` lists, coalesced (sort by detId + sum) lazily;
+  subgraphs aggregate by appending each child's already-coalesced span and
+  coalescing once. Hit sets, counts, recHit indices and recHit/tracker energies
+  are bit-identical to the hash-based build. Summed **sim-hit energies** agree
+  only to float **reassociation** (~1e-7 relative): the new sum runs in
+  deterministic detId order, whereas the old `unordered_map` summed in
+  (non-portable) hash-bucket order — so the new value is the more reproducible of
+  the two. The cppunit tolerance (`1e-6`) covers it.
+- **H4** — the inverted index and per-cell energy map are now flat, sorted
+  CSR-style arrays looked up by binary search (`cellRootsKeys_`/`Offsets_`/
+  `cellRoots_`, `cellEnergyKeys_`/`Values_`). The **all-particles default was
+  deliberately kept**: restricting the candidate roots (the other half of the
+  original H4 proposal) would change matching semantics and break the calo
+  validator, which matches reco objects against *ancestor* CaloParticles. So H4
+  here is the index-flattening only; root-restriction is left as a separate,
+  semantics-changing follow-up.
+- **H5** — both mixing producers build the out-edge CSR with the proven
+  `cursor = offsets; pos = cursor[src]++` counting-sort scatter (no sort, no
+  permutation vector), and the accumulator now asserts `isConsistent()` before
+  `put`.
+
+**Validation (old-vs-new):** clean from-scratch rebuild; 31 cppunit tests pass;
+library topology audit on 8 Run4 relval samples (`cycles=0, multiProd=0`, one
+component/event); branch-replacement validator on TTbar (CaloParticle/SimCluster/
+TrackingParticle all mapped, completeness=1); the gallery dump's per-particle
+`nParents`/`nChildren` and hit counts/sets/recHit-indices/recHit-energies are
+bit-identical to the pre-change dumps; the pile-up accumulator re-runs to a
+consistent, clean DAG. `code-format` + `code-checks` clean.
 
 ## Medium priority
 
@@ -46,8 +89,12 @@ robustness fixes in the mixing producers.
 
 ## Suggested order of attack
 
-1. **H1** (BFS per-node allocation) — biggest win, isolated to `Graph.cc`, unlocks H2.
-2. **H5** (mixing-producer CSR scatter + `isConsistent`) — correctness landmine in the largest product; quick mechanical fix.
-3. **H3 + H4** (hit-index `unordered_map`-per-particle; all-particles inverted index) — biggest memory/cache wins in the hottest producers.
-4. **H2** (LCA dense matrix) on top of H1.
+1. ~~**H1** (BFS per-node allocation) — biggest win, isolated to `Graph.cc`, unlocks H2.~~ **Done** (`fce7b87314b`).
+2. ~~**H5** (mixing-producer CSR scatter + `isConsistent`) — correctness landmine in the largest product; quick mechanical fix.~~ **Done** (`fce7b87314b`).
+3. ~~**H3 + H4** (hit-index `unordered_map`-per-particle; flat inverted index) — biggest memory/cache wins in the hottest producers.~~ **Done** (`fce7b87314b`); H4 = index-flattening only, all-particles default kept on purpose.
+
+**Remaining:**
+
+4. **H2** (LCA dense matrix) on top of H1 — iterate only the visited set, reuse one `dist` buffer.
 5. Storage items **M3 / M4 / M5** together — they shrink the persisted raw/mixed graph and hit index, the flagged scaling risk for pileup.
+6. The readability/robustness items (**M6 / M7**, **L1–L5**) as cleanup.
