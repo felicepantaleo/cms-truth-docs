@@ -41,9 +41,11 @@ Particle ↔ Vertex** graph built by `TruthLogicalGraphProducer` from the raw gr
   interaction is summarized by one artificial `Interaction` source vertex that
   fans out (through artificial connector particles) to its `Upstream`
   (ISR/hard-scatter) and `UnderlyingEvent` sub-vertices, so the whole interaction
-  descends from a single node — the signal is everything reachable from the signal
-  `Interaction` vertex, and each overlaid pile-up interaction gets its own. All
-  carry the genEvent/eventId of the activity they summarize.
+  descends from a single node. The Interaction vertices are keyed by the packed
+  `EncodedEventId` (one per pp collision), so the signal is everything reachable
+  from the signal `Interaction` vertex (bunch crossing 0, event 0) and each overlaid
+  pile-up interaction gets its own. All carry the genEvent/eventId of the activity
+  they summarize.
 - **Hitless SIM subgraphs are pruned** (`postProcessing.dropHitlessSimSubgraphs`,
   default on): every SIM particle whose calorimeter + tracker sim-hit subgraph is
   empty is removed together with its whole downstream subtree, so the logical graph

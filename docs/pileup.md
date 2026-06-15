@@ -75,28 +75,40 @@ breakdown used for these numbers.
     physical; the *mechanism* — provenance, bunch-crossing tagging, connectivity —
     is what is validated. Real minbias pileup is much lighter per interaction.
 
-## Visualizing pileup
+## Signal vs pile-up: how it is meant to separate
 
-A logical graph can be built and dumped from the mixed raw graph directly
-(`truthLogicalGraphProducer` with `src = "mix"`, then `TruthLogicalGraphDumper`),
-and it does carry the pileup: the detectable graph roughly *doubles* against the
-signal-only one (≈10.5k → ≈20.6k logical particles for TTbar + in-time PU ≈ 2).
+The truth graph separates signal from pile-up **by reachability**, not by a flag:
+each interaction is summarized by its own artificial `Interaction` vertex (see the
+[Interface reference](interface.md) and the [TenTau example](examples.md)), and
+those vertices are keyed by the **packed `EncodedEventId`** — one node per pp
+collision. So the signal is everything reachable from the signal Interaction vertex
+(bunch crossing 0, event 0), and each pile-up interaction (distinct `EncodedEventId`)
+gets its own Interaction vertex. The `truth::Particle::eventId` of every node carries
+the same provenance, exactly what the `TruthGraphTopologyChecker` already decodes for
+its signal-vs-pile-up per-bunch-crossing breakdown.
 
-Two things still block a clean, didactic pileup *figure*, and both are tracked work
-rather than rendering problems:
+The provenance *wiring* is in place and round-trips through persistence: the
+accumulator stamps each node's `EncodedEventId`, the logical producer copies it onto
+the SIM-bearing logical particle, and it survives the ROOT dictionary (verified with
+FWLite on the persisted product). A logical graph can be built and dumped from the
+mixed raw graph directly (`truthLogicalGraphProducer` with `src = "mix"`, then
+`TruthLogicalGraphDumper`).
 
+What still blocks a clean, *colored* pile-up figure is upstream of the graph code:
+
+- **The accumulator's pile-up population.** On the self-mixed TTbar sample the mixed
+  raw graph comes out effectively signal-only — ~one signal event's worth of nodes,
+  every `eventId == 0` — even though digitisation was configured with
+  `AVE_10_BX_25ns` pile-up. The per-sub-event `accumulate(PileUpEventPrincipal)` path
+  is not adding the pile-up interactions with their `EncodedEventId`; debugging that
+  (and re-running the DIGI step) is the open item, tracked with B1's "full GEN+SIM
+  for the signal" work. Once the mixed graph actually carries non-trivial `eventId`s,
+  the existing keying turns them into one Interaction vertex per interaction with no
+  further graph changes.
 - **The detectable-truth pruning must be turned off** for the mixed graph
-  (`dropHitlessSimSubgraphs = false`): pileup sim-hits live in the transient
+  (`dropHitlessSimSubgraphs = false`): pile-up sim-hits live in the transient
   `CrossingFrame`, not in the signal `g4SimHits` collections the producer reads, so
-  the pruning would otherwise drop the entire pileup as "hitless".
-- **No GEN merge / provenance on the mixed logical particles yet.** The accumulator
-  links each sub-event natively from `SimTrack`/`SimVertex`, so the mixed logical
-  graph is currently SIM-only (no GEN skeleton) and every node carries the default
-  `eventId`, which means signal-vs-pileup cannot yet be *colored* per node in a dump
-  the way the raw-graph `TruthGraphTopologyChecker` already separates them. Wiring
-  the per-sub-event GEN/`eventId` through to the logical particle (B1 "full GEN+SIM
-  for the signal" + its pileup counterpart) is what will make a provenance-colored
-  pileup view — multiple primary interactions, each its own color — render cleanly.
+  the pruning would otherwise drop the pile-up as "hitless".
 
 ## What remains
 

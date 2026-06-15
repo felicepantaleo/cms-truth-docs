@@ -91,9 +91,10 @@ propagated far enough.
 `bool isArtificial() const` decode `role`. The roles are:
 
 - `VertexRole::Normal` — a real GEN/SIM vertex.
-- `VertexRole::Interaction` — the per-interaction artificial source vertex. It is
-  the single root of one interaction and fans out, through artificial connector
-  particles, to that interaction's `Upstream` and `UnderlyingEvent` sub-vertices.
+- `VertexRole::Interaction` — the per-interaction artificial source vertex, keyed
+  by the packed `EncodedEventId` (one per pp collision). It is the single root of
+  one interaction and fans out, through artificial connector particles, to that
+  interaction's `Upstream` and `UnderlyingEvent` sub-vertices.
 - `VertexRole::Upstream` — an artificial vertex summarizing the truncated
   production context of the selected roots (ISR / beam / initial-state activity).
 - `VertexRole::UnderlyingEvent` — an artificial vertex collecting stable
