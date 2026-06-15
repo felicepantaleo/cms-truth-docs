@@ -87,28 +87,34 @@ gets its own Interaction vertex. The `truth::Particle::eventId` of every node ca
 the same provenance, exactly what the `TruthGraphTopologyChecker` already decodes for
 its signal-vs-pile-up per-bunch-crossing breakdown.
 
-The provenance *wiring* is in place and round-trips through persistence: the
-accumulator stamps each node's `EncodedEventId`, the logical producer copies it onto
-the SIM-bearing logical particle, and it survives the ROOT dictionary (verified with
-FWLite on the persisted product). A logical graph can be built and dumped from the
-mixed raw graph directly (`truthLogicalGraphProducer` with `src = "mix"`, then
-`TruthLogicalGraphDumper`).
+This works end to end. The accumulator stamps each node's `EncodedEventId`
+(signal `(0,0)`, pile-up `(bunch crossing, pile-up index)`); the logical producer
+copies it onto the SIM-bearing logical particle; it round-trips through the ROOT
+dictionary (checked with FWLite); and the `Interaction`-vertex keying turns the
+distinct ids into one Interaction vertex per interaction. Verified on a freshly
+mixed TTbar event with in-time pile-up: the accumulator added the signal plus the
+in-time pile-up sub-events with four distinct `EncodedEventId`s, and the logical
+graph then reported `signalParticles = 27611`, `pileupParticles = 20616` — a clean
+split, no graph changes needed.
 
-What still blocks a clean, *colored* pile-up figure is upstream of the graph code:
+The figure below is a muon-seeded view of that mixed graph
+(`seedPdgIds = {13, -13}`, `dropHitlessSimSubgraphs = false`): the **blue** subgraph
+descends from the signal Interaction vertex (`eid 0`), the **red** one from the
+in-time pile-up interaction (`eid 1`). Signal vs pile-up is just "which Interaction
+vertex do you reach".
 
-- **The accumulator's pile-up population.** On the self-mixed TTbar sample the mixed
-  raw graph comes out effectively signal-only — ~one signal event's worth of nodes,
-  every `eventId == 0` — even though digitisation was configured with
-  `AVE_10_BX_25ns` pile-up. The per-sub-event `accumulate(PileUpEventPrincipal)` path
-  is not adding the pile-up interactions with their `EncodedEventId`; debugging that
-  (and re-running the DIGI step) is the open item, tracked with B1's "full GEN+SIM
-  for the signal" work. Once the mixed graph actually carries non-trivial `eventId`s,
-  the existing keying turns them into one Interaction vertex per interaction with no
-  further graph changes.
+![Signal (blue) vs pile-up (red): two Interaction vertices keyed by EncodedEventId](img/pileup_signal_vs_pileup.svg)
+
+Two practical notes:
+
 - **The detectable-truth pruning must be turned off** for the mixed graph
   (`dropHitlessSimSubgraphs = false`): pile-up sim-hits live in the transient
   `CrossingFrame`, not in the signal `g4SimHits` collections the producer reads, so
   the pruning would otherwise drop the pile-up as "hitless".
+- **Regenerate the mixed sample with current code.** An older `step2_acc.root` in
+  `test/pu_probe/` predates the working provenance and reads back signal-only (all
+  `eventId == 0`); the verified fresh sample is `test/pu_probe/mix_fresh.root`. The
+  accumulator path itself was confirmed correct by re-running the DIGI step.
 
 ## What remains
 
