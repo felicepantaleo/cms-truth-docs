@@ -1,21 +1,11 @@
 # Roadmap
 
-What is done, and what is next.
+What is **not yet done**. For the data model, the validation results, and the
+already-applied performance work, see the respective pages — in particular
+[Implementation characteristics](optimization.md) for the optimizations that have
+landed.
 
-## Done
-
-- Three-layer data model (raw `TruthGraph`, logical `truth::Graph`, hit index) +
-  `Branch` view, `BranchHitAssociator`, `BranchSelector`.
-- Connectivity fix (`PersistencyEmin=0`) and the GEN/SIM **immediate-vertex attach**
-  fix (no mega-vertex, no cycles) — see [Findings](findings.md).
-- Validated as a replacement for `TrackingParticle` / `CaloParticle` / `SimCluster`
-  on eight relval topologies — see [Replacing truth objects](replacing-truth-objects.md).
-- Rebased to `CMSSW_20_0_0_pre1` with no behavior change — see [Validation](validation.md).
-- Pileup **Phase A** (MixCollection prototype) and **Phase B / B1**
-  (`TruthGraphAccumulator`, configurable, in-time pileup by default, collapsed
-  pileup GEN) — see [Pileup](pileup.md).
-
-## Next — pileup / Phase B
+## Pileup / Phase B
 
 1. **Full GEN+SIM for the signal** in `TruthGraphAccumulator`
    (`collapseSignalGen=false` currently leaves the signal SIM-only). Requires
@@ -28,31 +18,51 @@ What is done, and what is next.
 4. **B4 — CPfromPU-style simplification**: thresholded/collapsed pileup for PU200
    storage (mirroring `removeCPFromPU`).
 
-## Next — optimization (from the [review](optimization.md))
+## Validation
 
-**H1, H3, H4 and H5 are done** (commit `fce7b87314b`): allocation-free graph
-traversals; flat `vector<Hit>`+coalesce hit-index builder; flat sorted CSR inverted
-index in `BranchHitAssociator` (binary search, all-particles default kept on
-purpose); counting-sort cursor CSR scatter + `isConsistent()` in the mixing
-producers. Old-vs-new is bit-identical except summed sim-hit energies, which agree
-to float reassociation (~1e-7 rel; the new detId-sorted sum is deterministic, the
-old hash-bucket sum was not). See [Optimization → Implemented](optimization.md#implemented-commit-fce7b87314b).
+- **Wire the Branch validators into the release sequences.** The DQM analyzers,
+  associators and harvesters exist and run standalone; hooking them into
+  `globalValidation` / `postValidation` behind `enableTruth` is still pending — see
+  [Validation](validation.md).
+- **Disjoint "interesting particles" reference for the reco-side validators.** The
+  generic reco-side efficiency/merge/duplicate is only well-defined against a
+  disjoint (antichain) set of truth branches. A flat PDG-id selection is a
+  sufficient antichain only for non-showering species (muons), so the two reco-side
+  modules are kept **opt-in** (out of the default validation sequence) until the
+  physically correct, detector-dependent reference — the `BranchSelector`
+  "interesting particles" antichain (`CaloParticle`-like for calo,
+  `TrackingParticle`-like for tracking) — is wired in. See the caveat in
+  [Validation](validation.md#reco-side-validators-generic-hit-exposure).
 
-Also done: **H2** (`f523cd1ace0`, visited-set LCA, 138× on a 262k-particle tree),
-**M5** (`d2a67b5cb0c`, DetId→RecHit map as a sorted vector, ~6×) and **M7**
-(`1d3b7b5e7d3`, path-compressed collapse walk).
+## Storage / data layout (deliberate changes, not mechanical)
 
-Remaining (deliberate changes, not mechanical — see [Optimization](optimization.md)):
+1. **M3 — sparse, layout-agnostic association storage** in `TruthGraph`. Today
+   `simTrackToGen`/`simTrackToVtx`/`simVtxToGen` are full-length over all nodes;
+   ranging them by a single base requires contiguous SimTrack/SimVertex nodes, which
+   holds for the signal producer but **not** for the accumulator's per-sub-event
+   layout — a naive range would silently corrupt mixed/pileup associations. The fix
+   is sparse sorted `vector<pair<nodeId,target>>` + binary search (like the
+   DetId-map rework), keeping the `nodeSim*` API; touches `TruthGraph.h`, all three
+   producers and the dictionary. Guard with the topology audit.
+2. **M4 — subgraph hit-storage reduction.** The subgraph hit CSR re-stores
+   `{detId, recHitIndex, energy}` for every ancestor (≈ Σ subtree hits). Storing
+   subgraph spans as indices into the direct-hit storage breaks the contiguous
+   coalesced span the `Branch` view and `BranchHitAssociator` merge-join rely on, so
+   it needs a compute-on-read vs store-coalesced contract decision; the cheap safe
+   first step is to drop `recHitIndex` from subgraph storage and re-resolve it from
+   the DetId map.
 
-1. **M3** — sparse, layout-agnostic association storage in `TruthGraph` (a single
-   base range is unsafe for the accumulator's per-sub-event node layout).
-2. **M4** — subgraph hit-storage reduction; needs the compute-on-read vs
-   store-coalesced contract decision (start by dropping `recHitIndex`).
-3. **M1 / M6 / L1–L5** cleanup.
+## Cleanup
 
-## Housekeeping
-
-- **Refresh the package README** (`PhysicsTools/TruthInfo/README.md`): it still
+- **M1** — `Branch` reruns a full BFS `traverse()` on every accessor
+  (`invisibleEnergy()` runs it twice). Compute `stableLeaves()` once and derive all
+  kinematics in one pass; offer an opt-in materialized branch for loops over many
+  branches.
+- **M6** — `TruthGraphProducer::produce` / `TruthLogicalGraphProducer::produce` are
+  large multi-phase functions; extract phases for testability.
+- **L1–L5** — `std::ranges` transform views for one-shot view-returning helpers;
+  avoid redundant reco-hit copies in `bestBranches`; cap the diagnostic O(n²) scan
+  in `TruthGraphTopologyChecker`; **refresh the stale package README** (it still
   references `TruthLogicalGraphHitIndexProducer`, an old `python/` layout, and lists
-  `truth::Branch` as "not yet implemented" (it is) — see optimization item L4.
-- De-duplicate the `EncodedEventId` pack/unpack helper into one shared header (L5).
+  `truth::Branch` as "not yet implemented"); de-duplicate the `EncodedEventId`
+  pack/unpack helper into one shared header.

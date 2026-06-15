@@ -20,7 +20,7 @@ the inputs just never delivered it.
 
 ## Two routes
 
-### Phase A — `MixCollection` prototype (committed)
+### Phase A — `MixCollection` prototype
 
 `TruthGraphMixedProducer` reads the `CrossingFrame<SimTrack/SimVertex>` via
 `MixCollection`, keyed by `(EncodedEventId, localId)`. Because crossing frames are

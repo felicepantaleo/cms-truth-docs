@@ -15,16 +15,15 @@ legacy truth objects (`TrackingParticle`, `CaloParticle`, `SimCluster`).
     behind a new `enableTruth` process modifier, so standard workflows are
     unaffected.
 
-## What this PR adds
+## What this adds
 
 A new package `PhysicsTools/TruthInfo` (plus a `SimHitToRecHitMap` producer, an
-`enableTruth` modifier, and a validation sequence). Overall diff: **56 files,
-+12 108 / −0** — purely additive, with only three pre-existing files touched, all
-behind `enableTruth`.
+`enableTruth` modifier, and a validation sequence). The work is purely additive:
+only a handful of pre-existing files are touched, all behind `enableTruth`.
 
 | Area | What |
 |---|---|
-| New package | `PhysicsTools/TruthInfo` (46 files): data model, producers, dumpers, flat tables, the `Branch` view, hit associator, selector, tests |
+| New package | `PhysicsTools/TruthInfo`: data model, producers, dumpers, flat tables, the `Branch` view, hit associator, selector, tests |
 | New producer | `SimCalorimetry/HGCalAssociatorProducers`: `SimHitToRecHitMapProducer` + `DetIdRecHitMap` (not HGCal-specific) |
 | New modifier | `Configuration/ProcessModifiers/enableTruth_cff` |
 | New sequence | `Validation/Configuration/truthPrevalidation_cff` |
@@ -60,9 +59,17 @@ On top of the graph:
 ## Read next
 
 - [Data model](data-model.md) — the layers, the `Branch` view, the associator and selector.
+- [How to use the graph](usage.md) — enabling the producers and a worked tour of the navigation, selection, and hit-matching API.
+- [Worked examples](examples.md) — guided walkthroughs of two real events (Tau and Z→μμ).
 - [Findings & changes](findings.md) — the existing behavior we discovered and what we changed (and why).
 - [Replacing truth objects](replacing-truth-objects.md) — how `Branch` can stand in for `TrackingParticle` / `CaloParticle` / `SimCluster`, with validation.
-- [Validation](validation.md) — the relval workflows, topology audits, and the DOT gallery, with data.
+- [Validation](validation.md) — the relval workflows, topology audits, the DOT gallery, and the reco-side validators, with data.
 - [Pileup](pileup.md) — the pileup investigation and the Phase-A/B mixing work.
-- [Optimization](optimization.md) — CPU/memory/storage/readability review.
+- [Implementation characteristics](optimization.md) — the applied performance/layout design choices.
 - [Roadmap](roadmap.md) — what's next.
+
+## Contact
+
+This is a prototype and is **not yet open to external contributions**. Questions and
+feedback are welcome and go to the author: **Felice Pantaleo** (CERN),
+[felice.pantaleo@cern.ch](mailto:felice.pantaleo@cern.ch).

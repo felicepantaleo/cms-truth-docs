@@ -24,11 +24,14 @@ theme:
 nav:
   - Home: index.md
   - Data model: data-model.md
+  - How to use the graph: usage.md
+  - Interface reference: interface.md
+  - Worked examples: examples.md
   - Findings & changes: findings.md
   - Replacing truth objects: replacing-truth-objects.md
   - Validation: validation.md
   - Pileup: pileup.md
-  - Optimization: optimization.md
+  - Implementation characteristics: optimization.md
   - Roadmap: roadmap.md
 
 markdown_extensions:
