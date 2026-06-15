@@ -1,0 +1,11 @@
+include:
+  - project: 'authoring/documentation/mkdocs-ci'
+    file: 'mkdocs-gitlab-pages.gitlab-ci.yml'
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+variables:
+  SECRET_DETECTION_ENABLED: 'true'
+
+# Override secret_detection to use the validation stage
+secret_detection:
+  stage: validation
