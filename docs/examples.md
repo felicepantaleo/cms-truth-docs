@@ -33,37 +33,46 @@ gun gives a rich spread of final states in one event: leptonic τ → ℓ ν<sub
 test for a truth graph: ten independent decay branches, each with its own
 neutrinos (invisible energy), charged tracks, and electromagnetic/hadronic shower.
 
-The image below is the **GEN-level decay structure** of one event — the ten taus
-and their immediate decay products, before the Geant4 shower. (The full logical
-graph for this sample has ~10<sup>4</sup> nodes once every shower secondary is
-attached; the GEN core is the didactic part, and the [hit index](data-model.md)
-is what links each of these particles to its detector footprint.)
+The image below is the **seed-rooted view** of one event: the graph is cut so that
+each τ is a *true root* and the figure is its GEN-level decay structure — the ten
+taus and their immediate decay products, before the Geant4 shower. Because nothing
+sits above the taus, the ten decays come out as **ten completely disjoint
+subgraphs**, one per seed. (The full *detectable* logical graph for this sample has
+~10<sup>4</sup> nodes once every hit-leaving shower secondary is attached; the GEN
+core is the didactic part, and the [hit index](data-model.md) is what links each of
+these particles to its detector footprint.)
 
-![TenTau GEN-level decay structure: ten taus and their decay products](img/tentau_gen_event9.svg)
+![TenTau seed-rooted view: ten taus, each its own disjoint decay subgraph](img/tentau_seedrooted.svg)
 
 What to look at:
 
-- **Ten τ roots from the primary vertex.** The interaction point — the GEN-only
-  (blue) diamond at the far left — has exactly ten outgoing τ particles
-  (blue, pdgId ±15). Each τ then has its own decay vertex and a small subtree.
-- **The varied decay modes.** Following each τ to its decay vertex you find the
+- **Ten τ roots, ten disjoint subgraphs.** Each gold τ (pdgId ±15) is a graph root
+  with no production vertex above it — there is no shared primary vertex and no
+  upstream/underlying-event context, so the event is literally ten independent
+  trees. This is the cleanest way to ask "what came from *this* seed".
+- **The varied decay modes.** Following each τ to its decay products you find the
   full menu: hadronic τ → π<sup>±</sup> (π<sup>0</sup>, K…) ν<sub>τ</sub> in both
   1-prong and 3-prong topologies, plus a leptonic τ → μ ν<sub>μ</sub> ν<sub>τ</sub>
-  and a τ → e ν<sub>e</sub> ν<sub>τ</sub>. The charged, hit-leaving daughters
-  (π<sup>±</sup>, μ, e, and the γ from π<sup>0</sup>→γγ) show up **red** — these are
-  the merged GEN+SIM particles Geant4 tracked through the detector — while the
-  neutral/generator-only legs (π<sup>0</sup>, K<sup>0</sup>, and every neutrino)
-  stay **blue**.
+  and a τ → e ν<sub>e</sub> ν<sub>τ</sub>.
 - **Neutrinos are the invisible leaves.** Every branch terminates in at least one
-  **τ neutrino** (pdgId ±16), plus a ν<sub>μ</sub>/ν<sub>e</sub> in the leptonic
-  legs — blue leaves with no hits, exactly what `Branch::visibleP4()` excludes and
+  **τ neutrino** (ν, pdgId ±16), plus a ν<sub>μ</sub>/ν<sub>e</sub> in the leptonic
+  legs — leaves with no hits, exactly what `Branch::visibleP4()` excludes and
   `invisibleEnergy()` measures.
 
-How the **Branch** selection isolates this: the gallery view is produced with
-`seedPdgIds = {15, -15}` and `seedParentDepth = 1`, so each τ becomes a
-[Branch](usage.md#the-branch-subgraph-view-and-selecting-particles) root and its
-whole downstream subtree is kept. In code this is the same as building one Branch
-per τ and asking it for its leaves and kinematics:
+How the **Branch** selection isolates this: the view is produced with
+`seedPdgIds = {15, -15}`, `seedParentDepth = 0`, `keepStableSpectators = false` and
+`attachSelectionSources = false`, so each τ becomes a true root of its own
+[Branch](usage.md#the-branch-subgraph-view-and-selecting-particles) with its whole
+downstream subtree kept and nothing above it. With the standalone dumper that is
+
+```bash
+cmsRun dumpTruthGraphsFromGENSIMRECO_cfg.py file:step3.root \
+       -s 15,-15 -d 0 --no-keepSpectators --no-attachSources
+```
+
+(Drop `--no-attachSources` and the ten taus instead hang off one shared artificial
+*Upstream* vertex, i.e. a single connected component.) In code this is the same as
+building one Branch per τ and asking it for its leaves and kinematics:
 
 ```cpp
 truth::Branch tauBranch(&graph, tau.id());          // Subtree closure

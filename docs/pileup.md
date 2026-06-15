@@ -75,6 +75,29 @@ breakdown used for these numbers.
     physical; the *mechanism* — provenance, bunch-crossing tagging, connectivity —
     is what is validated. Real minbias pileup is much lighter per interaction.
 
+## Visualizing pileup
+
+A logical graph can be built and dumped from the mixed raw graph directly
+(`truthLogicalGraphProducer` with `src = "mix"`, then `TruthLogicalGraphDumper`),
+and it does carry the pileup: the detectable graph roughly *doubles* against the
+signal-only one (≈10.5k → ≈20.6k logical particles for TTbar + in-time PU ≈ 2).
+
+Two things still block a clean, didactic pileup *figure*, and both are tracked work
+rather than rendering problems:
+
+- **The detectable-truth pruning must be turned off** for the mixed graph
+  (`dropHitlessSimSubgraphs = false`): pileup sim-hits live in the transient
+  `CrossingFrame`, not in the signal `g4SimHits` collections the producer reads, so
+  the pruning would otherwise drop the entire pileup as "hitless".
+- **No GEN merge / provenance on the mixed logical particles yet.** The accumulator
+  links each sub-event natively from `SimTrack`/`SimVertex`, so the mixed logical
+  graph is currently SIM-only (no GEN skeleton) and every node carries the default
+  `eventId`, which means signal-vs-pileup cannot yet be *colored* per node in a dump
+  the way the raw-graph `TruthGraphTopologyChecker` already separates them. Wiring
+  the per-sub-event GEN/`eventId` through to the logical particle (B1 "full GEN+SIM
+  for the signal" + its pileup counterpart) is what will make a provenance-colored
+  pileup view — multiple primary interactions, each its own color — render cleanly.
+
 ## What remains
 
 See the [Roadmap](roadmap.md): full GEN+SIM for the signal (factor the producer
