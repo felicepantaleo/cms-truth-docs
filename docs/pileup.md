@@ -111,10 +111,11 @@ Two practical notes:
   (`dropHitlessSimSubgraphs = false`): pile-up sim-hits live in the transient
   `CrossingFrame`, not in the signal `g4SimHits` collections the producer reads, so
   the pruning would otherwise drop the pile-up as "hitless".
-- **Regenerate the mixed sample with current code.** An older `step2_acc.root` in
-  `test/pu_probe/` predates the working provenance and reads back signal-only (all
-  `eventId == 0`); the verified fresh sample is `test/pu_probe/mix_fresh.root`. The
-  accumulator path itself was confirmed correct by re-running the DIGI step.
+- **The mixed sample must be produced with current code.** An older
+  `test/pu_probe/step2_acc.root` predated the working provenance and read back
+  signal-only (all `eventId == 0`). It has been regenerated from a clean build
+  (full DIGI + in-time pile-up, 3 events) and now carries the provenance:
+  `signalParticles = 69549`, `pileupParticles = 269076` across the three events.
 
 ## What remains
 
