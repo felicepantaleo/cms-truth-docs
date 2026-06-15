@@ -33,23 +33,26 @@ gun gives a rich spread of final states in one event: leptonic τ → ℓ ν<sub
 test for a truth graph: ten independent decay branches, each with its own
 neutrinos (invisible energy), charged tracks, and electromagnetic/hadronic shower.
 
-The image below is the **seed-rooted view** of one event: the graph is cut so that
-each τ is a *true root* and the figure is its GEN-level decay structure — the ten
-taus and their immediate decay products, before the Geant4 shower. Because nothing
-sits above the taus, the ten decays come out as **ten completely disjoint
-subgraphs**, one per seed. (The full *detectable* logical graph for this sample has
-~10<sup>4</sup> nodes once every hit-leaving shower secondary is attached; the GEN
-core is the didactic part, and the [hit index](data-model.md) is what links each of
-these particles to its detector footprint.)
+The image below is the GEN-level decay structure of one event — the ten taus and
+their immediate decay products, before the Geant4 shower — with one deliberate
+feature: **all ten taus hang off a single artificial "signal" upstream vertex**
+(red, on the left). That one vertex is what lets you say *exactly* what is signal
+and what is not: the signal is, by definition, everything reachable from it. When
+pile-up is overlaid, each extra interaction gets its own artificial source vertex,
+so signal vs pile-up becomes a plain reachability test rather than a guess. (The
+full *detectable* logical graph for this sample has ~10<sup>4</sup> nodes once every
+hit-leaving shower secondary is attached; the GEN core is the didactic part, and the
+[hit index](data-model.md) is what links each of these particles to its detector
+footprint.)
 
-![TenTau seed-rooted view: ten taus, each its own disjoint decay subgraph](img/tentau_seedrooted.svg)
+![TenTau: ten taus from a single artificial signal upstream vertex](img/tentau_signal.svg)
 
 What to look at:
 
-- **Ten τ roots, ten disjoint subgraphs.** Each gold τ (pdgId ±15) is a graph root
-  with no production vertex above it — there is no shared primary vertex and no
-  upstream/underlying-event context, so the event is literally ten independent
-  trees. This is the cleanest way to ask "what came from *this* seed".
+- **One signal vertex, ten τ branches.** The red box is the artificial upstream
+  vertex; its ten outgoing edges are the ten τ particles (gold, pdgId ±15). It
+  carries the signal provenance (bunch crossing 0, event 0), so descending from it
+  enumerates the whole signal and nothing else.
 - **The varied decay modes.** Following each τ to its decay products you find the
   full menu: hadronic τ → π<sup>±</sup> (π<sup>0</sup>, K…) ν<sub>τ</sub> in both
   1-prong and 3-prong topologies, plus a leptonic τ → μ ν<sub>μ</sub> ν<sub>τ</sub>
@@ -59,20 +62,21 @@ What to look at:
   legs — leaves with no hits, exactly what `Branch::visibleP4()` excludes and
   `invisibleEnergy()` measures.
 
-How the **Branch** selection isolates this: the view is produced with
-`seedPdgIds = {15, -15}`, `seedParentDepth = 0`, `keepStableSpectators = false` and
-`attachSelectionSources = false`, so each τ becomes a true root of its own
-[Branch](usage.md#the-branch-subgraph-view-and-selecting-particles) with its whole
-downstream subtree kept and nothing above it. With the standalone dumper that is
+How the **Branch** selection produces this: the view is cut with
+`seedPdgIds = {15, -15}`, `seedParentDepth = 0` and `keepStableSpectators = false`,
+keeping each τ and its downstream subtree; with `attachSelectionSources = true`
+(the default) the truncated upstream is summarized into the single shared signal
+vertex. With the standalone dumper that is
 
 ```bash
 cmsRun dumpTruthGraphsFromGENSIMRECO_cfg.py file:step3.root \
-       -s 15,-15 -d 0 --no-keepSpectators --no-attachSources
+       -s 15,-15 -d 0 --no-keepSpectators
 ```
 
-(Drop `--no-attachSources` and the ten taus instead hang off one shared artificial
-*Upstream* vertex, i.e. a single connected component.) In code this is the same as
-building one Branch per τ and asking it for its leaves and kinematics:
+(Pass `--no-attachSources` instead and each τ becomes a true root of its own,
+giving ten *disjoint* subgraphs with no common vertex — useful when you want each
+seed in isolation rather than a signal-vs-rest split.) In code each τ is one Branch;
+ask it for its leaves and kinematics:
 
 ```cpp
 truth::Branch tauBranch(&graph, tau.id());          // Subtree closure
