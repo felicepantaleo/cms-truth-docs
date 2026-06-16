@@ -99,7 +99,8 @@ int nProng = std::count_if(leaves.begin(), leaves.end(), [](truth::Particle cons
 
 Each leaf's calorimeter and tracker hits are available through the
 [hit index](usage.md#hit-content-and-matching-reco-objects)
-(`subgraphHits` / `trackerSubgraphHits`), so the τ Branch carries the union of its
+(`subgraphHits(HitChannel::HGCalCalo, …)` / `subgraphHits(HitChannel::Tracker, …)`),
+so the τ Branch carries the union of its
 daughters' detector footprints — the basis for matching a reco jet or track back to
 "which τ did this come from".
 
@@ -147,7 +148,7 @@ if (auto z = muMinus.firstCommonAncestor(muPlus); z && z->pdgId() == 23) { /* ..
 // match a reco::Track to the muon branch by shared tracker hits:
 truth::BranchHitAssociator trk(hitIndex, /*roots=*/{},
                                truth::BranchHitAssociator::Metric::SharedHits,
-                               /*useTracker=*/true);
+                               truth::HitChannel::Tracker);
 auto best = trk.bestBranches(truth::recoHits(recoTrack));
 ```
 

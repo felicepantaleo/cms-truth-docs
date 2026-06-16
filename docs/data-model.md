@@ -85,25 +85,69 @@ Particle ↔ Vertex** graph built by `TruthLogicalGraphProducer` from the raw gr
 ## Layer 3 — `truth::LogicalGraphHitIndex`
 
 `PhysicsTools/TruthInfo/interface/LogicalGraphHitIndex.h`. A per-logical-particle
-calorimeter + tracker hit index, built by `LogicalGraphHitIndexProducer` from
-`PCaloHit`/`PSimHit` plus the DetId→RecHit-index map from `SimHitToRecHitMapProducer`.
+hit index spanning **N detector channels**, built by `LogicalGraphHitIndexProducer`
+from `PCaloHit`/`PSimHit` plus the DetId→RecHit-index map from
+`SimHitToRecHitMapProducer`.
 
-- **Direct hits** — a single particle's local detector contribution.
-- **Subgraph hits** — the full detector footprint of a shower / decay branch
-  (recursive subtree aggregation), stored as a **contiguous, DetId-sorted span**
-  (CSR), so two particles' footprints can be merged by a zero-gather merge-join.
-- Separate **calo** and **tracker** channels (`subgraphHits` vs
-  `trackerSubgraphHits`).
-- Each `Hit` is `{detId, recHitIndex, energy}`; `recHitIndex` is the position in
-  the global RecHit ordering from `SimHitToRecHitMapProducer` (the order is HGCal
-  collections first, then PF collections — changing it changes every index).
+Channels are keyed by an enum so new detectors can be added without new hardcoded
+members:
+
+```cpp
+enum class HitChannel : uint8_t {
+  HGCalCalo = 0,  // calorimeter PCaloHits, recHit-mapped via the DetId->RecHit map
+  Tracker   = 1,  // tracker PSimHits, energy = energyLoss, no recHit link
+  MTD       = 2,  // MIP timing layer (BTL/ETL)
+  Muon      = 3   // muon chambers (DT/CSC/RPC/GEM)
+};
+inline constexpr std::size_t kNumHitChannels = 4;
+```
+
+Each channel keeps its own per-particle hits (different DetId spaces, metrics and
+recHit links never mix):
+
+- **Direct hits** — a single particle's local detector contribution (the hits on its
+  own `SimTrack`).
+- **Subgraph hits** — the full detector footprint of a shower / decay branch (its own
+  hits plus those of every logical descendant), coalesced and stored as a
+  **contiguous, DetId-sorted span** (CSR), so two particles' footprints can be merged
+  by a zero-gather merge-join.
+
+A channel is one `Channel { directOffsets, directHits, subgraphOffsets, subgraphHits }`
+CSR struct; the per-particle spans are reached through the channel accessors:
+
+| Method | Returns |
+|---|---|
+| `directHits(HitChannel, particleId)` | `std::span<const Hit>` — particle's direct hits in that channel |
+| `subgraphHits(HitChannel, particleId)` | `std::span<const Hit>` — particle's subgraph hits in that channel |
+| `hasChannel(HitChannel)` | whether the channel is filled |
+| `channel(HitChannel)` | the raw `Channel const&` (flat vectors, for whole-channel scans) |
+
+- Each `Hit` is `{detId, recHitIndex, energy}` (unchanged). `recHitIndex` is the
+  position in the global RecHit ordering from `SimHitToRecHitMapProducer` and is set
+  only for channels that carry a DetId→RecHit link (`HGCalCalo`); for the tracker it
+  stays `Hit::invalidRecHitIndex` (the order is HGCal collections first, then PF
+  collections — changing it changes every index). `Hit::hasRecHit()` tests validity.
 
 !!! note "Technical details"
-    The builder uses flat, lazily-coalesced `vector<Hit>` per particle (not a hash
-    map per particle × channel) and aggregates subgraphs by a k-way merge of sorted
-    spans; the `DetIdRecHitMap` is a sorted `vector<pair>` + binary search (~6×
-    smaller than a hash map). See
+    The builder uses flat, lazily-coalesced `vector<Hit>` per particle and channel
+    (not a hash map per particle × channel) and aggregates subgraphs by a k-way merge
+    of sorted spans; the `DetIdRecHitMap` is a sorted `vector<pair>` + binary search
+    (~6× smaller than a hash map). See
     [Implementation characteristics](optimization.md#flat-per-particle-hit-index).
+
+!!! info "Adding detector channels (planned / in-progress)"
+    `HitChannel::MTD` and `HitChannel::Muon` are declared but **not yet filled** — the
+    channel-enum design exists precisely so they can be added without new hardcoded
+    members. The intended sources:
+
+    - **MTD** — filled from `MtdSimLayerCluster` (already keyed by `SimTrack` trackId)
+      via the official `MtdRecoClusterToSimLayerClusterAssociation`, whose recHit is the
+      `FTLCluster`; MTD carries a DetId→RecHit link, so its `recHitIndex` will be set.
+    - **Muon** — filled per subsystem from the `SimMuon/MCTruth` DigiSimLink associators
+      (GEM/RPC/CSC/DT). ME0 has no rechits and is left out.
+
+    Until those producers land, `hasChannel(HitChannel::MTD)` /
+    `hasChannel(HitChannel::Muon)` return `false`.
 
 ## `truth::Branch` — the subgraph view
 
@@ -138,7 +182,8 @@ object, efficiently finds the best truth branches.
   DetId-sorted span.
 - **Metrics:** `SharedEnergy` (the HGCal by-hits score:
   `score = (1/Σ(f·E)²) · Σ max(0, f_reco − f_branch)²·E²`) and `SharedHits`.
-- Calo or tracker channel (`useTracker`).
+- Works on any one channel, selected by a `HitChannel` constructor argument
+  (default `HitChannel::HGCalCalo`).
 
 !!! note "Technical details"
     The inverted index and per-cell energy map are flat, sorted CSR-style arrays

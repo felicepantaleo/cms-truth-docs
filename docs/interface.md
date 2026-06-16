@@ -16,7 +16,7 @@ signature below is copied from the authoritative headers in
     | `truth::BranchSelector` | `interface/BranchSelector.h` |
     | `truth::BranchHitAssociator`, `truth::RecoHit`, `truth::BranchMatch`, `truth::HasTruthHits` | `interface/BranchHitAssociator.h` |
     | `truth::recoHits(...)` adapters | `interface/RecoHitAdapters.h` |
-    | `truth::LogicalGraphHitIndex` | `interface/LogicalGraphHitIndex.h` |
+    | `truth::LogicalGraphHitIndex`, `truth::HitChannel` | `interface/LogicalGraphHitIndex.h` |
 
 ## The bipartite Particle ↔ Vertex CSR model
 
@@ -348,6 +348,46 @@ Config const& config() const;
 
 Charge for `chargedOnly` comes from `HepPDT::ParticleID(pdgId).threeCharge()`.
 
+## `truth::LogicalGraphHitIndex`
+
+The per-logical-particle hit index, indexed by particle id and by detector
+**channel**. Channels are keyed by an enum so detectors can be added without new
+hardcoded members:
+
+```cpp
+enum class HitChannel : uint8_t { HGCalCalo = 0, Tracker = 1, MTD = 2, Muon = 3 };
+inline constexpr std::size_t kNumHitChannels = 4;
+```
+
+Each particle has, per channel, its **direct** hits (on its own `SimTrack`) and its
+**subgraph** hits (its own plus every logical descendant's, coalesced and
+DetId-sorted). The accessors take the channel first, then the particle id:
+
+```cpp
+uint32_t                     nParticles() const;
+static constexpr std::size_t nChannels();   // == kNumHitChannels
+
+std::span<const Hit>  directHits(HitChannel channel, uint32_t particleId) const;
+std::span<const Hit>  subgraphHits(HitChannel channel, uint32_t particleId) const;
+
+bool                  hasChannel(HitChannel channel) const;   // channel is filled
+Channel const&        channel(HitChannel channel) const;      // raw flat storage
+```
+
+A `Hit` is `{ uint32_t detId; uint32_t recHitIndex; float energy; }` with
+`bool hasRecHit() const` (⇔ `recHitIndex != Hit::invalidRecHitIndex`). `recHitIndex`
+is set only for channels carrying a DetId→RecHit link (`HGCalCalo`); the tracker
+leaves it invalid. A `Channel` is the CSR struct
+`{ directOffsets, directHits, subgraphOffsets, subgraphHits }`, exposed for callers
+that scan a whole channel (e.g. `BranchHitAssociator`'s inverted-index build); most
+consumers use the span accessors above.
+
+!!! note "Empty channels return empty spans"
+    `directHits`/`subgraphHits` on an unfilled channel (today `MTD`/`Muon`) or an
+    out-of-range particle id return an **empty span**, not an error. Gate on
+    `hasChannel(channel)` if you need to distinguish "no hits" from "channel not
+    built".
+
 ## `truth::BranchHitAssociator`
 
 Matches reco objects to truth branches by shared detector hits. Built once per
@@ -361,7 +401,7 @@ enum class Metric { SharedEnergy, SharedHits };
 explicit BranchHitAssociator(LogicalGraphHitIndex const& hitIndex,
                              std::vector<uint32_t> candidateRoots = {},
                              Metric metric = Metric::SharedEnergy,
-                             bool useTracker = false);
+                             HitChannel channel = HitChannel::HGCalCalo);
 
 std::vector<BranchMatch> bestBranches(std::span<const RecoHit> recoHits,
                                       std::size_t maxResults = 0) const;  // 0 = all
@@ -396,8 +436,9 @@ std::vector<RecoHit> truth::recoHits(ticl::Trackster const& trackster,
   (the convention the calo association producers use).
 - `Metric::SharedHits` counts shared cells (`sharedEnergy` then holds that count);
   the natural metric for the tracker, where hits carry no per-cell energy.
-- `useTracker = true` switches `bestBranches` from the calo channel
-  (`subgraphHits`) to the tracker channel (`trackerSubgraphHits`).
+- The `channel` argument selects which `HitChannel` of the hit index `bestBranches`
+  matches against — `HitChannel::HGCalCalo` (the default) for calorimeter objects,
+  `HitChannel::Tracker` for tracks, and so on once MTD/Muon are filled.
 
 See [How to use the graph → matching an arbitrary reco object](usage.md#matching-an-arbitrary-reco-object-to-a-branch)
 for end-to-end snippets, and [Physics questions](examples.md#physics-questions-the-interface-answers)

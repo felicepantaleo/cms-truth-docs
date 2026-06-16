@@ -316,20 +316,26 @@ if (select(branch)) { /* passes */ }
 
 ## Hit content and matching reco objects
 
-The hit index answers, per logical particle, two questions: which calorimeter
-SimHits it produced **directly**, and which were produced by its whole **subgraph**
-(the full shower / decay-branch footprint). Tracker simhits live in a separate
-channel.
+The hit index answers, per logical particle and per detector **channel**, two
+questions: which SimHits the particle produced **directly**, and which its whole
+**subgraph** produced (the full shower / decay-branch footprint). The channels are
+keyed by `truth::HitChannel` (`HGCalCalo`, `Tracker`, and the planned `MTD` / `Muon`),
+each with its own DetId space and metric. The accessors take the channel first, then
+the particle id:
 
 ```cpp
 #include "PhysicsTools/TruthInfo/interface/LogicalGraphHitIndex.h"
 
 auto const& hitIndex = event.get(hitIndexToken_);  // truth::LogicalGraphHitIndex
+using truth::HitChannel;
 
 for (uint32_t pid = 0; pid < hitIndex.nParticles(); ++pid) {
-  std::span<const truth::LogicalGraphHitIndex::Hit> direct   = hitIndex.directHits(pid);
-  std::span<const truth::LogicalGraphHitIndex::Hit> subgraph = hitIndex.subgraphHits(pid);
-  std::span<const truth::LogicalGraphHitIndex::Hit> trk      = hitIndex.trackerSubgraphHits(pid);
+  std::span<const truth::LogicalGraphHitIndex::Hit> direct =
+      hitIndex.directHits(HitChannel::HGCalCalo, pid);
+  std::span<const truth::LogicalGraphHitIndex::Hit> subgraph =
+      hitIndex.subgraphHits(HitChannel::HGCalCalo, pid);
+  std::span<const truth::LogicalGraphHitIndex::Hit> trk =
+      hitIndex.subgraphHits(HitChannel::Tracker, pid);
 
   float e = 0.f;
   for (auto const& h : subgraph) {
@@ -340,11 +346,13 @@ for (uint32_t pid = 0; pid < hitIndex.nParticles(); ++pid) {
 }
 ```
 
-Each `Hit` is `{detId, recHitIndex, energy}`; calo subgraph spans are contiguous
-and DetId-sorted, so two particles' footprints merge by a linear merge-join.
-Tracker hits carry no per-cell energy (`recHitIndex` stays invalid), so tracker
-matching is by shared-hit multiplicity. Check `hitIndex.hasTrackerHits()` before
-using the tracker channel.
+Each `Hit` is `{detId, recHitIndex, energy}`; subgraph spans are contiguous and
+DetId-sorted, so two particles' footprints merge by a linear merge-join. Only
+channels with a DetId→RecHit link (`HGCalCalo`) set `recHitIndex`; tracker hits carry
+no per-cell energy and leave it invalid, so tracker matching is by shared-hit
+multiplicity. Gate on `hitIndex.hasChannel(HitChannel::Tracker)` before using a
+channel — today `MTD` / `Muon` are declared but not yet filled and return empty
+spans.
 
 ### Matching an arbitrary reco object to a Branch
 
@@ -352,8 +360,10 @@ using the tracker channel.
 the hit index once per event, then `bestBranches()` answers any reco object by a
 merge-join of its hits against each candidate's subgraph span, scored and sorted
 best-first (`score` ascending). Two metrics: `SharedEnergy` (the HGCal by-hits
-score, comparing cell fractions) and `SharedHits` (cell multiplicity). The
-`useTracker` flag switches the calo channel for the tracker channel.
+score, comparing cell fractions) and `SharedHits` (cell multiplicity). A
+`truth::HitChannel` constructor argument (default `HitChannel::HGCalCalo`) selects
+which channel of the hit index it matches against — pass `HitChannel::Tracker` for
+tracks.
 
 A reco object is matchable if it exposes its hits as a range of
 `truth::RecoHit{detId, energy, fraction}` — that is the `HasTruthHits` concept; any
@@ -378,7 +388,7 @@ for (auto const& m : best) {
 // Tracker: a reco::Track, matched by shared-hit multiplicity.
 truth::BranchHitAssociator trk(hitIndex, /*candidateRoots=*/{},
                                truth::BranchHitAssociator::Metric::SharedHits,
-                               /*useTracker=*/true);
+                               truth::HitChannel::Tracker);
 auto best2 = trk.bestBranches(truth::recoHits(track));
 ```
 
