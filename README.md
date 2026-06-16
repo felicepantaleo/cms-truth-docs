@@ -5,11 +5,19 @@ built with [MkDocs](https://www.mkdocs.org/) + Material.
 
 ## Build locally
 
+The `Makefile` bootstraps a self-contained virtualenv (with a known-good
+Python 3.12) and installs the pinned requirements, so the build never depends on
+whatever `mkdocs`/`pip` happen to be on `PATH`:
+
 ```bash
-pip install -r requirements.txt
-mkdocs serve          # live preview at http://127.0.0.1:8000
-mkdocs build          # static site into site/
+make serve            # live preview at http://127.0.0.1:8000 (auto-bootstraps .venv)
+make build            # strict static build into site/
+make deploy           # build + push to the gh-pages branch
+make clean            # remove .venv and site/
 ```
+
+Override the interpreter if the default cvmfs path is unavailable:
+`make serve PYTHON=/path/to/python3`.
 
 ## Contents
 
