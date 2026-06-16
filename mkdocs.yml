@@ -45,3 +45,18 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.details
   - pymdownx.emoji
+
+plugins:
+  # `search` is implicit until a plugins section exists, then it must be listed.
+  - search
+  # Click any image to open it in a full-screen lightbox; the gallery graphs are
+  # large vector SVGs, so enable mouse-wheel zoom and drag-to-pan to read them at
+  # full size without downloading. Opt images out per-image with {.off-glb}.
+  - glightbox:
+      zoomable: true
+      draggable: true
+      touchNavigation: true
+      effect: zoom
+      width: 100%
+      height: auto
+      background: white
