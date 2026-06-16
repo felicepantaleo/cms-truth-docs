@@ -66,3 +66,49 @@ landed.
   references `TruthLogicalGraphHitIndexProducer`, an old `python/` layout, and lists
   `truth::Branch` as "not yet implemented"); de-duplicate the `EncodedEventId`
   pack/unpack helper into one shared header.
+
+## Multi-surface boundary crossings (CMSSW-core follow-up PR)
+
+Each particle can carry trajectory **checkpoints** — a position/momentum snapshot
+where Geant4 records a boundary crossing (stored as `Checkpoint{checkpointId, position,
+momentum}` on `ParticleData`). Today there is exactly **one** crossing: the
+**Tracker → CALO** boundary. We want several surfaces (e.g. ECAL → HCAL, the muon
+system entrance, the HGCAL front face), each with its own per-surface 4-position /
+4-momentum, so a branch can be sampled where it enters each subdetector.
+
+**How the single crossing is produced today.** Geant4 detects it in
+`SimG4Core/Application/src/SteppingAction.cc` by comparing the pre- and post-step
+**physical volumes** against the names configured in
+`SimG4Core/Application/python/g4SimHits_cfi.py` (`SteppingAction.TrackerName = 'Tracker'`,
+`CaloName = 'CALO'`; there is already a `BTLName = 'BarrelTimingLayer'`, and
+`SaveCaloBoundaryInformation = True` under the Phase-2 modifier). On the transition it
+calls `TrackInformation::setCrossedBoundary(...)`
+(`SimG4Core/Notification/interface/TrackInformation.h`), which is propagated through
+`TrackWithHistory` → `TmpSimTrack` → the persistent `SimTrack`
+(`DataFormats/Track/interface/SimTrack.h`), where it lands as a **single**
+`idAtBoundary_` / `positionAtBoundary_` / `momentumAtBoundary_` plus one `crossedBoundary_`
+bit.
+
+**Why it is not config-only.** `SimTrack` stores exactly one crossing, so multiple
+surfaces need a data-format change *and* a `SimG4Core` change:
+
+1. **`SimTrack` (DataFormats/Track)** — replace the single boundary fields with a
+   `std::vector<BoundaryCrossing>` (`{int surfaceId; XYZTLorentzVectorF position;
+   XYZTLorentzVectorF momentum;}`); a class-version bump and schema evolution.
+2. **`SteppingAction`** — accept a list of volume (or `G4Region`) pairs instead of the
+   single Tracker/CALO pair, detect every configured transition, and
+   `addBoundaryCrossing(surfaceId, pos, mom)` for each.
+3. **`TrackInformation` / `TrackWithHistory` / `SimTrackManager`** (SimG4Core/Notification)
+   — carry a vector of crossings and transfer all of them to the final `SimTrack`.
+4. **GEN-SIM re-run** — boundary information is produced at simulation time, so existing
+   samples must be regenerated to gain the new surfaces.
+
+**Geometry hooks.** Named physical volumes already exist for `Tracker`, `CALO` and
+`BarrelTimingLayer`; `G4Region`s such as `EcalRegion` / `HcalRegion` / the HGCAL regions
+exist but are currently used only for physics cuts — extending `SteppingAction` to test
+`G4Region` pointers would expose ECAL↔HCAL and HGCAL-front surfaces.
+
+On the truth-graph side the change is small: each extra `SimTrack` crossing becomes one
+more `Checkpoint` (with the surface id as `checkpointId`) on the particle, surfaced
+through the existing `checkpoints()` / `checkpoint(id)` API — no logical-graph schema
+change needed.
