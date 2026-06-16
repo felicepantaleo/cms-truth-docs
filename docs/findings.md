@@ -12,11 +12,118 @@ history only above `TrackingAction.PersistencyEmin` (default **50 GeV** in the
 `common_MCtruth` PSet). Below it, intermediate `SimTrack`s are dropped, so a
 stored low-energy `SimVertex` can lose its parent branch → an orphan component.
 
+### How `PersistencyEmin` actually works
+
+The value is a **kinetic-energy threshold**.
+`SimG4Core/Application/python/g4SimHits_cfi.py`:
+
+```python
+PersistencyEmin = cms.double(50.0), # in GeV
+```
+
+In `Phase2TrackingAction.cc` it is converted to Geant4 internal units and stored
+as `ekinMin_`:
+
+```cpp
+ekinMin_(p.getParameter<double>("PersistencyEmin") * CLHEP::GeV),   // = 50 GeV
+```
+
+**Where it is applied — once per Geant4 track, at track start.**
+`Phase2TrackingAction::PreUserTrackingAction`:
+
+```cpp
+double ekin = aTrack->GetKineticEnergy();          // KE at the track's creation vertex
+...
+if (nullptr != trkInfo_ && ekin > ekinMin_) {
+  trkInfo_->putInHistory();                         // mark "keep in history"
+}
+```
+
+`putInHistory()` just sets `isInHistory_ = true` (`TrackInformation.h`). So the
+**only** thing the threshold does directly is: *if a track is created with
+KE > 50 GeV, flag it "in history."* Nothing else reads `ekinMin_`. The cut is on
+**kinetic energy at the creation vertex** — not total energy, not momentum — so a
+slow heavy particle can have KE far below its total energy, making 50 GeV even
+more aggressive than it looks.
+
+**What "in history" controls.** At track end, `PostUserTrackingAction` passes the
+flag to the manager, and a track that is *not* in history is discarded on the spot:
+
+```cpp
+trackManager_->addTrack(currentHistory_, aTrack, isInHistory, withAncestor);
+...
+if (!isInHistory) { delete currentHistory_; }       // not in history -> dropped immediately
+```
+
+In `SimTrackManager::addTrack`, **only in-history tracks enter `m_trackContainer`**
+— the searchable pool of tracks that can later be persisted and, crucially, can
+serve as a *parent link*:
+
+```cpp
+if (inHistory) {
+  ...
+  m_trackContainer.push_back(iTrack);
+}
+```
+
+So `isInHistory` becomes true via **either**:
+
+- `putInHistory()` → KE > 50 GeV (the `PersistencyEmin` path), **or**
+- `storeTrack()` → the track is independently needed (it has SimHits, is a
+  primary, crossed the Tracker→CALO boundary, or is a required ancestor);
+  `storeTrack()` sets `isInHistory_ = true` as well.
+
+**Why the chain reconstruction needs it.** At end of event, `storeTracks()` walks
+**up the parent chain** for every track that must be saved, via
+`saveTrackAndItsBranch`:
+
+```cpp
+trkH->setToBeSaved();
+int parent = trkH->parentID();
+auto tk_itr = std::lower_bound(m_trackContainer.begin(), m_trackContainer.end(), parent, ...);
+if (tk_itr != end && (*tk_itr)->trackID() == parent)
+  saveTrackAndItsBranch(*tk_itr);   // recurse to the grandparent, etc.
+```
+
+The parent is found **only by searching `m_trackContainer`**. If an intermediate
+ancestor was *not* in history (sub-50-GeV and with no hits of its own) it was
+already `delete`d and is absent — so `lower_bound` misses, the recursion stops,
+and **the branch is severed at the first dropped intermediate.** The persisted
+secondary then has its parent set to `idLastStoredAncestor()`, jumping over the
+dropped intermediates to the nearest surviving ancestor; if none survives, its
+production `SimVertex` ends up with `parentIndex = -1`, looking like a fresh
+primary — the orphan component.
+
+**So "50 GeV" means:** *keep a track in the persistable history purely for
+ancestry's sake only if it was born with more than 50 GeV of kinetic energy;
+otherwise keep it only if it earns persistence another way (hits, boundary
+crossing, primary, needed ancestor).* 50 GeV is a deliberately high cut: in a
+hadronic/EM cascade or a τ-decay chain almost every intermediate is well below it,
+so the connective tissue between two genuinely-stored tracks is dropped and the
+graph loses the edges linking SIM back to GEN.
+
 **Change:** `enableTruth` sets `g4SimHits.TrackingAction.PersistencyEmin = 0` in
-the SIM step, so every stored `SimTrack` keeps its full ancestor branch.
+the SIM step. Then `ekin > ekinMin_` is true for **every** track, so every
+`TrackWithHistory` enters `m_trackContainer` and survives. `saveTrackAndItsBranch`
+can now always find the real mother, so **a mother is kept whenever any daughter
+is kept**, and `SimVertex::parentIndex` always resolves to a stored ancestor (or a
+true primary). The cost is higher `SimTrack`/`SimVertex` multiplicity, which is why
+it is scoped to the `enableTruth` workflows only.
 
 **Result:** exactly **one connected component per event** across all eight
 validation samples (no orphan fragments). See [Validation](validation.md).
+
+### Would 50 GeV break the history again? — Yes
+
+`PersistencyEmin` is a **simulation-time** decision: it governs which `SimTrack`s
+and `SimVertex`es Geant4 ever writes to the event. The truth-graph producers run
+**downstream, at RECO**, on the already-persisted collections — they cannot
+resurrect a track Geant4 never stored. So re-running the SIM step with the default
+50 GeV reproduces the dropped intermediates verbatim: severed parent chains,
+`SimVertex::parentIndex = -1`, and fragments disconnected from the generator. The
+graph is only complete because `enableTruth` forces `PersistencyEmin = 0` *before*
+the SIM step. Concretely: a `step3.root` made from a 50 GeV SIM is fragmented and
+no truth-graph setting recovers it — the fix has to live at GEN-SIM, not RECO.
 
 ## 2. The GEN/SIM vertex mega-vertex and DAG cycles
 
