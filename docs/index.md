@@ -27,7 +27,7 @@ only a handful of pre-existing files are touched, all behind `enableTruth`.
 | New producer | `SimCalorimetry/HGCalAssociatorProducers`: `SimHitToRecHitMapProducer` + `DetIdRecHitMap` (not HGCal-specific) |
 | New modifier | `Configuration/ProcessModifiers/enableTruth_cff` |
 | New sequence | `Validation/Configuration/truthPrevalidation_cff` |
-| Modified (gated) | `globalValidation_cff.py`, `g4SimHits_cfi.py` (`PersistencyEmin=0`), `upgradeWorkflowComponents.py` (`.88` workflow variant) |
+| Modified (gated) | `globalValidation_cff.py`, `postValidation_cff.py`, `g4SimHits_cfi.py` + `SimTrackManager` (`ReconnectDroppedAncestors`), `upgradeWorkflowComponents.py` (`.88` workflow variant) |
 
 ## The three-layer model at a glance
 

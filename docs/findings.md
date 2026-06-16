@@ -102,28 +102,43 @@ hadronic/EM cascade or a τ-decay chain almost every intermediate is well below 
 so the connective tissue between two genuinely-stored tracks is dropped and the
 graph loses the edges linking SIM back to GEN.
 
-**Change:** `enableTruth` sets `g4SimHits.TrackingAction.PersistencyEmin = 0` in
-the SIM step. Then `ekin > ekinMin_` is true for **every** track, so every
-`TrackWithHistory` enters `m_trackContainer` and survives. `saveTrackAndItsBranch`
-can now always find the real mother, so **a mother is kept whenever any daughter
-is kept**, and `SimVertex::parentIndex` always resolves to a stored ancestor (or a
-true primary). The cost is higher `SimTrack`/`SimVertex` multiplicity, which is why
-it is scoped to the `enableTruth` workflows only.
+**Change:** `enableTruth` keeps `PersistencyEmin` at its default **50 GeV** and
+instead sets `g4SimHits.TrackingAction.ReconnectDroppedAncestors = True`. When a
+stored track's immediate parent was dropped, its production vertex is reattached to
+the **nearest stored ancestor** — found by walking the full `trackID → parentID`
+topology, which Geant4 retains for *every* track (in `idsave`, captured per event in
+`addTrack`) and which always terminates at the always-stored primary — so
+`SimVertex::parentIndex` can never be −1.
 
-**Result:** exactly **one connected component per event** across all eight
-validation samples (no orphan fragments). See [Validation](validation.md).
+This replaced the original `PersistencyEmin = 0`, which keeps a mother whenever any
+daughter is kept (`ekin > ekinMin_` true for every track, so every `TrackWithHistory`
+survives and `saveTrackAndItsBranch` always finds the real mother) but at the cost of
+persisting *every* intermediate. The trade-off of the reconnect is that the dropped
+intermediate nodes are **collapsed**: the reattached edge is a shortcut to the nearest
+survivor, so a sub-threshold π⁰→γγ no longer appears as a distinct node (its two
+photons attach to the π⁰'s parent).
 
-### Would 50 GeV break the history again? — Yes
+**Result:** exactly **one connected component per event** (no orphan fragments)
+across all eight validation samples — identical connectivity to `PersistencyEmin = 0`,
+at a much leaner collection. Measured on TTbar+Run4D120 (2 events): 50 GeV alone →
+**15286** orphan fragments; with the flag → **0** (one component/event); stored
+SimTracks **12021** (flag) vs **33941** (`PersistencyEmin = 0`) — a **~65% leaner**
+collection for the same connectivity. See [Validation](validation.md).
+
+### Would 50 GeV break the history? — Only without the reconnect
 
 `PersistencyEmin` is a **simulation-time** decision: it governs which `SimTrack`s
-and `SimVertex`es Geant4 ever writes to the event. The truth-graph producers run
-**downstream, at RECO**, on the already-persisted collections — they cannot
-resurrect a track Geant4 never stored. So re-running the SIM step with the default
-50 GeV reproduces the dropped intermediates verbatim: severed parent chains,
-`SimVertex::parentIndex = -1`, and fragments disconnected from the generator. The
-graph is only complete because `enableTruth` forces `PersistencyEmin = 0` *before*
-the SIM step. Concretely: a `step3.root` made from a 50 GeV SIM is fragmented and
-no truth-graph setting recovers it — the fix has to live at GEN-SIM, not RECO.
+and `SimVertex`es Geant4 ever writes. The truth-graph producers run downstream at
+RECO and cannot resurrect a track Geant4 never stored — so a `step3.root` made from
+a *plain* 50 GeV SIM is fragmented and no RECO-side setting recovers it; the fix has
+to live at GEN-SIM. But the *topology* is never lost: Geant4 keeps the full
+`trackID → parentID` map for **every** track regardless of threshold.
+`ReconnectDroppedAncestors` exploits exactly this at SIM time — walking that map to
+the nearest stored ancestor and reattaching the production vertex there — which is
+why `enableTruth` can stay at 50 GeV and still be orphan-free. So the honest answer
+is: yes, a bare 50 GeV breaks the history, **but the reconnect avoids it without
+lowering the threshold**, trading the intermediate nodes (collapsed) for a SimTrack
+collection ~2.7× smaller than `PersistencyEmin = 0`.
 
 ## 2. The GEN/SIM vertex mega-vertex and DAG cycles
 

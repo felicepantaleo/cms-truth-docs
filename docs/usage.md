@@ -34,8 +34,10 @@ In a standard workflow this is gated behind the `enableTruth` process modifier
 (`Configuration/ProcessModifiers/enableTruth_cff`), which hooks the
 `truthGraphPrevalidation` sequence (in
 `Validation/Configuration/python/truthPrevalidation_cff.py`) into global validation
-and sets `g4SimHits.TrackingAction.PersistencyEmin = 0` in the SIM step so every
-stored `SimTrack` keeps its full ancestor branch:
+and sets `g4SimHits.TrackingAction.ReconnectDroppedAncestors = True` in the SIM step
+so every stored `SimTrack`'s production vertex resolves to a stored ancestor (no
+orphans) while `PersistencyEmin` stays at 50 GeV — see
+[Findings](findings.md#1-orphan-simvertices-generator-history-retention):
 
 ```bash
 # Run4 D120 relval with the truth producers enabled in RECO:
