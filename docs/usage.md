@@ -319,9 +319,9 @@ if (select(branch)) { /* passes */ }
 The hit index answers, per logical particle and per detector **channel**, two
 questions: which SimHits the particle produced **directly**, and which its whole
 **subgraph** produced (the full shower / decay-branch footprint). The channels are
-keyed by `truth::HitChannel` (`HGCalCalo`, `Tracker`, and the planned `MTD` / `Muon`),
-each with its own DetId space and metric. The accessors take the channel first, then
-the particle id:
+keyed by `truth::HitChannel` (`HGCalCalo`, `Tracker`, `MTD`, `Muon`), each with its
+own DetId space and metric. The accessors take the channel first, then the particle
+id:
 
 ```cpp
 #include "PhysicsTools/TruthInfo/interface/LogicalGraphHitIndex.h"
@@ -347,12 +347,13 @@ for (uint32_t pid = 0; pid < hitIndex.nParticles(); ++pid) {
 ```
 
 Each `Hit` is `{detId, recHitIndex, energy}`; subgraph spans are contiguous and
-DetId-sorted, so two particles' footprints merge by a linear merge-join. Only
-channels with a DetId→RecHit link (`HGCalCalo`) set `recHitIndex`; tracker hits carry
-no per-cell energy and leave it invalid, so tracker matching is by shared-hit
-multiplicity. Gate on `hitIndex.hasChannel(HitChannel::Tracker)` before using a
-channel — today `MTD` / `Muon` are declared but not yet filled and return empty
-spans.
+DetId-sorted, so two particles' footprints merge by a linear merge-join. `recHitIndex`
+is set where a recHit link exists: `HGCalCalo` (the HGCal recHit ordering) and `MTD`
+(the FTLCluster ordering — note it is *channel-relative*, not the same ordering as
+calo). `Tracker` and `Muon` carry no per-cell energy / no recHit link and leave it
+invalid, so their matching is by shared-hit multiplicity. All four channels are
+filled by `LogicalGraphHitIndexProducer`, but only for the subdetectors named in its
+`subdetectors` config — gate on `hitIndex.hasChannel(...)` before using a channel.
 
 ### Matching an arbitrary reco object to a Branch
 

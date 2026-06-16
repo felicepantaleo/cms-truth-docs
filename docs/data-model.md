@@ -135,19 +135,31 @@ CSR struct; the per-particle spans are reached through the channel accessors:
     (~6× smaller than a hash map). See
     [Implementation characteristics](optimization.md#flat-per-particle-hit-index).
 
-!!! info "Adding detector channels (planned / in-progress)"
-    `HitChannel::MTD` and `HitChannel::Muon` are declared but **not yet filled** — the
-    channel-enum design exists precisely so they can be added without new hardcoded
-    members. The intended sources:
+!!! info "All four channels are filled"
+    The four channels are populated by `LogicalGraphHitIndexProducer`, each from its
+    own subdetector sources:
 
-    - **MTD** — filled from `MtdSimLayerCluster` (already keyed by `SimTrack` trackId)
-      via the official `MtdRecoClusterToSimLayerClusterAssociation`, whose recHit is the
-      `FTLCluster`; MTD carries a DetId→RecHit link, so its `recHitIndex` will be set.
-    - **Muon** — filled per subsystem from the `SimMuon/MCTruth` DigiSimLink associators
-      (GEM/RPC/CSC/DT). ME0 has no rechits and is left out.
+    - **HGCalCalo** — `PCaloHit`s (HGCAL EE/HE + ECAL barrel + HCAL) matched by
+      `geantTrackId()`, with `recHitIndex` from the `DetIdRecHitMap`.
+    - **Tracker** — tracker `PSimHit`s matched by `trackId()`; no recHit link.
+    - **MTD** — filled from `MtdSimLayerCluster` (already keyed by the producing
+      `SimTrack` via `particleId()`), restricted to the signal interaction by
+      `EncodedEventId`. The `recHitIndex` is the matched reco **`FTLCluster`**, looked
+      up through `MtdSimLayerClusterToRecoClusterAssociation` and indexed in the
+      barrel-then-endcap `FTLCluster` concatenation. (This `recHitIndex` is
+      *channel-relative* — the MTD ordering is FTLClusters, not the HGCal recHit
+      ordering.)
+    - **Muon** — the five `g4SimHits:Muon{DT,CSC,RPC,GEM,ME0}Hits` `PSimHit`
+      collections matched by `trackId()`, like the tracker channel; no recHit link
+      (muon rechits are reconstructed segments — a DigiSimLink-based link is future
+      work). ME0 hits are read but have no rechits.
 
-    Until those producers land, `hasChannel(HitChannel::MTD)` /
-    `hasChannel(HitChannel::Muon)` return `false`.
+    **Choosing subdetectors.** The producer takes a `subdetectors` list (default
+    `{HGCalCalo, Tracker, MTD, Muon}`); a channel left off the list stays empty and
+    `hasChannel(...)` returns `false` for it. Each subdetector's input collections are
+    separate config parameters (`simHitCollections`, `trackerSimHitCollections`,
+    `muonSimHitCollections`, `mtdSimLayerClusters` + the FTLCluster inputs), so a user
+    can both pick which subdetectors to read and point each at different collections.
 
 ## `truth::Branch` — the subgraph view
 
