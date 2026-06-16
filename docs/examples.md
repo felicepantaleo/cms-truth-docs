@@ -119,8 +119,15 @@ What to look at:
 - **One Z, two muons.** Seeding on the Z (`seedPdgIds = {23}`) the selected graph
   has the Z boson at its root, decaying at a single vertex into a μ<sup>−</sup> and
   a μ<sup>+</sup> (pdgId ∓13). With `seedParentDepth = 1` you also see the incoming
-  partons (the blue status-21 `d`/anti-`d` quarks at the top) that produced the Z —
-  the hard-scatter context.
+  partons (the blue status-21 `d`/anti-`d` quarks) that produced the Z — the
+  hard-scatter context.
+- **The signal interaction structure.** As in TenTau, the whole event descends from
+  a single artificial **Interaction** vertex (red), fanning out through an
+  **ISR/upstream** node (here the partons) and an **UnderlyingEvent** node (the
+  spectators). These graph-internal nodes are not GEN or SIM, so they carry their
+  own **`Internal`** domain and inherit the **primary-vertex 4-position** of the
+  collision — everything reachable from the Interaction vertex is, by definition,
+  this signal interaction.
 - **The two muon branches are long and thin.** Each muon is a merged GEN+SIM
   particle that Geant4 propagated (red, with trajectory checkpoints), and its
   subtree is essentially itself plus a handful of delta-ray / bremsstrahlung
