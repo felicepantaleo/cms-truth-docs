@@ -87,10 +87,25 @@ them into plots; a `DQMGenericClient` harvester forms the efficiencies.
 
 **Calorimetry** — `BranchHGCalValidator` (folder `HGCAL/BranchValidator/{CaloParticle,SimCluster}`)
 compares the Branch subgraph calo hits to each object's `hits_and_fractions`:
-reproduction efficiency vs η/p_T/E, purity, hit/energy completeness, and sim-energy
-containment. `TruthBranchCaloAssociationProducer` emits `caloParticleToBranch` /
-`branchToCaloParticle` (+ SimCluster), shared-energy + score, best first. Verified on
-TTbar: CaloParticle eff ≈ 0.76, SimCluster ≈ 0.93.
+reproduction efficiency vs η/p_T/E, purity, hit/energy completeness, and energy response.
+Three response references are booked. `energy_response` is the **sim-energy containment**
+`E^{sim}_Branch / E_gen`, which folds in the active-material sampling fraction and so
+sits well below 1 and varies by region. `raw_energy_response_sim` and
+`raw_energy_response_reco` instead normalise the Branch's energy **on the object's own
+cells** by the object's **fraction-weighted hit energy** (rather than the generator
+energy) — on the deposited (PCaloHit) and reconstructed (RecHit) scales. The deposited
+one is a **closure test**: a CaloParticle/SimCluster's per-cell fraction *is* its tracks'
+share of the deposit, i.e. the Branch's own sim energy on that cell, so the ratio is
+**== 1 by construction** and any deviation flags a fraction↔deposit bug in PR validation
+(numerator restricted to the object footprint also keeps it finite — un-restricted, a
+tiny object whose `trackId` maps to a large shower would blow the un-thresholded sim
+ratio up to ~10⁵). The reconstructed one is the informative plot: the Branch claims each
+shared cell's **whole** RecHit while the object keeps only its fraction, so it peaks just
+above 1 (TenTau: CaloParticle ⟨E^{rec}_Branch/E^{rec}_hits⟩ ≈ 1.1, SimCluster ≈ 1.2) and
+measures the non-fractional reco energy the Branch picks up in cells shared between
+overlapping showers. `TruthBranchCaloAssociationProducer` emits
+`caloParticleToBranch` / `branchToCaloParticle` (+ SimCluster), shared-energy + score,
+best first. Verified on TTbar: CaloParticle eff ≈ 0.76, SimCluster ≈ 0.93.
 
 **Tracking** — a `TrackingParticle` carries *no hits of its own* (only its
 `SimTrack`s), so the Branch↔TrackingParticle comparison cannot be a direct hit
