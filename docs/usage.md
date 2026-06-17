@@ -289,6 +289,7 @@ postProcessing = cms.PSet(
         cms.PSet(pdgIds = cms.vint32(13, -13)),
     ),
     keepStableSpectators = cms.bool(True),
+    keepProductionSiblings = cms.bool(False),
     ignoredPdgIds = cms.vint32(),
     ignoredParticleIds = cms.vuint32(),
 )
@@ -296,6 +297,17 @@ postProcessing = cms.PSet(
 
 The special value `seedPdgIds = [0]` disables selection and keeps the full graph
 (a debugging escape hatch).
+
+!!! tip "Showing the seed's production co-products (e.g. VBF tagging jets)"
+    `seedParentDepth` only walks **up** the ancestry. The partons that *recoil
+    against* the seed at its production vertex are **siblings**, not ancestors, so
+    no parent depth reaches them: seeding on the Higgs in VBF leaves the event with
+    nothing upstream, even though the two forward quarks that fused to make it (and
+    then become the tagging jets) share the Higgs's production vertex.
+    `keepProductionSiblings = True` keeps that production vertex and its other
+    outgoing particles (with their subtrees), so the recoiling quarks and their
+    jets appear; because the real hard vertex is now kept, it is shown in place of
+    the artificial Upstream summary. Standalone: `--keepProductionSiblings`.
 
 ### Selecting branches at use time
 
