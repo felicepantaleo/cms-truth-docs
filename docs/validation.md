@@ -72,10 +72,17 @@ a **full relval re-run** on CMSSW_20. Result: **no change in truth-graph behavio
 
 `makeTruthGallery.sh` re-derives the logical graph from each `step3.root` and emits
 per process: a full-graph DOT (`seedPdgIds=0`, reference) and three selected
-DOT/SVG views (natural seeds, `seedParentDepth=1`). Both galleries
+DOT/SVG views, with the per-process selection resolved from the generator fragment
+by the [seven presets](usage.md#per-process-presets) (so VBF shows its tagging
+jets, Drell-Yan its dilepton channel, guns their species). Both galleries
 (`test/dot_gallery` for CMSSW_17, `test/dot_gallery_v20` for CMSSW_20) have the
 identical structure: 8 processes × (1 full + 3 selected) = 32 DOT, 24 SVG, all
 rendering cleanly (the old mega-vertex would have blown up the layout).
+
+**Browse the rendered gallery:** the full CMSSW_20 set (SVG + DOT) is online and
+searchable at **[felice.web.cern.ch/truth](https://felice.web.cern.ch/truth/)**
+(an [Orbit](https://github.com/felicepantaleo/orbit) folder browser — click a
+process, then a `*_signal_*` / `*_full_*` SVG for the inline zoomable view).
 
 ## DQM performance plots (Branch vs legacy truth objects)
 
