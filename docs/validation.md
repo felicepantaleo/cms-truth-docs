@@ -193,6 +193,17 @@ makeTruthGraphValidationPlots.py tau.root:Tau zmm.root:ZMM ttbar.root:TTbar -o p
 The `FILE:LABEL` form sets the legend entry; passing several samples doubles as the
 per-event guided comparison (cf. [Worked examples](examples.md)).
 
+**The library wrapper** — `test/makeBranchValidationPlots.sh` automates the above
+over a `runTruthRelvals.sh` library: it locates each workflow's harvested legacy
+DQM file (`DQM_V0001_R*__Global__*__RECO.root`) and overlays a few representative
+samples (TTbar / TenTau / ZMM by default; override with `SAMPLES`) in one set of
+PNGs + `index.html`, the companion to `makeTruthGallery.sh`:
+
+```bash
+cmsenv
+makeBranchValidationPlots.sh /path/library /path/branch_plots
+```
+
 ## Build & checks
 
 - `scram b` clean (only external `vecgeom` warnings).
