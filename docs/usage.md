@@ -309,6 +309,11 @@ The special value `seedPdgIds = [0]` disables selection and keeps the full graph
     jets appear; because the real hard vertex is now kept, it is shown in place of
     the artificial Upstream summary. Standalone: `--keepProductionSiblings`.
 
+    A worked VBF H→ZZ→4ν event (`-s 25 -d 0 --keepProductionSiblings`) - the Higgs
+    and the two tagging quarks share the hard vertex, the quarks fan out into the
+    forward jets: [vbf_higgs_tagging_jets.svg](img/vbf_higgs_tagging_jets.svg)
+    (large, opens in a new tab).
+
 ### Selecting branches at use time
 
 `truth::BranchSelector` mirrors the cut surface of `TrackingParticleSelector` /
