@@ -140,6 +140,38 @@ is: yes, a bare 50 GeV breaks the history, **but the reconnect avoids it without
 lowering the threshold**, trading the intermediate nodes (collapsed) for a SimTrack
 collection ~2.7× smaller than `PersistencyEmin = 0`.
 
+### Limitation: calo SimHits are conserved, tracker SimHits are not
+
+The reconnect fixes the graph **topology** (no orphan vertices), but hit
+**attribution** is governed separately, by the sensitive detectors — and the two
+calorimeter/tracker SDs behave differently.
+
+- **Calorimeter — conserved.** `CaloSD` reassigns a dropped track's `PCaloHit`s to
+  the nearest stored ancestor (`SimTrackManager::giveMotherNeeded`), so every calo
+  hit lands on a stored — hence graph — track. The hit index then sums the per-detId
+  energies on the owning particle (`coalesce()`). Measured on TTbar+Run4D120: **375228
+  calo hits attributed, 0 lost**, identical under `PersistencyEmin = 0` and 50 GeV +
+  reconnect.
+- **Tracker — partially lost.** `TkAccumulatingSensitiveDetector` does **not**
+  reassign hit trackIds, so a `PSimHit` on a dropped (sub-threshold) track keeps a
+  `trackId` that resolves to no SimTrack — it matches no logical particle and is
+  dropped. This is **pre-existing**: ≈7% of real-trackId tracker hits are lost even
+  at `PersistencyEmin = 0` (tracks with no saved branch are pruned regardless), and
+  the high-`PersistencyEmin` reconnect widens it to ≈12%.
+
+The tracker loss is **not recoverable downstream**: the dropped track has no
+SimTrack/SimVertex record at RECO. A RECO-side reassignment of unmatched hits to the
+nearest logical particle was tried and recovers **nothing** — the hitless-SIM
+pruning already guarantees every hit-carrying *stored* track is a logical particle,
+so there are no "subsumed-with-hits" tracks to reattach; the only unmatched hits are
+on truly-dropped tracks. Closing it would require a **SIM-time** change to the
+tracker SD (reassign like `CaloSD`), which alters the standard tracker `PSimHit`
+collection that `TrackingParticle` and other consumers rely on — a separate, broader
+change. For the truth graph the calo channel (the bulk of the deposited energy) is
+exact; the tracker channel under-counts soft-secondary hits — the same reason
+standard tracking truth uses `TrackingParticle`'s history-aware accumulation rather
+than raw SimHit-`trackId` matching.
+
 ## 2. The GEN/SIM vertex mega-vertex and DAG cycles
 
 **Discovered (logical graph only; the raw graph was always clean):** in every
