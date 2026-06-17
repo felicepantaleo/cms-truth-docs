@@ -46,6 +46,25 @@ Particle ↔ Vertex** graph built by `TruthLogicalGraphProducer` from the raw gr
   from the signal `Interaction` vertex (bunch crossing 0, event 0) and each overlaid
   pile-up interaction gets its own. All carry the genEvent/eventId of the activity
   they summarize.
+- **Vertex reason** (`VertexReason`, `Vertex::vertexReason()`): every SIM vertex
+  carries the *physical process that created it*, decoded from the Geant4 process
+  sub-type (`SimVertex::processType()`) of its outgoing track's creator process —
+  `Primary`, `Decay`, `Bremsstrahlung`, `Ionisation` (delta-ray), `PairConversion`,
+  `Compton`, `PhotoElectric`, `Annihilation`, `Rayleigh`, `CoulombScattering`,
+  `HadronInelastic`, `HadronElastic`, `NuclearCapture`, `ChargeExchange`,
+  `HadronAtRest`, or `Other`/`Unknown`. The raw graph stores the process sub-type
+  verbatim (`TruthGraph::simVertexProcessType`); the logical producer folds it into
+  the enum via `reasonFromG4ProcessSubType`. On a TTbar event the SIM vertices break
+  down (most-frequent first) as hadronic-inelastic, e⁺e⁻ annihilation,
+  bremsstrahlung, pair-conversion, decay, nuclear capture, hadron-at-rest, … —
+  i.e. the reason tells you *why* a given branch point exists.
+- **Back-scattering** (`Particle::backscattered()`): a SIM particle is flagged when
+  Geant4 marked its track as inward albedo crossing the CALO→Tracker boundary
+  (`SimTrack::isFromBackScattering()`). This is a track-level property (not a vertex
+  reason): such particles travel *back* toward the beamline, decreasing their
+  distance from the production region, and are a known source of apparent
+  history-reversal. The flag is OR-ed onto a merged GEN+SIM particle from its SIM
+  side, propagated through `TruthGraph::simTrackBackscattered`.
 - **Hitless SIM subgraphs are pruned** (`postProcessing.dropHitlessSimSubgraphs`,
   default on): every SIM particle whose calorimeter + tracker sim-hit subgraph is
   empty is removed together with its whole downstream subtree, so the logical graph

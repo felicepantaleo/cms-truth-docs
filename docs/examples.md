@@ -164,6 +164,46 @@ truth side to muons on ZMM gives a sensible reco-track efficiency (≈0.56) and 
 near-zero merge rate, the clean reference case discussed in
 [Validation](validation.md#reco-side-validators-generic-hit-exposure).
 
+## SingleElectron — an EM shower read off its vertex reasons
+
+`SingleElectron` (workflow `34002.88`) fires one 35 GeV electron into the detector.
+Where TenTau and ZMM exercise the GEN topology, this sample exercises the **SIM
+cascade**: a single electron radiates, the photons convert, and the products
+re-radiate, so the detectable logical graph is a deep electromagnetic shower. Every
+SIM vertex now carries the **physical process that created it**
+(`Vertex::vertexReason()`, see [Data model](data-model.md#layer-2-truthgraph-logical)),
+so the shower is self-describing.
+
+![SingleElectron EM shower with per-vertex reasons: bremsstrahlung and pair-conversion dominate](img/singleelectron_reasons.svg)
+
+What to look at (click to zoom):
+
+- **Bremsstrahlung dominates.** Most branch points read `reason: Bremsstrahlung`
+  (this event has 27 of them) — each is a photon radiated off the electron or a
+  shower secondary, the defining 1→2 vertex of an EM cascade.
+- **Pair conversion turns photons back into pairs.** `reason: PairConversion`
+  vertices are where a radiated γ materializes into an e⁺e⁻ pair; alternating
+  bremsstrahlung ↔ pair-conversion is exactly the shower-multiplication chain.
+- **Annihilation and the hadronic tail.** `reason: Annihilation` marks an e⁺
+  finding an e⁻ (back-to-back 511 keV γ's); a handful of `reason: HadronInelastic`
+  vertices are the rare photonuclear / electronuclear interactions seeding the
+  small hadronic component of the shower.
+- **Back-scattering.** Secondaries that Geant4 flagged as inward albedo across the
+  CALO→Tracker boundary carry a **back-scattered** badge — the one class of
+  particle whose distance from the production region *decreases*, and historically
+  the source of apparent history-reversal (see [Findings](findings.md)).
+
+In code the reason is a plain enum on every vertex, so you can, e.g., tag the
+conversion points of a shower while walking its members:
+
+```cpp
+int nConversions = 0;
+for (truth::Particle p : branch.members())          // every shower particle
+  for (truth::Vertex v : p.productionVertices())     // where it was created
+    if (v.vertexReason() == truth::VertexReason::PairConversion)
+      ++nConversions;                                // a gamma -> e+e- materialisation
+```
+
 ## Physics questions the interface answers
 
 The point of the navigation API is that physics questions map onto a couple of
