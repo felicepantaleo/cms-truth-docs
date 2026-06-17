@@ -314,6 +314,34 @@ The special value `seedPdgIds = [0]` disables selection and keeps the full graph
     forward jets: [vbf_higgs_tagging_jets.svg](img/vbf_higgs_tagging_jets.svg)
     (large, opens in a new tab).
 
+#### Per-process presets
+
+`enableTruth` attaches to **every** Run4 workflow (~140 generator fragments), but the
+right selection depends only on the physics, and they collapse to **seven archetypes**:
+
+| Preset | Fragments | Selection |
+|---|---|---|
+| `gun` | `Single*`/`Double*`/`Ten*`/`CloseBy*` | seed = the gun species (from the name) |
+| `resonance` | `ZMM`/`ZEE`/`DYTo*`/`Zp*`/`WTo*` | seed the boson (+ ISR), channel decay group |
+| `vbf` | `VBFH*`, `QQToHToTauTau` | seed Higgs **+ keepProductionSiblings** |
+| `ggf` | `H125GGgluonfusion` | seed Higgs |
+| `top` | `TTbar*`, single top, `Tprime*` | seed the top(s) |
+| `heavyflavor` | `Bs*`/`Bu*`/`Jpsi*`/`Upsilon*` | seed by heavy-flavor content (b/c) |
+| `full` | QCD / MinBias / NuGun / unknown | keep the whole graph |
+
+`PhysicsTools/TruthInfo/python/truthGraphSelections.py` maps a fragment name (or short
+label) to its preset and returns the `postProcessing` selection — overridable per call,
+so a preset is a starting point, never a cage:
+
+```python
+from PhysicsTools.TruthInfo.truthGraphSelections import postProcessingPSet
+producer.postProcessing = postProcessingPSet("VBFHZZ4Nu_14TeV")          # the VBF preset
+producer.postProcessing = postProcessingPSet("ZMM_14", seedParentDepth=2)  # preset + override
+```
+
+The same module backs the standalone dumper (`python3 truthGraphSelections.py <fragment>`
+prints the flags) and `makeTruthGallery.sh`, so adding a Run4 sample needs no config edit.
+
 ### Selecting branches at use time
 
 `truth::BranchSelector` mirrors the cut surface of `TrackingParticleSelector` /
