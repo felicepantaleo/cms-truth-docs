@@ -127,6 +127,25 @@ CSR struct; the per-particle spans are reached through the channel accessors:
   only for channels that carry a DetId→RecHit link (`HGCalCalo`); for the tracker it
   stays `Hit::invalidRecHitIndex` (the order is HGCal collections first, then PF
   collections — changing it changes every index). `Hit::hasRecHit()` tests validity.
+- **One entry per DetId; `energy` is the summed sim deposit.** When a particle (or,
+  for subgraph hits, several of its descendants) deposits in the same cell more than
+  once, `coalesce()` merges those into a **single** `Hit` whose `energy` is the
+  **sum** of the deposits. So if two leaves of the same mother both hit cell `D` with
+  `e1` and `e2`, the mother's subgraph holds `D` once with `energy = e1 + e2` — the
+  contributions accumulate, never duplicate.
+
+!!! warning "Sim energy is per-particle; reco attribution is whole-cell, not fractional"
+    `energy` is the particle's (or subtree's) **own** sim energy in the cell — this
+    side *is* fractional: each particle carries exactly what it deposited. The
+    **recHit** side is **binary**, not fractional: the coalesced `Hit` links the cell's
+    recHit once, so summing `recHitEnergies[recHitIndex]` over a particle's hits credits
+    it the **full** cell energy for every cell its subtree touches. Within one subtree
+    that is exact (the cell's energy does belong to that ancestor). But a cell shared
+    with a particle **outside** the subtree is counted in full for *both* — the index
+    does **not** carry per-cell energy fractions. This is deliberately **not** the
+    `CaloParticle`/`SimCluster` fraction model; use the sim `energy` (per-particle) when
+    you need energy sharing, and treat the recHit sum as "reco energy in cells this
+    branch lit up", not "this branch's share of the reco energy".
 
 !!! note "Technical details"
     The builder uses flat, lazily-coalesced `vector<Hit>` per particle and channel
