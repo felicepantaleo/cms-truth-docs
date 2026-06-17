@@ -290,6 +290,8 @@ postProcessing = cms.PSet(
     ),
     keepStableSpectators = cms.bool(True),
     keepProductionSiblings = cms.bool(False),
+    signalOnly = cms.bool(False),                   # pile-up filter (see below)
+    keepBunchCrossings = cms.vint32(),
     ignoredPdgIds = cms.vint32(),
     ignoredParticleIds = cms.vuint32(),
 )
@@ -341,6 +343,25 @@ producer.postProcessing = postProcessingPSet("ZMM_14", seedParentDepth=2)  # pre
 
 The same module backs the standalone dumper (`python3 truthGraphSelections.py <fragment>`
 prints the flags) and `makeTruthGallery.sh`, so adding a Run4 sample needs no config edit.
+
+!!! note "Pile-up is an orthogonal axis, not a preset"
+    The seven presets pick the **signal** of a *process*; pile-up is an *overlay*
+    that composes with any of them (ZMM+PU, TTbar+PU, …), so it is **not** an eighth
+    preset. It is handled on two separate layers:
+
+    - **Build layer** (`TruthGraphAccumulator`): `pileupBunchCrossings` (default
+      `{0}` = in-time only) chooses which PU bunch crossings enter the graph, and
+      every node is stamped with its `EncodedEventId` — `(0,0)` signal vs
+      `(bx, puIndex)` pile-up.
+    - **Selection layer** (`postProcessing`): the composable filter
+      `signalOnly = True` keeps only the signal interaction, and
+      `keepBunchCrossings = [0]` keeps only the listed crossings — both drop
+      particles *after* the seed selection, by their `EncodedEventId`, so they layer
+      on top of any preset. Downstream, `Branch::isSignal()` / `isFromPileup()`
+      expose the same provenance. Standalone: `--signal-only` / `--bunch-crossings 0`.
+
+    (MinBias, having no hard scatter, is just the `full` preset — there is no signal
+    to seed on.)
 
 ### Selecting branches at use time
 
