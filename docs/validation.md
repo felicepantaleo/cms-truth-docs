@@ -21,6 +21,10 @@ RecoGlobal steps). Regenerated with `runTruthRelvals.sh`; DOT gallery with
 | H125_diphoton | H125 ggF | 34052.88 | 25 |
 | VBFHZZ4Nu | VBF H→ZZ→4ν | 34131.88 | 25 |
 | TenTau | TenTau E 15–500 | 34087.88 | 15, −15 |
+| SingleTop | ST t-channel (custom) | 34999.88 | 6, −6 |
+| TTbarPowheg | ttbar POWHEG (custom) | 34998.88 | 6, −6 |
+| Diboson | WW→2ℓ2ν (custom) | 34997.88 | 23, 24, −24 |
+| VH | ZH→bb,ℓℓ (custom) | 34996.88 | 25 |
 
 ## Topology audit (after the immediate-GEN-attach fix)
 

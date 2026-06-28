@@ -318,18 +318,27 @@ The special value `seedPdgIds = [0]` disables selection and keeps the full graph
 
 #### Per-process presets
 
-`enableTruth` attaches to **every** Run4 workflow (~140 generator fragments), but the
-right selection depends only on the physics, and they collapse to **seven archetypes**:
+`enableTruth` attaches to **every** Run4 workflow (~140 generator fragments), and the
+same presets are used to pick a focused view across the much larger production zoo
+(validated against all ~740 `genproductions_cards` fragment names). The right selection
+depends only on the physics, and they collapse to these archetypes:
 
 | Preset | Fragments | Selection |
 |---|---|---|
 | `gun` | `Single*`/`Double*`/`Ten*`/`CloseBy*` | seed = the gun species (from the name) |
-| `resonance` | `ZMM`/`ZEE`/`DYTo*`/`Zp*`/`WTo*` | seed the boson (+ ISR), channel decay group |
-| `vbf` | `VBFH*`, `QQToHToTauTau` | seed Higgs **+ keepProductionSiblings** |
-| `ggf` | `H125GGgluonfusion` | seed Higgs |
-| `top` | `TTbar*`, single top, `Tprime*` | seed the top(s) |
+| `resonance` | `ZMM`/`ZEE`/`DYTo*` (incl. n-jet `DY1jTo*`/`dyellell*`), `Zp*`, `WTo*` and **W+jets** (`WJetsToLNu`/`W4JToLNu`) | seed the boson (+ ISR), channel decay group |
+| `vbf` | `VBFH*` (incl. VBF HH), `QQToHToTauTau` | seed Higgs **+ keepProductionSiblings** |
+| `ggf` | `H125GGgluonfusion`, **di-Higgs** `GluGluToHH*`/`HHto*` | seed Higgs (seeds every Higgs) |
+| `vh` | **`WH*`/`ZH*`/`VH*`/`WWH*`/`ZZH*`** (associated Higgs) | seed Higgs **+ keepProductionSiblings** (recoiling boson) |
+| `top` | `TTbar*`, **ttX** (`ttH`/`ttW`/`ttZ`/`ttbb`/four-top/`ttDM`), `Tprime*` | seed the top(s) **+ keepProductionSiblings** |
+| `singletop` | `ST_t*`/`ST_tW`/`ST_s-channel` | seed top **+ keepProductionSiblings** (production partner) |
+| `diboson` | **`WW*`/`WZ*`/`ZZ*`/`VBS*`/same-sign WW** | seed the bosons `{23,24,−24}` **+ keepProductionSiblings** |
 | `heavyflavor` | `Bs*`/`Bu*`/`Jpsi*`/`Upsilon*` | seed by heavy-flavor content (b/c) |
-| `full` | QCD / MinBias / NuGun / unknown | keep the whole graph |
+| `full` | QCD / MinBias / NuGun / **SUSY / LLP / DM / EFT / BSM** / unknown | keep the whole graph |
+
+The exotic/BSM zoo (SUSY, long-lived, dark-matter, EFT, generic BSM resonances) has no
+clean single seed and intentionally lands on `full`. Adding the diboson/VH/ttX/HH/W+jets
+routing dropped the `full`-fallback rate over the production fragment set from 77 % to 45 %.
 
 `PhysicsTools/TruthInfo/python/truthGraphSelections.py` maps a fragment name (or short
 label) to its preset and returns the `postProcessing` selection — overridable per call,
