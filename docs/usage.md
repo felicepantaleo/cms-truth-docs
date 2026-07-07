@@ -488,3 +488,43 @@ tracksters) and the `makeTruthGraphValidationPlots.py` overlay macro — see
 For DQM performance plots comparing the truth `Branch` graph against the legacy
 truth objects (`CaloParticle`, `SimCluster`, `TrackingParticle`), and the topology
 audits across the relval library, see the [Validation](validation.md) page.
+
+## Trackster-to-branch associations and the training dataset
+
+`AllTracksterToTruthBranchAssociatorsProducer` (PhysicsTools/TruthInfo) associates
+TICL trackster collections to truth branches: one pair of `ticl::AssociationMap`
+products per configured collection (instance labels `<label>ToTruthBranch` and
+`TruthBranchTo<label>`), each entry carrying the shared HGCAL rechit energy and the
+normalized association score of `truth::BranchHitAssociator` (both directions). The
+branch key is the root particle index in the `truth::Graph`.
+
+The branch roots are the particles that physically entered the calorimeter: the
+SimTrack tracker-calo boundary checkpoint (`Checkpoint::checkpointId == 0`),
+excluding back-scattered re-entries. This is the CaloParticle boundary semantics
+read off the graph and it forms an antichain by construction: beam particles never
+cross, in-calo shower secondaries are born inside and never cross, and a particle
+interacting or converting before the calorimeter promotes its crossing products.
+An optional `branchPdgIds` restriction narrows the species; the default (empty)
+keeps every crossing particle.
+
+`TracksterTruthBranchTableProducer` (DPGAnalysis/HGCalNanoAOD) dumps the
+associations to NanoAOD: a `TruthBranch` table (pdgId, kinematics, gen/sim
+provenance, back-scatter flag, graph root index) over the union of matched roots,
+and one pair table per collection (`tracksterIdx`, `branchIdx`, `sharedEnergy`,
+`score`). Together with the trackster feature tables this is a per-trackster
+training dataset with continuous truth labels; a trackster with no pair rows is
+the principled "unknown". Purity and completeness are one join away
+(sharedEnergy over the trackster raw energy and over the branch energy).
+
+Production is a two-step chain, because the associator needs the sim hits while
+the NanoAOD step does not:
+
+```
+cmsDriver.py step3 -s RAW2DIGI,RECO ... \
+  --customise PhysicsTools/TruthInfo/customiseTruthBranchTraining.customise
+cmsDriver.py step4 -s NANO:@HGCALTruth ...
+```
+
+The customisation runs the truth chain plus the associator during RECO and
+persists the `truth::Graph` and the association maps; the `@HGCALTruth` autoNANO
+flavour builds the tables from them.
