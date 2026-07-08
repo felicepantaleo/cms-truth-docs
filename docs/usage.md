@@ -528,3 +528,26 @@ cmsDriver.py step4 -s NANO:@HGCALTruth ...
 The customisation runs the truth chain plus the associator during RECO and
 persists the `truth::Graph` and the association maps; the `@HGCALTruth` autoNANO
 flavour builds the tables from them.
+
+### Hierarchical labels: clean, ambiguous, unknown
+
+The label table (an extension of each trackster feature table) assigns every
+trackster the LOWEST truth-graph node whose branch contains it with purity of at
+least `labelPurityMin` (default 0.75):
+
+- `labelClass 0` (clean): a single calo-entering particle dominates; `labelPdgId`
+  is its species. The standard PID training label.
+- `labelClass 1` (ambiguous): no single leaf is pure, but a DECAY-LEVEL common
+  ancestor of the significant contributors is: the trackster merges different legs
+  of the same decay (the photons of a pi0, the products of a D0 or a phi, the legs
+  of a conversion). `labelPdgId` is the ancestor species; which leaf PID to assign
+  is genuinely unclear.
+- `labelClass 2` (unknown): the significant contributors share no physical ancestor
+  below the parton or event level (or nothing matches above `minSharedEnergy`):
+  the trackster mixes unrelated particles, i.e. it is fake.
+
+The ancestor search takes the contributors above `contributorMinFraction` of the
+matched energy and uses `truth::Graph::lowestCommonAncestor`; partonic ancestors
+(quarks, gluons) mean "same jet", which is the unknown class, not ambiguous. The
+companion columns `labelPurity`, `leafPurity` and `matchedFraction` carry the
+continuous quantities the thresholds act on, so the cuts can be re-tuned offline.
