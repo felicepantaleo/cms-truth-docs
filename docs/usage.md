@@ -551,3 +551,23 @@ matched energy and uses `truth::Graph::lowestCommonAncestor`; partonic ancestors
 (quarks, gluons) mean "same jet", which is the unknown class, not ambiguous. The
 companion columns `labelPurity`, `leafPurity` and `matchedFraction` carry the
 continuous quantities the thresholds act on, so the cuts can be re-tuned offline.
+
+### Multi-level branch SimTracksters
+
+`BranchSimTracksterProducer` materializes branches as `ticl::Trackster`
+collections (SIM iteration) at every level of the graph. Level 0 is the
+calo-entering antichain: one trackster per boundary-crossing particle, covering
+its whole shower. Each higher level is a decay or interaction ancestor that
+merges at least two selected nodes (a pi0 over its photons, a rho, omega, eta, K0,
+D or tau over its products). The parton shower is excluded; a partonic merge node
+is kept only when it carries the `kIsHardProcess` status flag. Each trackster's
+vertices are the layer clusters touched by the node's subgraph hits (shared
+fractions encoded in the vertex multiplicities), the node's truth momentum is the
+regressed energy, and the node species sets a one-hot PID, so the whole
+SimTrackster toolchain works against any level. Parallel products carry `level`,
+`rootId` and `pdgId`, and a `roots` list that
+`AllTracksterToTruthBranchAssociatorsProducer` consumes (`rootsSrc`) to produce
+reco associations against every level at once; the `@HGCALTruth` NanoAOD flavour
+dumps them as the `TruthBranchAllLevels` and `*ToTruthBranchAllLevels` tables.
+Together with the leaf-level labels this lets an ambiguous trackster be scored
+against the level where it IS pure (the pi0 instead of either photon).
