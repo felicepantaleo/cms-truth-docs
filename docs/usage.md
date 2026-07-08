@@ -571,3 +571,5 @@ reco associations against every level at once; the `@HGCALTruth` NanoAOD flavour
 dumps them as the `TruthBranchAllLevels` and `*ToTruthBranchAllLevels` tables.
 Together with the leaf-level labels this lets an ambiguous trackster be scored
 against the level where it IS pure (the pi0 instead of either photon).
+
+> Note: since the MCTruthHelper fill, ParticleData.statusFlags carries real reco::GenStatusFlags for HepMC2-built graphs (isHardProcess etc.); HepMC3-built graphs still carry 0 pending an MCTruthHelper HepMC3 specialization.
