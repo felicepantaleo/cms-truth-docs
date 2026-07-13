@@ -529,35 +529,50 @@ The customisation runs the truth chain plus the associator during RECO and
 persists the `truth::Graph` and the association maps; the `@HGCALTruth` autoNANO
 flavour builds the tables from them.
 
-### Trackster labels: leaf and adaptive
+### Hierarchical labels: clean, ambiguous, unknown
 
-`TracksterFeatureFlatTableProducer` extends each trackster feature table with two
-truth PID labels, both read off the trackster-to-branch associations, plus the
-companion columns training consumes.
+The `TruthBranch` label table (`TracksterTruthBranchTableProducer`,
+DPGAnalysis/HGCalNanoAOD) assigns every trackster the LOWEST truth-graph node whose
+branch contains it with purity of at least `labelPurityMin` (default 0.75):
 
-`label` (leaf) is the single-particle class of the best calo-crossing branch by
-shared energy (the highest-`sharedEnergy` leaf above `minSharedEnergy`). Leaves are
-single particles, so this is always a clean single-class label: `0` em (electron or
-photon), `1` mip (muon), `2` hadronic (any meson or baryon), `5` fake (nothing
-matches, or the match is not a calo object). `best_pdg` and `best_sharedE` carry the
-matched species and its shared energy.
+- `labelClass 0` (clean): a single calo-entering particle dominates; `labelPdgId`
+  is its species. The standard PID training label.
+- `labelClass 1` (ambiguous): no single leaf is pure, but a DECAY-LEVEL common
+  ancestor of the significant contributors is: the trackster merges different legs
+  of the same decay (the photons of a pi0, the products of a D0 or a phi, the legs
+  of a conversion). `labelPdgId` is the ancestor species; which leaf PID to assign
+  is genuinely unclear.
+- `labelClass 2` (unknown): the significant contributors share no physical ancestor
+  below the parton or event level (or nothing matches above `minSharedEnergy`):
+  the trackster mixes unrelated particles, i.e. it is fake.
+
+The ancestor search takes the contributors above `contributorMinFraction` of the
+matched energy and uses `truth::Graph::lowestCommonAncestor`; partonic ancestors
+(quarks, gluons) mean "same jet", which is the unknown class, not ambiguous. The
+companion columns `labelPurity`, `leafPurity` and `matchedFraction` carry the
+continuous quantities the thresholds act on, so the cuts can be re-tuned offline.
+
+### Feature-table PID label: label and label_adaptive
+
+The trackster FEATURE table (`TracksterFeatureFlatTableProducer`,
+PhysicsTools/TruthInfo, the one production dumps for training) carries its OWN
+calo-class label, distinct from the `labelClass` above and computed by a different
+search. `label` (leaf) is the single-particle class of the best calo-crossing branch
+by shared energy (the highest-`sharedEnergy` leaf above `minSharedEnergy`): `0` em
+(electron/photon), `1` mip (muon), `2` hadronic (any meson or baryon), `5` fake;
+`best_pdg` and `best_sharedE` carry the matched species and its shared energy.
 
 `label_adaptive` is the class of the branch the adaptive search picks: the graph
-level whose subgraph hits best match the reco trackster. Climbing one ancestor
-further only adds that ancestor's other, far-away sim hits, which lowers the shared
-fraction, so the search stops at the level that actually matches. Its class is:
-
-- a single calo-crossing particle takes its own class (em, mip or hadronic);
-- a merge node (an ancestor reached by several crossing leaves), or a particle that
-  crosses the boundary but decays before it can shower (a tau), is classified by its
-  calo-crossing descendant leaves, the real shower-makers: any hadronic leaf makes it
-  `4` merged_hadron, otherwise an electron or photon `3` merged_em, otherwise a muon
-  `1` mip. This is what lets a hadronic tau read as a merged hadronic system instead
-  of falling to fake on pdgId 15, which is not itself a calo object;
-- `5` fake when nothing matches above `minSharedEnergy`.
-
-`adaptive_pdg`, `adaptive_sharedE` and `adaptive_score` carry the picked level's
-species and the continuous match quantities, so the label can be re-cut offline.
+level whose subgraph hits best match the reco trackster (climbing one ancestor
+further only adds its far-away sim hits, which lowers the shared fraction, so the
+search stops at the matching level). A single calo-crossing particle takes its own
+class (em/mip/hadronic); a merge node, or a particle that crosses the boundary but
+decays before it can shower (a tau), is classified by its calo-crossing DESCENDANT
+leaves, the real shower-makers: any hadronic leaf makes it `4` merged_hadron, else an
+electron or photon `3` merged_em, else a muon `1` mip. This is what lets a hadronic
+tau read as a merged hadronic system instead of falling to fake on pdgId 15, which is
+not itself a calo object. `adaptive_pdg`, `adaptive_sharedE` and `adaptive_score`
+carry the picked level and its continuous match quantities.
 
 Two more columns separate signal from pileup: `is_primary` is `1` when the matched
 particle is from the hard scatter (bunch crossing 0, event 0) and `0` for pileup,
