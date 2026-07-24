@@ -161,35 +161,38 @@ energies over *all* particles in a cell, so the persisted index must stay comple
 high. Do not shrink the index without also persisting a separate all-contributor
 per-cell total map.
 
-### The workflow
+### Default for Run4, not a special workflow
 
-`Configuration/PyReleaseValidation` registers `enableTruthMixed` (offset `.89`,
-TTbar Run4): `enableTruth` at GenSim, `customiseTruthDigi` at Digi,
-`enableTruth` + `customiseTruthMixedReco.customise` at RecoGlobal, `enableTruth` at
-HARVEST.
+The whole chain is wired under the **`enableTruth` modifier**, and `enableTruth` is
+added to the **`Phase2C22I13M9` era**, so truth is on by default for Run4 with no
+special workflow (`Phase2C26I13M9` and the `noMkFit` variants inherit it through the
+C22 chain):
 
-```bash
-# no-PU flavor and PU200 flavor
-runTheMatrix.py -l 27234.89 --what upgrade   # TTbar Run4D104
-runTheMatrix.py -l 27434.89 --what upgrade   # TTbar Run4D104 PU200
-```
+- `digitizers_cfi` registers the `TruthGraphAccumulator` in the mixing digitizers;
+- `Digi_cff` builds the logical graph + unresolved hit index right after mixing;
+- `EventContent` keeps the compact truth in FEVTDEBUGHLT and RECOSIM;
+- `truthGraphValidation_cff` / `globalValidation_cff` consume the DIGI-built graph at
+  RECO (associators + validators with `rawSrc=mix`), and deliberately do NOT import
+  the signal-only build producers, which would attach at RECO and shadow the
+  DIGI-built products.
 
-The PU200 flavor uses **classic mixing** (`--pileup AVE_200_BX_25ns
---pileup_input das:/RelValMinBias_14TeV/.../GEN-SIM`), which is what the accumulator
-needs: the raw pileup `g4SimHits` are overlaid and captured during mixing. Two
-requirements follow, and both must be met for the pileup truth to be correct:
+**Excluded where it cannot work:** `premix_stage2` (premixed pileup carries no raw PU
+`SimTrack`s) and FastSim (no full-sim `g4SimHits`) both drop `enableTruth`. Phase-2
+uses classic mixing, which is what the accumulator needs: the raw pileup `g4SimHits`
+are overlaid and captured during mixing.
 
-- **classic mixing, not premix**: premixed pileup carries no raw PU `SimTrack`s,
-  so the accumulator has nothing to build from;
-- **the MinBias pileup library must itself be produced with `enableTruth`**: the
-  `ReconnectDroppedAncestors` connectivity is what keeps the pileup
-  SimTrack/SimVertex graph well formed; the stock MinBias leaves the pileup
-  subgraphs poorly connected.
+**The one central-sample requirement:** because it is default on all Run4 PU, the
+Run4 MinBias pileup library should itself be produced with `enableTruth`, so the
+`ReconnectDroppedAncestors` connectivity keeps the pileup SimTrack/SimVertex graph
+well formed. The stock MinBias still works, just with poorer pileup subgraphs. The
+truth-off A/B baseline is reachable by using a non-`enableTruth` era
+(`ReconnectDroppedAncestors` is detector-neutral, so the reco stays comparable).
 
 The full build→persist→consume→validate→harvest chain is verified end to end on a
 no-PU gun sample: the `BranchHGCalValidator` efficiency/completeness/purity/response
-plots are produced from the DIGI-built truth. PU200 runtime validation is pending a
-truth-enabled MinBias library.
+plots are produced from the DIGI-built truth. The change is config-generation
+validated (accumulator, build and keeps appear via the era; RECO consumes; premix and
+FastSim exclude it); runtime and relval validation is the next step.
 
 ## What remains
 
