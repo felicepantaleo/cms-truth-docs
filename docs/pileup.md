@@ -117,8 +117,83 @@ Two practical notes:
   (full DIGI + in-time pile-up, 3 events) and now carries the provenance:
   `signalParticles = 69549`, `pileupParticles = 269076` across the three events.
 
+## Production flow: build at DIGI, consume at RECO
+
+For a split production (GEN-SIM, DIGI-RAW, RECO, Validation as separate jobs) the
+mixed truth is built **once, at the mixing/DIGI step**, where the merged
+signal+pileup sim-hits are live, and every later step consumes it. This is what
+`mixedTruthGraphCustomize.customiseTruthDigi` does:
+
+1. registers the `TruthGraphAccumulator` (the merged raw `TruthGraph_mix`);
+2. builds the logical graph and the per-particle per-cell **hit index** right after
+   mixing (`buildCompactTruthAtDigi`), reading the accumulator's merged calo
+   (and, under `includeTrackingHits`, tracker/muon) sim-hits;
+3. applies an event-content level.
+
+The hit index is built **unresolved** (`recHitMap = ""`, so `recHitIndex` stays
+invalid). This is deliberate: the shared-energy association
+(`truth::BranchHitAssociator`) matches reco objects to branches **by `DetId`**, not
+by `recHitIndex`, and it keys the per-cell total-sim-energy denominator on `DetId`
+too. The same unresolved index therefore serves every later stage that exposes its
+reco objects as `(DetId, fraction)` (L1, HLT, offline RECO), and the bulky merged
+sim-hits never have to cross the DIGI→RECO boundary. (MTD is left out of the DIGI
+index: its channel needs the reco Mtd cluster associations, which are RECO-stage
+products.)
+
+At RECO, `customiseTruthMixedReco.customise` drops the signal-only rebuild that
+`enableTruth` would otherwise schedule, so the branch validators and association
+producers resolve to the DIGI-built mixed products; it repoints the validators'
+`rawSrc` to `TruthGraph_mix`; and it persists the truth. No rebuild and no sim-hits
+are needed at RECO.
+
+### Event content: `compact` vs `full`
+
+`truthEventContent_cff` defines two verbosity levels (`setTruthEventContent`):
+
+| Level | Keeps | Serves |
+|---|---|---|
+| `compact` (default) | logical graph + **unresolved** hit index + raw `TruthGraph_mix` | correct hits-and-fractions shared energy at any stage whose rechits share the cell-level `DetId` space (HLT, offline RECO) |
+| `full` | compact + merged sim-hits (calo, plus tracking under `includeTrackingHits`) | re-association at a **different granularity** (e.g. L1 trigger cells) or with a different metric, from the raw deposits |
+
+**Denominator invariant:** the fraction denominator is the sum of the index hit
+energies over *all* particles in a cell, so the persisted index must stay complete
+(every hit-leaving contributor, no pdgId pruning); pruning it biases every fraction
+high. Do not shrink the index without also persisting a separate all-contributor
+per-cell total map.
+
+### The workflow
+
+`Configuration/PyReleaseValidation` registers `enableTruthMixed` (offset `.89`,
+TTbar Run4): `enableTruth` at GenSim, `customiseTruthDigi` at Digi,
+`enableTruth` + `customiseTruthMixedReco.customise` at RecoGlobal, `enableTruth` at
+HARVEST.
+
+```bash
+# no-PU flavor and PU200 flavor
+runTheMatrix.py -l 27234.89 --what upgrade   # TTbar Run4D104
+runTheMatrix.py -l 27434.89 --what upgrade   # TTbar Run4D104 PU200
+```
+
+The PU200 flavor uses **classic mixing** (`--pileup AVE_200_BX_25ns
+--pileup_input das:/RelValMinBias_14TeV/.../GEN-SIM`), which is what the accumulator
+needs: the raw pileup `g4SimHits` are overlaid and captured during mixing. Two
+requirements follow, and both must be met for the pileup truth to be correct:
+
+- **classic mixing, not premix**: premixed pileup carries no raw PU `SimTrack`s,
+  so the accumulator has nothing to build from;
+- **the MinBias pileup library must itself be produced with `enableTruth`**: the
+  `ReconnectDroppedAncestors` connectivity is what keeps the pileup
+  SimTrack/SimVertex graph well formed; the stock MinBias leaves the pileup
+  subgraphs poorly connected.
+
+The full build→persist→consume→validate→harvest chain is verified end to end on a
+no-PU gun sample: the `BranchHGCalValidator` efficiency/completeness/purity/response
+plots are produced from the DIGI-built truth. PU200 runtime validation is pending a
+truth-enabled MinBias library.
+
 ## What remains
 
 See the [Roadmap](roadmap.md): full GEN+SIM for the signal (factor the producer
-build), the mixed hit index (B2), premix-library storage of the minbias graph (B3),
-and a CPfromPU-style simplification for PU200 storage (B4).
+build), premix-library storage of the minbias graph (B3), and a CPfromPU-style
+simplification for PU200 storage (B4). The mixed hit index (B2) is built at DIGI as
+described above.
