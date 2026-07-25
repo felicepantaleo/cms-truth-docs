@@ -113,10 +113,10 @@ members:
 
 ```cpp
 enum class HitChannel : uint8_t {
-  HGCalCalo = 0,  // calorimeter PCaloHits, recHit-mapped via the DetId->RecHit map
-  Tracker   = 1,  // tracker PSimHits, energy = energyLoss, no recHit link
-  MTD       = 2,  // MIP timing layer (BTL/ETL)
-  Muon      = 3   // muon chambers (DT/CSC/RPC/GEM)
+  Tracker = 0,  // tracker PSimHits, energy = energyLoss, no recHit link
+  MTD     = 1,  // MIP timing layer (BTL/ETL)
+  Calo    = 2,  // all calorimeter PCaloHits (HGCAL endcap + ECAL barrel + HCAL), recHit-mapped via the DetId->RecHit map
+  Muon    = 3   // muon chambers (DT/CSC/RPC/GEM)
 };
 inline constexpr std::size_t kNumHitChannels = 4;
 ```
@@ -143,7 +143,7 @@ CSR struct; the per-particle spans are reached through the channel accessors:
 
 - Each `Hit` is `{detId, recHitIndex, energy}` (unchanged). `recHitIndex` is the
   position in the global RecHit ordering from `SimHitToRecHitMapProducer` and is set
-  only for channels that carry a DetId→RecHit link (`HGCalCalo`); for the tracker it
+  only for channels that carry a DetId→RecHit link (`Calo`); for the tracker it
   stays `Hit::invalidRecHitIndex` (the order is HGCal collections first, then PF
   collections — changing it changes every index). `Hit::hasRecHit()` tests validity.
 - **One entry per DetId; `energy` is the summed sim deposit.** When a particle (or,
@@ -177,7 +177,7 @@ CSR struct; the per-particle spans are reached through the channel accessors:
     The four channels are populated by `LogicalGraphHitIndexProducer`, each from its
     own subdetector sources:
 
-    - **HGCalCalo** — `PCaloHit`s (HGCAL EE/HE + ECAL barrel + HCAL) matched by
+    - **Calo**: `PCaloHit`s (HGCAL EE/HE + ECAL barrel + HCAL) matched by
       `geantTrackId()`, with `recHitIndex` from the `DetIdRecHitMap`.
     - **Tracker** — tracker `PSimHit`s matched by `trackId()`; no recHit link.
     - **MTD** — filled from `MtdSimLayerCluster` (already keyed by the producing
@@ -193,7 +193,7 @@ CSR struct; the per-particle spans are reached through the channel accessors:
       work). ME0 hits are read but have no rechits.
 
     **Choosing subdetectors.** The producer takes a `subdetectors` list (default
-    `{HGCalCalo, Tracker, MTD, Muon}`); a channel left off the list stays empty and
+    `{Calo, Tracker, MTD, Muon}`); a channel left off the list stays empty and
     `hasChannel(...)` returns `false` for it. Each subdetector's input collections are
     separate config parameters (`simHitCollections`, `trackerSimHitCollections`,
     `muonSimHitCollections`, `mtdSimLayerClusters` + the FTLCluster inputs), so a user
@@ -233,7 +233,7 @@ object, efficiently finds the best truth branches.
 - **Metrics:** `SharedEnergy` (the HGCal by-hits score:
   `score = (1/Σ(f·E)²) · Σ max(0, f_reco − f_branch)²·E²`) and `SharedHits`.
 - Works on any one channel, selected by a `HitChannel` constructor argument
-  (default `HitChannel::HGCalCalo`).
+  (default `HitChannel::Calo`).
 
 !!! note "Technical details"
     The inverted index and per-cell energy map are flat, sorted CSR-style arrays

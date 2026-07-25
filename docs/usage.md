@@ -396,7 +396,7 @@ if (select(branch)) { /* passes */ }
 The hit index answers, per logical particle and per detector **channel**, two
 questions: which SimHits the particle produced **directly**, and which its whole
 **subgraph** produced (the full shower / decay-branch footprint). The channels are
-keyed by `truth::HitChannel` (`HGCalCalo`, `Tracker`, `MTD`, `Muon`), each with its
+keyed by `truth::HitChannel` (`Calo`, `Tracker`, `MTD`, `Muon`), each with its
 own DetId space and metric. The accessors take the channel first, then the particle
 id:
 
@@ -408,9 +408,9 @@ using truth::HitChannel;
 
 for (uint32_t pid = 0; pid < hitIndex.nParticles(); ++pid) {
   std::span<const truth::LogicalGraphHitIndex::Hit> direct =
-      hitIndex.directHits(HitChannel::HGCalCalo, pid);
+      hitIndex.directHits(HitChannel::Calo, pid);
   std::span<const truth::LogicalGraphHitIndex::Hit> subgraph =
-      hitIndex.subgraphHits(HitChannel::HGCalCalo, pid);
+      hitIndex.subgraphHits(HitChannel::Calo, pid);
   std::span<const truth::LogicalGraphHitIndex::Hit> trk =
       hitIndex.subgraphHits(HitChannel::Tracker, pid);
 
@@ -425,7 +425,7 @@ for (uint32_t pid = 0; pid < hitIndex.nParticles(); ++pid) {
 
 Each `Hit` is `{detId, recHitIndex, energy}`; subgraph spans are contiguous and
 DetId-sorted, so two particles' footprints merge by a linear merge-join. `recHitIndex`
-is set where a recHit link exists: `HGCalCalo` (the HGCal recHit ordering) and `MTD`
+is set where a recHit link exists: `Calo` (the HGCal recHit ordering) and `MTD`
 (the FTLCluster ordering — note it is *channel-relative*, not the same ordering as
 calo). `Tracker` and `Muon` carry no per-cell energy / no recHit link and leave it
 invalid, so their matching is by shared-hit multiplicity. All four channels are
@@ -439,7 +439,7 @@ the hit index once per event, then `bestBranches()` answers any reco object by a
 merge-join of its hits against each candidate's subgraph span, scored and sorted
 best-first (`score` ascending). Two metrics: `SharedEnergy` (the HGCal by-hits
 score, comparing cell fractions) and `SharedHits` (cell multiplicity). A
-`truth::HitChannel` constructor argument (default `HitChannel::HGCalCalo`) selects
+`truth::HitChannel` constructor argument (default `HitChannel::Calo`) selects
 which channel of the hit index it matches against — pass `HitChannel::Tracker` for
 tracks.
 

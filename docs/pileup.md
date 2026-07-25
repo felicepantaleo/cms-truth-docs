@@ -126,8 +126,10 @@ signal+pileup sim-hits are live, and every later step consumes it. This is what
 
 1. registers the `TruthGraphAccumulator` (the merged raw `TruthGraph_mix`);
 2. builds the logical graph and the per-particle per-cell **hit index** right after
-   mixing (`buildCompactTruthAtDigi`), reading the accumulator's merged calo
-   (and, under `includeTrackingHits`, tracker/muon) sim-hits;
+   mixing (`buildCompactTruthAtDigi`), reading the accumulator's merged sim-hits. The
+   default scope is the full detector (Calo + Tracker + Muon; the MTD channel is
+   resolved at RECO), and `customiseTruthReduced` drops the Tracker channel for
+   cost-sensitive runs, leaving calo + MTD + muon;
 3. applies an event-content level.
 
 The hit index is built **unresolved** (`recHitMap = ""`, so `recHitIndex` stays
@@ -153,7 +155,7 @@ are needed at RECO.
 | Level | Keeps | Serves |
 |---|---|---|
 | `compact` (default) | logical graph + **unresolved** hit index + raw `TruthGraph_mix` | correct hits-and-fractions shared energy at any stage whose rechits share the cell-level `DetId` space (HLT, offline RECO) |
-| `full` | compact + merged sim-hits (calo, plus tracking under `includeTrackingHits`) | re-association at a **different granularity** (e.g. L1 trigger cells) or with a different metric, from the raw deposits |
+| `full` | compact + the merged sim-hits of every in-scope channel | re-association at a **different granularity** (e.g. L1 trigger cells) or with a different metric, from the raw deposits |
 
 **Denominator invariant:** the fraction denominator is the sum of the index hit
 energies over *all* particles in a cell, so the persisted index must stay complete
@@ -164,9 +166,10 @@ per-cell total map.
 ### Default for Run4, not a special workflow
 
 The whole chain is wired under the **`enableTruth` modifier**, and `enableTruth` is
-added to the **`Phase2C22I13M9` era**, so truth is on by default for Run4 with no
-special workflow (`Phase2C26I13M9` and the `noMkFit` variants inherit it through the
-C22 chain):
+added to the **`Phase2C17I13M9` era** (the common, HGCal-geometry-agnostic Phase-2
+base), so truth is on by default for Run4 with no special workflow: `Phase2C20I13M9`
+(hfnose), `Phase2C22I13M9` (HGCal V18), `Phase2C26I13M9` (V19) and the `noMkFit`
+variants all inherit it, as does any future geometry era layered on C17:
 
 - `digitizers_cfi` registers the `TruthGraphAccumulator` in the mixing digitizers;
 - `Digi_cff` builds the logical graph + unresolved hit index right after mixing;
@@ -181,18 +184,20 @@ C22 chain):
 uses classic mixing, which is what the accumulator needs: the raw pileup `g4SimHits`
 are overlaid and captured during mixing.
 
-**The one central-sample requirement:** because it is default on all Run4 PU, the
-Run4 MinBias pileup library should itself be produced with `enableTruth`, so the
-`ReconnectDroppedAncestors` connectivity keeps the pileup SimTrack/SimVertex graph
-well formed. The stock MinBias still works, just with poorer pileup subgraphs. The
-truth-off A/B baseline is reachable by using a non-`enableTruth` era
-(`ReconnectDroppedAncestors` is detector-neutral, so the reco stays comparable).
+**No special pileup sample is needed:** `ReconnectDroppedAncestors` is now an
+unconditional GEN-SIM default (no longer gated by `enableTruth`), so any Run4 MinBias
+library already carries the well-formed SimTrack/SimVertex connectivity the pileup
+truth graph relies on. The truth-off A/B baseline is reachable by using a
+non-`enableTruth` era; the only GEN-SIM difference (`ReconnectDroppedAncestors`) is
+detector-neutral, so the reco stays comparable.
 
 The full build→persist→consume→validate→harvest chain is verified end to end on a
 no-PU gun sample: the `BranchHGCalValidator` efficiency/completeness/purity/response
-plots are produced from the DIGI-built truth. The change is config-generation
-validated (accumulator, build and keeps appear via the era; RECO consumes; premix and
-FastSim exclude it); runtime and relval validation is the next step.
+plots are produced from the DIGI-built truth. The change is config-generation and
+single-event-runtime validated on D122/V19 (the full-detector truth builds, persists
+and reads back: the logical graph, the unresolved hit index and `TruthGraph_mix` are
+all written, with the Calo channel carrying HGCAL, ECAL barrel and HCAL); full relval
+plus IB validation is the next step.
 
 ## What remains
 

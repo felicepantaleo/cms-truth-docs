@@ -355,7 +355,7 @@ The per-logical-particle hit index, indexed by particle id and by detector
 hardcoded members:
 
 ```cpp
-enum class HitChannel : uint8_t { HGCalCalo = 0, Tracker = 1, MTD = 2, Muon = 3 };
+enum class HitChannel : uint8_t { Tracker = 0, MTD = 1, Calo = 2, Muon = 3 };
 inline constexpr std::size_t kNumHitChannels = 4;
 ```
 
@@ -376,7 +376,7 @@ Channel const&        channel(HitChannel channel) const;      // raw flat storag
 
 A `Hit` is `{ uint32_t detId; uint32_t recHitIndex; float energy; }` with
 `bool hasRecHit() const` (⇔ `recHitIndex != Hit::invalidRecHitIndex`). `recHitIndex`
-is set only for channels carrying a DetId→RecHit link (`HGCalCalo`); the tracker
+is set only for channels carrying a DetId→RecHit link (`Calo`); the tracker
 leaves it invalid. A `Channel` is the CSR struct
 `{ directOffsets, directHits, subgraphOffsets, subgraphHits }`, exposed for callers
 that scan a whole channel (e.g. `BranchHitAssociator`'s inverted-index build); most
@@ -401,7 +401,7 @@ enum class Metric { SharedEnergy, SharedHits };
 explicit BranchHitAssociator(LogicalGraphHitIndex const& hitIndex,
                              std::vector<uint32_t> candidateRoots = {},
                              Metric metric = Metric::SharedEnergy,
-                             HitChannel channel = HitChannel::HGCalCalo);
+                             HitChannel channel = HitChannel::Calo);
 
 std::vector<BranchMatch> bestBranches(std::span<const RecoHit> recoHits,
                                       std::size_t maxResults = 0) const;  // 0 = all
@@ -437,7 +437,7 @@ std::vector<RecoHit> truth::recoHits(ticl::Trackster const& trackster,
 - `Metric::SharedHits` counts shared cells (`sharedEnergy` then holds that count);
   the natural metric for the tracker, where hits carry no per-cell energy.
 - The `channel` argument selects which `HitChannel` of the hit index `bestBranches`
-  matches against — `HitChannel::HGCalCalo` (the default) for calorimeter objects,
+  matches against: `HitChannel::Calo` (the default) for calorimeter objects,
   `HitChannel::Tracker` for tracks, and so on once MTD/Muon are filled.
 
 See [How to use the graph → matching an arbitrary reco object](usage.md#matching-an-arbitrary-reco-object-to-a-branch)

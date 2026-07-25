@@ -99,7 +99,7 @@ int nProng = std::count_if(leaves.begin(), leaves.end(), [](truth::Particle cons
 
 Each leaf's calorimeter and tracker hits are available through the
 [hit index](usage.md#hit-content-and-matching-reco-objects)
-(`subgraphHits(HitChannel::HGCalCalo, …)` / `subgraphHits(HitChannel::Tracker, …)`),
+(`subgraphHits(HitChannel::Calo, …)` / `subgraphHits(HitChannel::Tracker, …)`),
 so the τ Branch carries the union of its
 daughters' detector footprints — the basis for matching a reco jet or track back to
 "which τ did this come from".
