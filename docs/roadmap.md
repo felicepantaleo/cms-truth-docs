@@ -12,11 +12,17 @@ landed.
    factoring `TruthGraphProducer`'s build into a shared helper so the accumulator
    can call it for the signal sub-event; verify the no-PU cppunit + a no-PU graph
    diff stay identical after the refactor.
-2. **B2 — mixed hit index**: accumulate per sub-event, consistent with the digis.
-3. **B3 — premix-library storage** of each minbias raw `TruthGraph` (+ per-particle
-   hit index) so the stage-2 overlay is consistent by construction.
-4. **B4 — CPfromPU-style simplification**: thresholded/collapsed pileup for PU200
+2. **B3, premix-library storage** of each minbias raw `TruthGraph` (+ per-particle
+   hit index) so the stage-2 overlay is consistent by construction. Only relevant if
+   truth is ever wanted under premixing: today `premix_stage2` drops the accumulator
+   and the build, because premixed pileup carries no raw pileup `SimTrack`s.
+3. **B4, CPfromPU-style simplification**: thresholded/collapsed pileup for PU200
    storage (mirroring `removeCPFromPU`).
+
+(B2, the mixed hit index accumulated per sub-event, is done: the index is built after
+mixing from the accumulator's merged sim-hits, and every hit is keyed by its
+`EncodedEventId` together with the `SimTrack` trackId, so sub-events cannot collide.
+See [Pileup](pileup.md).)
 
 ## Validation
 

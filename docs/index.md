@@ -8,30 +8,33 @@ branches, hits — instead of depending directly on the storage details of
 `GenParticle`, `SimTrack`, `GenVertex`, `SimVertex`, `PCaloHit`/`PSimHit`, and the
 legacy truth objects (`TrackingParticle`, `CaloParticle`, `SimCluster`).
 
-!!! warning "Status: prototype, under heavy development"
-    This documents work in progress on the branch
-    `felicepantaleo:truthGraph_CMSSW_20` (developed on `CMSSW_20_0_0_pre1`, also
-    validated on `CMSSW_17_0_0_pre2`). It is **Phase-2 only**. The chain is gated
+!!! warning "Status: under active development"
+    The packages are in `CMSSW_20_1_X`. It is **Phase-2 only**. The chain is gated
     behind the `enableTruth` process modifier, which the Run4 eras apply from
     `Phase2C17I13M9` onwards, so the truth graph is built at DIGI and persisted in
-    the standard Run4 workflows. Run3 and Run2 workflows are unaffected. See
-    [Pileup](pileup.md) for the default-for-Run4 wiring.
+    the standard Run4 workflows; Run3 and Run2 workflows are unaffected. The one
+    ungated change is the `g4SimHits` `ReconnectDroppedAncestors` default, a
+    detector-neutral SimVertex connectivity fix applied to every sample. See
+    [Pileup](pileup.md) for the default-for-Run4 wiring. Interfaces are still
+    evolving: check a signature against the headers before relying on it.
 
 ## What this adds
 
-A new package `PhysicsTools/TruthInfo` (plus a `SimHitToRecHitMap` producer, an
-`enableTruth` modifier, and a validation sequence). Only a handful of pre-existing
-files are touched, all behind `enableTruth` except the `g4SimHits`
-`ReconnectDroppedAncestors` default, which is a detector-neutral SimVertex
-connectivity fix applied to every sample.
+Two packages, `SimDataFormats/TruthInfo` for the data model and
+`PhysicsTools/TruthInfo` for the analysis layer, plus a `SimHitToRecHitMap`
+producer, the `enableTruth` modifier and a validation sequence. The pre-existing
+files that are touched are listed below.
 
 | Area | What |
 |---|---|
-| New package | `PhysicsTools/TruthInfo`: data model, producers, dumpers, flat tables, the `Branch` view, hit associator, selector, tests |
+| New package | `SimDataFormats/TruthInfo`: the data model (`TruthGraph`, `truth::Graph`, `truth::LogicalGraphHitIndex` and their payload types) |
+| New package | `PhysicsTools/TruthInfo`: producers, dumpers, flat tables, the `Branch` view, hit associator, selector, tests |
 | New producer | `SimCalorimetry/HGCalAssociatorProducers`: `SimHitToRecHitMapProducer` + `DetIdRecHitMap` (not HGCal-specific) |
 | New modifier | `Configuration/ProcessModifiers/enableTruth_cff` |
 | New sequence | `Validation/Configuration/truthPrevalidation_cff` |
-| Modified (gated) | `globalValidation_cff.py`, `postValidation_cff.py`, `g4SimHits_cfi.py` + `SimTrackManager` (`ReconnectDroppedAncestors`), `upgradeWorkflowComponents.py` (`.88` workflow variant) |
+| Modified: default-on wiring | `Configuration/Eras` (`enableTruth` on `Phase2C17I13M9`, excluded by `Util_fastSimPhase2_cff`), `Digi_cff.py` (build after mixing), `digitizers_cfi.py` (the accumulator), `EventContent_cff.py` (the truth keeps) |
+| Modified: validation | `globalValidation_cff.py`, `postValidation_cff.py`, `upgradeWorkflowComponents.py` (`.88` workflow variant) |
+| Modified: ungated | `g4SimHits_cfi.py` + `SimTrackManager` (`ReconnectDroppedAncestors`) |
 
 ## The three-layer model at a glance
 
