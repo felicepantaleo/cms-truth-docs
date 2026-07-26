@@ -171,7 +171,7 @@ Where TenTau and ZMM exercise the GEN topology, this sample exercises the **SIM
 cascade**: a single electron radiates, the photons convert, and the products
 re-radiate, so the detectable logical graph is a deep electromagnetic shower. Every
 SIM vertex now carries the **physical process that created it**
-(`Vertex::vertexReason()`, see [Data model](data-model.md#layer-2-truthgraph-logical)),
+(`VertexData::vertexReason()`, see [Data model](data-model.md#layer-2-truthgraph-logical)),
 so the shower is self-describing.
 
 ![SingleElectron EM shower with per-vertex reasons: bremsstrahlung and pair-conversion dominate](img/singleelectron_reasons.svg)
@@ -200,7 +200,7 @@ conversion points of a shower while walking its members:
 int nConversions = 0;
 for (truth::Particle p : branch.members())          // every shower particle
   for (truth::Vertex v : p.productionVertices())     // where it was created
-    if (v.vertexReason() == truth::VertexReason::PairConversion)
+    if (v.data().vertexReason() == truth::VertexReason::PairConversion)
       ++nConversions;                                // a gamma -> e+e- materialisation
 ```
 

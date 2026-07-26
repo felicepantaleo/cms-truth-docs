@@ -3,7 +3,8 @@
 This page is the precise reference for the user-facing C++ interface of the logical
 truth graph: the `truth::Graph` navigation API, the `truth::Branch` subgraph view,
 and the `truth::BranchSelector` / `truth::BranchHitAssociator` helpers. Every
-signature below is copied from the authoritative headers, which live in two packages:
+signature below is quoted from the authoritative headers (with `[[nodiscard]]`
+omitted for brevity), which live in two packages:
 the data-model headers in `SimDataFormats/TruthInfo/interface/` and the analysis-layer
 headers in `PhysicsTools/TruthInfo/interface/`; for the design rationale see the
 [Data model](data-model.md), and for narrative walk-throughs see
@@ -12,7 +13,12 @@ headers in `PhysicsTools/TruthInfo/interface/`; for the design rationale see the
 !!! note "Where each symbol lives"
     | Symbol | Header |
     |---|---|
-    | `truth::Graph`, `truth::Particle`, `truth::Vertex`, `truth::ParticleData`, `truth::VertexData`, `truth::Checkpoint`, `truth::VertexRole` | `SimDataFormats/TruthInfo/interface/Graph.h` |
+    | `truth::Graph` | `SimDataFormats/TruthInfo/interface/Graph.h` |
+    | `truth::Particle` | `SimDataFormats/TruthInfo/interface/Particle.h` |
+    | `truth::Vertex` | `SimDataFormats/TruthInfo/interface/Vertex.h` |
+    | `truth::ParticleData` | `SimDataFormats/TruthInfo/interface/ParticleData.h` |
+    | `truth::VertexData`, `truth::VertexRole`, `truth::VertexReason` | `SimDataFormats/TruthInfo/interface/VertexData.h` |
+    | `truth::Checkpoint` | `SimDataFormats/TruthInfo/interface/Checkpoint.h` |
     | `truth::Branch`, `truth::ClosureSpec`, `truth::ClosureKind` | `PhysicsTools/TruthInfo/interface/Branch.h` |
     | `truth::BranchSelector` | `PhysicsTools/TruthInfo/interface/BranchSelector.h` |
     | `truth::BranchHitAssociator`, `truth::RecoHit`, `truth::BranchMatch`, `truth::HasTruthHits` | `PhysicsTools/TruthInfo/interface/BranchHitAssociator.h` |
@@ -43,7 +49,7 @@ auto const& graph = event.get(graphToken_);            // truth::Graph
 for (uint32_t pid = 0; pid < graph.nParticles(); ++pid) {
   for (uint32_t vid : graph.decayVertices(pid))        // std::span<const uint32_t>
     for (uint32_t cid : graph.outgoingParticles(vid))  // children of pid
-      use(graph.particles[cid]);
+      use(graph.particles()[cid]);
 }
 ```
 
@@ -68,6 +74,7 @@ The per-particle payload (`Particle::data()` returns a `const ParticleData&`):
 | `genEvent` | `int32_t` | GEN connected-component id from the raw graph; `-1` if N/A |
 | `momentum` | `math::XYZTLorentzVectorD` | four-momentum (GEN p4 for GEN+SIM, SimTrack p4 for SIM-only) |
 | `checkpoints` | `std::vector<Checkpoint>` | optional trajectory checkpoints |
+| `backscattered` | `bool` | Geant4 marked the track as inward albedo crossing CALO to Tracker |
 
 `bool hasGen() const` ⇔ `genNode >= 0`; `bool hasSim() const` ⇔ `simNode >= 0`;
 `bool valid() const` ⇔ `hasGen() || hasSim()`.
@@ -86,10 +93,13 @@ propagated far enough.
 | `eventId` | `uint64_t` | packed `EncodedEventId`; `0` if none |
 | `genEvent` | `int32_t` | GEN component id; `-1` if N/A |
 | `role` | `uint8_t` | a `VertexRole` stored as its underlying type |
+| `reason` | `uint8_t` | a `VertexReason` stored as its underlying type |
 | `position` | `math::XYZTLorentzVectorD` | best-available position (SIM if present, else GEN) |
 
 `hasGen()`/`hasSim()`/`valid()` as above. `VertexRole vertexRole() const` and
-`bool isArtificial() const` decode `role`. The roles are:
+`bool isArtificial() const` decode `role`, and `VertexReason vertexReason() const`
+decodes `reason` (the free helper `vertexReasonName(VertexReason)` gives its name).
+The roles are:
 
 - `VertexRole::Normal` — a real GEN/SIM vertex.
 - `VertexRole::Interaction` — the per-interaction artificial source vertex, keyed
@@ -128,6 +138,7 @@ int16_t   status() const;
 uint16_t  statusFlags() const;
 uint64_t  eventId() const;
 int32_t   genEvent() const;
+bool      backscattered() const;
 const math::XYZTLorentzVectorD& momentum() const;
 ```
 
@@ -384,7 +395,8 @@ that scan a whole channel (e.g. `BranchHitAssociator`'s inverted-index build); m
 consumers use the span accessors above.
 
 !!! note "Empty channels return empty spans"
-    `directHits`/`subgraphHits` on an unfilled channel (today `MTD`/`Muon`) or an
+    `directHits`/`subgraphHits` on a channel that was not filled (the `subdetectors`
+    list selects which ones are) or an
     out-of-range particle id return an **empty span**, not an error. Gate on
     `hasChannel(channel)` if you need to distinguish "no hits" from "channel not
     built".
@@ -402,24 +414,56 @@ enum class Metric { SharedEnergy, SharedHits };
 explicit BranchHitAssociator(LogicalGraphHitIndex const& hitIndex,
                              std::vector<uint32_t> candidateRoots = {},
                              Metric metric = Metric::SharedEnergy,
-                             HitChannel channel = HitChannel::Calo);
+                             HitChannel channel = HitChannel::Calo,
+                             bool emptyRootsMeansAll = true);
 
 std::vector<BranchMatch> bestBranches(std::span<const RecoHit> recoHits,
                                       std::size_t maxResults = 0) const;  // 0 = all
 
 template <HasTruthHits R>
 std::vector<BranchMatch> bestBranches(R const& reco, std::size_t maxResults = 0) const;
+
+BranchMatch bestAdaptiveBranch(std::span<const RecoHit> recoHits,
+                               float reverseWeight = 1.f,
+                               float maxReverseScore = 1.f) const;
 ```
+
+`emptyRootsMeansAll` guards the restricted-root case: with the default, an empty
+`candidateRoots` means "every particle"; pass `false` when an empty list must instead
+mean "no candidates", so a selection that legitimately returns nothing does not
+silently widen to the whole event.
 
 The result is sorted by `score` ascending (lower is better):
 
 ```cpp
 struct BranchMatch {
+  static constexpr uint32_t kInvalidRoot = 0xFFFFFFFFu;
+
   uint32_t rootParticleId = 0;
-  float    sharedEnergy = 0.f;  // (SharedHits metric: number of shared cells)
-  float    score = 0.f;         // lower is better
+  float    sharedEnergy = 0.f;   // (SharedHits metric: number of shared cells)
+  float    score = 0.f;          // reco-normalized, lower is better
+  float    reverseScore = 0.f;   // branch-normalized: how far the branch spreads
 };
 ```
+
+### Adaptive-level matching
+
+`bestAdaptiveBranch` answers a different question from `bestBranches`: not "which
+branches share hits with this object" but "at which level of the graph does this
+object best correspond to a single branch". Among every candidate root sharing hits
+with the reco object (leaves and their ancestors, when the candidate set is the
+ancestor closure) it returns the one minimizing
+
+```
+score + reverseWeight * reverseScore
+```
+
+`score` falls as the branch climbs and covers more of the reco object, while
+`reverseScore` rises as the branch spreads into energy the reco object does not have,
+so the minimum is the level that matches the object best. Candidates whose
+`reverseScore` exceeds `maxReverseScore` are rejected; if that empties the candidate
+set the ceiling is ignored and the global minimum is returned. When the reco object
+shares no hits with any root, `rootParticleId` is `BranchMatch::kInvalidRoot`.
 
 The hit format is `truth::RecoHit { uint32_t detId; float energy; float fraction; }`.
 Any reco object that satisfies the `HasTruthHits` concept — exposes a `truthHits()`
@@ -429,6 +473,7 @@ adapters in `RecoHitAdapters.h`:
 
 ```cpp
 std::vector<RecoHit> truth::recoHits(reco::Track const& track);
+std::vector<RecoHit> truth::recoHits(reco::CaloCluster const& layerCluster);
 std::vector<RecoHit> truth::recoHits(ticl::Trackster const& trackster,
                                      std::vector<reco::CaloCluster> const& layerClusters);
 ```

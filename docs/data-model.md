@@ -46,7 +46,8 @@ Particle ↔ Vertex** graph built by `TruthLogicalGraphProducer` from the raw gr
   from the signal `Interaction` vertex (bunch crossing 0, event 0) and each overlaid
   pile-up interaction gets its own. All carry the genEvent/eventId of the activity
   they summarize.
-- **Vertex reason** (`VertexReason`, `Vertex::vertexReason()`): every SIM vertex
+- **Vertex reason** (`VertexReason`, `VertexData::vertexReason()`, reached as
+  `vertex.data().vertexReason()`): every SIM vertex
   carries the *physical process that created it*, decoded from the Geant4 process
   sub-type (`SimVertex::processType()`) of its outgoing track's creator process —
   `Primary`, `Decay`, `Bremsstrahlung`, `Ionisation` (delta-ray), `PairConversion`,
