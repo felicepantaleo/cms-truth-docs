@@ -20,10 +20,6 @@ landed.
 
 ## Validation
 
-- **Wire the Branch validators into the release sequences.** The DQM analyzers,
-  associators and harvesters exist and run standalone; hooking them into
-  `globalValidation` / `postValidation` behind `enableTruth` is still pending — see
-  [Validation](validation.md).
 - **Disjoint "interesting particles" reference for the reco-side validators.** The
   generic reco-side efficiency/merge/duplicate is only well-defined against a
   disjoint (antichain) set of truth branches. A flat PDG-id selection is a

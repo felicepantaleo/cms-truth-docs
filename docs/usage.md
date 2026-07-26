@@ -114,8 +114,18 @@ process.truthLogicalGraphHitIndexProducer = cms.EDProducer(
         cms.InputTag("g4SimHits", "HcalHits", "SIM"),
     ),
     doHGCalRelabelling = cms.bool(False),
+    doHcalRelabelling = cms.bool(True),
 )
 ```
+
+!!! note "Sim-to-reco DetId conversion"
+    The two switches are independent, one per numbering scheme.
+    `doHGCalRelabelling` unpacks the old hexagon-indexed HGCAL simulation DetIds; it
+    is a no-op for the Run4 geometries, whose HGCAL simulation DetId is already the
+    reco DetId, which is why the example above can leave it off. `doHcalRelabelling`
+    runs `HcalHitRelabeller` on the HCAL simulation DetIds, which are in packed test
+    numbering: without it the HCAL entries of the index carry sim ids that match no
+    `HBHERecHit`. ECAL barrel needs no conversion.
 
 !!! note
     The global `recHitIndex` is fixed by the concatenation order in
@@ -134,8 +144,8 @@ the exact pattern the bundled validators (`BranchTrackingValidator`,
 
 ```cpp
 #include "FWCore/Framework/interface/global/EDAnalyzer.h"
-#include "PhysicsTools/TruthInfo/interface/Graph.h"
-#include "PhysicsTools/TruthInfo/interface/LogicalGraphHitIndex.h"
+#include "SimDataFormats/TruthInfo/interface/Graph.h"
+#include "SimDataFormats/TruthInfo/interface/LogicalGraphHitIndex.h"
 
 class MyTruthAnalyzer : public edm::global::EDAnalyzer<> {
 public:
@@ -172,7 +182,7 @@ Get the product, then iterate. `truth::Graph` is a flat CSR; `particleViews()` a
 come from `particle(id)` / `vertex(id)`:
 
 ```cpp
-#include "PhysicsTools/TruthInfo/interface/Graph.h"
+#include "SimDataFormats/TruthInfo/interface/Graph.h"
 
 auto const& graph = event.get(truthGraphToken_);  // EDGetTokenT<truth::Graph>
 
@@ -401,7 +411,7 @@ own DetId space and metric. The accessors take the channel first, then the parti
 id:
 
 ```cpp
-#include "PhysicsTools/TruthInfo/interface/LogicalGraphHitIndex.h"
+#include "SimDataFormats/TruthInfo/interface/LogicalGraphHitIndex.h"
 
 auto const& hitIndex = event.get(hitIndexToken_);  // truth::LogicalGraphHitIndex
 using truth::HitChannel;

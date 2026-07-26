@@ -3,20 +3,21 @@
 This page is the precise reference for the user-facing C++ interface of the logical
 truth graph: the `truth::Graph` navigation API, the `truth::Branch` subgraph view,
 and the `truth::BranchSelector` / `truth::BranchHitAssociator` helpers. Every
-signature below is copied from the authoritative headers in
-`PhysicsTools/TruthInfo/interface/`; for the design rationale see the
+signature below is copied from the authoritative headers, which live in two packages:
+the data-model headers in `SimDataFormats/TruthInfo/interface/` and the analysis-layer
+headers in `PhysicsTools/TruthInfo/interface/`; for the design rationale see the
 [Data model](data-model.md), and for narrative walk-throughs see
 [How to use the graph](usage.md) and [Worked examples](examples.md).
 
 !!! note "Where each symbol lives"
     | Symbol | Header |
     |---|---|
-    | `truth::Graph`, `truth::Particle`, `truth::Vertex`, `truth::ParticleData`, `truth::VertexData`, `truth::Checkpoint`, `truth::VertexRole` | `interface/Graph.h` |
-    | `truth::Branch`, `truth::ClosureSpec`, `truth::ClosureKind` | `interface/Branch.h` |
-    | `truth::BranchSelector` | `interface/BranchSelector.h` |
-    | `truth::BranchHitAssociator`, `truth::RecoHit`, `truth::BranchMatch`, `truth::HasTruthHits` | `interface/BranchHitAssociator.h` |
-    | `truth::recoHits(...)` adapters | `interface/RecoHitAdapters.h` |
-    | `truth::LogicalGraphHitIndex`, `truth::HitChannel` | `interface/LogicalGraphHitIndex.h` |
+    | `truth::Graph`, `truth::Particle`, `truth::Vertex`, `truth::ParticleData`, `truth::VertexData`, `truth::Checkpoint`, `truth::VertexRole` | `SimDataFormats/TruthInfo/interface/Graph.h` |
+    | `truth::Branch`, `truth::ClosureSpec`, `truth::ClosureKind` | `PhysicsTools/TruthInfo/interface/Branch.h` |
+    | `truth::BranchSelector` | `PhysicsTools/TruthInfo/interface/BranchSelector.h` |
+    | `truth::BranchHitAssociator`, `truth::RecoHit`, `truth::BranchMatch`, `truth::HasTruthHits` | `PhysicsTools/TruthInfo/interface/BranchHitAssociator.h` |
+    | `truth::recoHits(...)` adapters | `PhysicsTools/TruthInfo/interface/RecoHitAdapters.h` |
+    | `truth::LogicalGraphHitIndex`, `truth::HitChannel` | `SimDataFormats/TruthInfo/interface/LogicalGraphHitIndex.h` |
 
 ## The bipartite Particle ↔ Vertex CSR model
 
@@ -375,7 +376,7 @@ Channel const&        channel(HitChannel channel) const;      // raw flat storag
 ```
 
 A `Hit` is `{ uint32_t detId; uint32_t recHitIndex; float energy; }` with
-`bool hasRecHit() const` (⇔ `recHitIndex != Hit::invalidRecHitIndex`). `recHitIndex`
+`bool hasRecHit() const` (⇔ `recHitIndex != Hit::kInvalidRecHitIndex`). `recHitIndex`
 is set only for channels carrying a DetId→RecHit link (`Calo`); the tracker
 leaves it invalid. A `Channel` is the CSR struct
 `{ directOffsets, directHits, subgraphOffsets, subgraphHits }`, exposed for callers

@@ -138,8 +138,12 @@ more than enough to identify the particle.
 Standalone drivers: `test/validateBranch{DQM,TrackingDQM}_cfg.py` (→ DQMIO),
 `test/harvestBranchDQM_cfg.py` (→ legacy `DQM_V0001`). Both sequences live in
 `PhysicsTools/TruthInfo/python/truthGraphValidation_cff.py` and
-`truthGraphDQMHarvester_cff.py`; wiring into `globalValidation` / `postValidation`
-behind `enableTruth` is still pending.
+`truthGraphDQMHarvester_cff.py`. Both are wired into the release sequences behind
+`enableTruth`: the association producers into `baseCommonPreValidation` and the DQM
+analyzers into `baseCommonValidation` (`globalValidation_cff`), with the matching
+harvesting attached to `postValidation_common` (`postValidation_cff`). The Run4 eras
+apply `enableTruth`, so these run in the standard Phase-2 validation. The reco-side
+validators and their harvesters stay opt-in (see the antichain caveat below).
 
 ## Reco-side validators (generic hit exposure)
 

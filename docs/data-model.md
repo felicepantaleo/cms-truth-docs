@@ -7,7 +7,7 @@ sparse-row) layouts.
 
 ## Layer 1 — `TruthGraph` (raw)
 
-`PhysicsTools/TruthInfo/interface/TruthGraph.h`. A single heterogeneous,
+`SimDataFormats/TruthInfo/interface/TruthGraph.h`. A single heterogeneous,
 read-only graph built directly from HepMC2/HepMC3 + `SimTrack`/`SimVertex` by
 `TruthGraphProducer`.
 
@@ -26,7 +26,7 @@ SimTracks**, interpreting `genpartIndex()` as a HepMC barcode (see
 
 ## Layer 2 — `truth::Graph` (logical)
 
-`PhysicsTools/TruthInfo/interface/Graph.h`. A user-facing **bipartite
+`SimDataFormats/TruthInfo/interface/Graph.h`. A user-facing **bipartite
 Particle ↔ Vertex** graph built by `TruthLogicalGraphProducer` from the raw graph.
 
 - `Particle` and `Vertex` are lightweight handles `(graph*, id)`; the payload is in
@@ -103,7 +103,7 @@ Particle ↔ Vertex** graph built by `TruthLogicalGraphProducer` from the raw gr
 
 ## Layer 3 — `truth::LogicalGraphHitIndex`
 
-`PhysicsTools/TruthInfo/interface/LogicalGraphHitIndex.h`. A per-logical-particle
+`SimDataFormats/TruthInfo/interface/LogicalGraphHitIndex.h`. A per-logical-particle
 hit index spanning **N detector channels**, built by `LogicalGraphHitIndexProducer`
 from `PCaloHit`/`PSimHit` plus the DetId→RecHit-index map from
 `SimHitToRecHitMapProducer`.
@@ -144,7 +144,7 @@ CSR struct; the per-particle spans are reached through the channel accessors:
 - Each `Hit` is `{detId, recHitIndex, energy}` (unchanged). `recHitIndex` is the
   position in the global RecHit ordering from `SimHitToRecHitMapProducer` and is set
   only for channels that carry a DetId→RecHit link (`Calo`); for the tracker it
-  stays `Hit::invalidRecHitIndex` (the order is HGCal collections first, then PF
+  stays `Hit::kInvalidRecHitIndex` (the order is HGCal collections first, then PF
   collections — changing it changes every index). `Hit::hasRecHit()` tests validity.
 - **One entry per DetId; `energy` is the summed sim deposit.** When a particle (or,
   for subgraph hits, several of its descendants) deposits in the same cell more than

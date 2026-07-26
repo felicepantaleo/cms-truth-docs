@@ -11,15 +11,19 @@ legacy truth objects (`TrackingParticle`, `CaloParticle`, `SimCluster`).
 !!! warning "Status: prototype, under heavy development"
     This documents work in progress on the branch
     `felicepantaleo:truthGraph_CMSSW_20` (developed on `CMSSW_20_0_0_pre1`, also
-    validated on `CMSSW_17_0_0_pre2`). It is **Phase-2 only**. Everything is gated
-    behind a new `enableTruth` process modifier, so standard workflows are
-    unaffected.
+    validated on `CMSSW_17_0_0_pre2`). It is **Phase-2 only**. The chain is gated
+    behind the `enableTruth` process modifier, which the Run4 eras apply from
+    `Phase2C17I13M9` onwards, so the truth graph is built at DIGI and persisted in
+    the standard Run4 workflows. Run3 and Run2 workflows are unaffected. See
+    [Pileup](pileup.md) for the default-for-Run4 wiring.
 
 ## What this adds
 
 A new package `PhysicsTools/TruthInfo` (plus a `SimHitToRecHitMap` producer, an
-`enableTruth` modifier, and a validation sequence). The work is purely additive:
-only a handful of pre-existing files are touched, all behind `enableTruth`.
+`enableTruth` modifier, and a validation sequence). Only a handful of pre-existing
+files are touched, all behind `enableTruth` except the `g4SimHits`
+`ReconnectDroppedAncestors` default, which is a detector-neutral SimVertex
+connectivity fix applied to every sample.
 
 | Area | What |
 |---|---|
