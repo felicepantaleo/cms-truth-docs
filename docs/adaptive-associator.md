@@ -4,12 +4,11 @@ Associate reco tracksters to MC-truth-graph branches, including the **adaptive-l
 match, on single-electron and single-pion samples in the HGCAL acceptance: no pileup,
 Run4 **D122** geometry.
 
-All commands are single-thread and assume an el8 node with CVMFS.
+All commands are single-thread and need CVMFS.
 
 ## 1. Release and branch
 
 ```bash
-export SCRAM_ARCH=el8_amd64_gcc13
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 cmsrel CMSSW_20_1_X_2026-07-22-2300
@@ -27,6 +26,10 @@ scram b -j 8
 
 Notes:
 
+- Do not set `SCRAM_ARCH` by hand: `cmsrel` picks the architecture matching your
+  machine. This IB is built for both `el8_amd64_gcc13` and `el9_amd64_gcc13`. If your OS
+  is not one of those, run inside the matching CMS container first, for example
+  `cmssw-el8` or `cmssw-el9`, and then follow the same commands.
 - The base MC-truth-graph packages (`SimDataFormats/TruthInfo`, `PhysicsTools/TruthInfo`)
   are already in this IB; the merge adds the default-on wiring, the `Calo` channel
   rename, and the adaptive associator.
