@@ -160,6 +160,49 @@ from a compiled `EDAnalyzer`: bare FWLite/cppyy cannot instantiate this template
 reliably. Each entry gives the branch key (the root particle index in the
 `truth::Graph`), the shared energy, and the normalized score.
 
+`AdaptiveAssociationDumper` ships with this branch and prints them directly:
+
+```python
+# dump.py
+import FWCore.ParameterSet.Config as cms
+process = cms.Process("DUMP")
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.source = cms.Source("PoolSource",
+                            fileNames=cms.untracked.vstring("file:ele_step3.root"))
+process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(5))
+process.d = cms.EDAnalyzer(
+    "AdaptiveAssociationDumper",
+    fixed    = cms.InputTag("tracksterToTruthBranch",
+                            "ticlTrackstersCLUE3DHighToTruthBranch"),
+    adaptive = cms.InputTag("tracksterToTruthBranch",
+                            "ticlTrackstersCLUE3DHighToTruthBranchAdaptive"),
+)
+process.p = cms.Path(process.d)
+```
+
+```bash
+cmsRun dump.py
+```
+
+Output on a single-electron event (5 events, D122, no PU):
+
+```
+=== event 1 ===
+FIXED   [ticlTrackstersCLUE3DHighToTruthBranch]: 3 tracksters, 3 with >=1 match
+    trackster 0 -> branch 1  sharedEnergy=585      score=0.00340715
+    trackster 0 -> branch 7  sharedEnergy=99.4849  score=0.792751
+    ...
+    trackster 2 -> branch 0  sharedEnergy=666      score=1.3336e-16
+ADAPTIVE[ticlTrackstersCLUE3DHighToTruthBranchAdaptive]: 3 tracksters, 3 with >=1 match
+    trackster 0 -> branch 1  sharedEnergy=585      score=0.00340715
+    trackster 1 -> branch 1  sharedEnergy=46       score=0.0212766
+    trackster 2 -> branch 0  sharedEnergy=666      score=1.3336e-16
+```
+
+Read it as: the FIXED map ranks every candidate branch per trackster (shared energy
+falling, score rising); the ADAPTIVE map keeps exactly **one** branch per trackster, the
+level that best matches it. A low score means a good match.
+
 ## Notes and caveats
 
 - **No pileup**: the DIGI step has no `--pileup`, so these are clean single-particle
@@ -170,6 +213,7 @@ reliably. Each entry gives the branch key (the root particle index in the
   `truthLogicalGraphHitIndexProducer` are NOT scheduled at RECO; their products come
   from the DIGI file. If you see them as modules in the RECO config, something is
   rebuilding the truth and the association will be signal-only.
-- **Validation state**: build, unit tests, and the RECO config composition (associator
-  scheduled, inputs produced, products kept) are verified. Run the three steps once on
-  a couple of events and confirm the maps are non-empty before scaling up.
+- **Validation state**: the full single-electron chain has been run end to end on this
+  branch (5 events, D122, no PU): all three steps exit 0, the four association products
+  are written, and the maps are populated (every trackster matched, one adaptive branch
+  each). Build and unit tests pass.
