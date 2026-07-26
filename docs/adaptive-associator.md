@@ -236,6 +236,52 @@ one physical object and the right label is their common parent (a pi0 whose two 
 are separate roots, an electron plus its brem photons, an early pion interaction). Test
 it there, not on a clean pion.
 
+## 8. Checking the truth-to-rechit match per calorimeter
+
+The association matches truth to reco by `DetId`, so it only works where the hit index
+stores the same `DetId` the reco rechits use. `CaloRecHitMatchAnalyzer` checks exactly
+that, per calorimeter: it reports how many index cells, and how much index sim energy,
+are found in the HGCAL, ECAL barrel and HBHE reco rechit collections.
+
+```python
+# calomatch.py
+import FWCore.ParameterSet.Config as cms
+process = cms.Process("CALOMATCH")
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.source = cms.Source("PoolSource",
+                            fileNames=cms.untracked.vstring("file:pi_step3.root"))
+process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(3))
+process.m = cms.EDAnalyzer("CaloRecHitMatchAnalyzer")
+process.p = cms.Path(process.m)
+```
+
+```bash
+cmsRun calomatch.py
+```
+
+Output on a 100 GeV pion in the HGCAL acceptance:
+
+```
+=== event 1: reco rechits  HGCAL=21278  ECAL(EB)=1419  HCAL(HBHE)=4
+    HGCAL EE  : cells 3800/4444 (85.5%)   simE 3.3966/3.4389 (98.8%)
+    HGCAL HSi : cells  643/906  (71.0%)   simE 0.2103/0.2211 (95.1%)
+    HGCAL HSc : cells   47/922  ( 5.1%)   simE 0.0779/0.0977 (79.7%)
+```
+
+**Read the energy column, not the cell column.** A calorimeter cell with a sim deposit
+below the rechit threshold has no rechit to match, and single-particle showers leave a
+large tail of such cells: that is why the cell fractions are much lower than the energy
+fractions everywhere, including channels that are perfectly healthy. A channel is
+working when the matched sim ENERGY is high (about 80% or more); a channel whose energy
+fraction is near zero **while it holds real energy** is a genuine `DetId` mismatch.
+
+Choose a sample that puts energy where you want to test. An endcap particle exercises
+HGCAL but leaves ECAL barrel and HCAL essentially empty, so their fractions there are
+meaningless; a barrel particle (for instance `SinglePiPt100_pythia8_cfi` with
+`process.generator.PGunParameters.MinEta = -1.0` and `MaxEta = 1.0`) exercises ECAL
+barrel and HCAL. Reference values measured on D122 with no pileup: HGCAL EE 99%, HGCAL
+HSi 95 to 98%, HGCAL HSc 80 to 92%, ECAL barrel 90 to 98%, HCAL barrel 89 to 92%.
+
 ## Notes and caveats
 
 - **No pileup**: the DIGI step has no `--pileup`, so these are clean single-particle
