@@ -203,6 +203,36 @@ Read it as: the FIXED map ranks every candidate branch per trackster (shared ene
 falling, score rising); the ADAPTIVE map keeps exactly **one** branch per trackster, the
 level that best matches it. A low score means a good match.
 
+## 7. What to expect: electron versus pion
+
+Both samples were run end to end on this branch (5 events each, D122, no PU). Every
+trackster gets a match in both. What differs is the **number of candidate branches**,
+and it is worth understanding before you interpret your own plots:
+
+| Sample | Distinct candidate branches per event |
+|---|---|
+| single electron | 15, 24, 19, 15, 20 |
+| single pion | 2, 2, 2, 2, 17 |
+
+The gun fires one particle per endcap, so **2** is the floor: one branch per primary.
+
+- The **electron** radiates bremsstrahlung in the tracker. Those photons cross the
+  tracker-calorimeter boundary themselves, so each becomes its own branch root, and one
+  electron produces a whole family of candidate branches. This is why the electron
+  tracksters have long ranked candidate lists.
+- The **pion** in events 1 to 4 crosses the boundary as a single particle and showers
+  *inside* the calorimeter. Its shower daughters are created past the boundary, so they
+  are not roots: they are subgraph hits of the pion branch. Hence exactly 2 branches.
+  Event 5 (17 branches) is the interesting case: a pion that interacted early, upstream
+  of the calorimeter, so its secondaries crossed the boundary and became roots.
+
+Consequence for the adaptive level: for a clean single particle the adaptive match
+coincides with the best fixed-level match, because there is nothing to climb to. The
+adaptive climb earns its keep in **merged** topologies, where several roots belong to
+one physical object and the right label is their common parent (a pi0 whose two photons
+are separate roots, an electron plus its brem photons, an early pion interaction). Test
+it there, not on a clean pion.
+
 ## Notes and caveats
 
 - **No pileup**: the DIGI step has no `--pileup`, so these are clean single-particle
@@ -213,7 +243,7 @@ level that best matches it. A low score means a good match.
   `truthLogicalGraphHitIndexProducer` are NOT scheduled at RECO; their products come
   from the DIGI file. If you see them as modules in the RECO config, something is
   rebuilding the truth and the association will be signal-only.
-- **Validation state**: the full single-electron chain has been run end to end on this
-  branch (5 events, D122, no PU): all three steps exit 0, the four association products
-  are written, and the maps are populated (every trackster matched, one adaptive branch
-  each). Build and unit tests pass.
+- **Validation state**: both chains, single electron and single pion, have been run end
+  to end on this branch (5 events each, D122, no PU): all steps exit 0, the four
+  association products are written, and the maps are populated (every trackster matched,
+  exactly one adaptive branch each). Build and unit tests pass.
