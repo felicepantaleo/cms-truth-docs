@@ -27,14 +27,16 @@ matching).
 The producer chain order matters — each consumes the previous:
 
 ```
-truthGraphProducer → truthLogicalGraphProducer → simHitToRecHitMapProducer → truthLogicalGraphHitIndexProducer
+truthGraphProducer → truthLogicalGraphProducer → detIdToRecHitMapProducer → truthLogicalGraphHitIndexProducer
 ```
 
 In a standard workflow this is gated behind the `enableTruth` process modifier
-(`Configuration/ProcessModifiers/enableTruth_cff`), which hooks the
-`truthGraphPrevalidation` sequence (in
-`Validation/Configuration/python/truthPrevalidation_cff.py`) into global validation
-and sets `g4SimHits.TrackingAction.ReconnectDroppedAncestors = True` in the SIM step
+(`Configuration/ProcessModifiers/enableTruth_cff`), which the Run4 eras apply from
+`Phase2C17I13M9` onwards. It attaches `truthGraphValidationProducers` to
+`baseCommonPreValidation` and `truthGraphValidationAnalyzers` to
+`baseCommonValidation` (`Validation/Configuration/python/globalValidation_cff.py`),
+which are the sequences the Phase-2 `autoValidation` assembly actually schedules. The
+baseline `g4SimHits` configuration sets `g4SimHits.TrackingAction.ReconnectDroppedAncestors = True` in the SIM step
 so every stored `SimTrack`'s production vertex resolves to a stored ancestor (no
 orphans) while `PersistencyEmin` stays at 50 GeV — see
 [Findings](findings.md#1-orphan-simvertices-generator-history-retention):
@@ -86,8 +88,8 @@ process.truthLogicalGraphProducer = cms.EDProducer(
 )
 
 # DetId -> global RecHit index map (HGCal collections first, then PF collections).
-process.simHitToRecHitMapProducer = cms.EDProducer(
-    "SimHitToRecHitMapProducer",
+process.detIdToRecHitMapProducer = cms.EDProducer(
+    "DetIdToRecHitMapProducer",
     hgcalRecHits = cms.VInputTag(
         cms.InputTag("HGCalRecHit", "HGCEERecHits", "RECO"),
         cms.InputTag("HGCalRecHit", "HGCHEFRecHits", "RECO"),
@@ -105,7 +107,7 @@ process.truthLogicalGraphHitIndexProducer = cms.EDProducer(
     "TruthLogicalGraphHitIndexProducer",
     src = cms.InputTag("truthLogicalGraphProducer"),
     rawSrc = cms.InputTag("truthGraphProducer"),
-    recHitMap = cms.InputTag("simHitToRecHitMapProducer"),
+    recHitMap = cms.InputTag("detIdToRecHitMapProducer"),
     simHitCollections = cms.VInputTag(
         cms.InputTag("g4SimHits", "HGCHitsEE", "SIM"),
         cms.InputTag("g4SimHits", "HGCHitsHEfront", "SIM"),
@@ -129,7 +131,7 @@ process.truthLogicalGraphHitIndexProducer = cms.EDProducer(
 
 !!! note
     The global `recHitIndex` is fixed by the concatenation order in
-    `SimHitToRecHitMapProducer` — all `HGCRecHitCollection` inputs first, then all
+    `DetIdToRecHitMapProducer`: all `HGCRecHitCollection` inputs first, then all
     `reco::PFRecHitCollection` inputs. Changing the order changes every stored
     index. Never feed both `HGCalRecHit` and `particleFlowRecHitHGC` into the same
     map (double counting).
@@ -161,7 +163,7 @@ public:
       if (!p.valid() || std::abs(p.pdgId()) != 15)       // taus only, say
         continue;
       truth::Branch tau(&graph, p.id());                 // see below
-      // ... use tau.visibleP4(), hits.subgraphHits(p.id()), ...
+      // ... use tau.visibleP4(), hits.subgraphHits(truth::HitChannel::Calo, p.id()), ...
     }
   }
 
@@ -364,7 +366,7 @@ The same module backs the standalone dumper (`python3 truthGraphSelections.py <f
 prints the flags) and `makeTruthGallery.sh`, so adding a Run4 sample needs no config edit.
 
 !!! note "Pile-up is an orthogonal axis, not a preset"
-    The seven presets pick the **signal** of a *process*; pile-up is an *overlay*
+    The presets pick the **signal** of a *process*; pile-up is an *overlay*
     that composes with any of them (ZMM+PU, TTbar+PU, …), so it is **not** an eighth
     preset. It is handled on two separate layers:
 
@@ -437,8 +439,8 @@ Each `Hit` is `{detId, recHitIndex, energy}`; subgraph spans are contiguous and
 DetId-sorted, so two particles' footprints merge by a linear merge-join. `recHitIndex`
 is set where a recHit link exists: `Calo` (the HGCal recHit ordering) and `MTD`
 (the FTLCluster ordering — note it is *channel-relative*, not the same ordering as
-calo). `Tracker` and `Muon` carry no per-cell energy / no recHit link and leave it
-invalid, so their matching is by shared-hit multiplicity. All four channels are
+calo). `Tracker` and `Muon` carry `energyLoss` as the hit energy but have no recHit link, so
+they leave `recHitIndex` invalid, so their matching is by shared-hit multiplicity. All four channels are
 filled by `LogicalGraphHitIndexProducer`, but only for the subdetectors named in its
 `subdetectors` config — gate on `hitIndex.hasChannel(...)` before using a channel.
 
@@ -501,10 +503,21 @@ audits across the relval library, see the [Validation](validation.md) page.
 
 ## Trackster-to-branch associations and the training dataset
 
+!!! warning "Partly on the development branch"
+    `AllTracksterToTruthBranchAssociatorsProducer` is in the release. The NanoAOD
+    table producers and the training customise described from here on
+    (`TracksterTruthBranchTableProducer`, `TracksterFeatureFlatTableProducer`,
+    `BranchSimTracksterProducer`, `customiseTruthBranchTraining`, the `@HGCALTruth`
+    autoNANO block and the `labelClass` / `label_adaptive` columns) live on the
+    `ticl-v6-dev` development branch and are **not** in `CMSSW_20_1_X`. Merge that
+    branch before following these recipes.
+
+
 `AllTracksterToTruthBranchAssociatorsProducer` (PhysicsTools/TruthInfo) associates
-TICL trackster collections to truth branches: one pair of `ticl::AssociationMap`
-products per configured collection (instance labels `<label>ToTruthBranch` and
-`TruthBranchTo<label>`), each entry carrying the shared HGCAL rechit energy and the
+TICL trackster collections to truth branches: two pairs of `ticl::AssociationMap`
+products per configured collection, the fixed-level `<label>ToTruthBranch` /
+`TruthBranchTo<label>` and the adaptive-level `<label>ToTruthBranchAdaptive` /
+`TruthBranchTo<label>Adaptive`, each entry carrying the shared HGCAL rechit energy and the
 normalized association score of `truth::BranchHitAssociator` (both directions). The
 branch key is the root particle index in the `truth::Graph`.
 

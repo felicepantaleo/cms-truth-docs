@@ -107,7 +107,7 @@ Particle ↔ Vertex** graph built by `TruthLogicalGraphProducer` from the raw gr
 `SimDataFormats/TruthInfo/interface/LogicalGraphHitIndex.h`. A per-logical-particle
 hit index spanning **N detector channels**, built by `LogicalGraphHitIndexProducer`
 from `PCaloHit`/`PSimHit` plus the DetId→RecHit-index map from
-`SimHitToRecHitMapProducer`.
+`DetIdToRecHitMapProducer`.
 
 Channels are keyed by an enum so new detectors can be added without new hardcoded
 members:
@@ -143,7 +143,7 @@ CSR struct; the per-particle spans are reached through the channel accessors:
 | `channel(HitChannel)` | the raw `Channel const&` (flat vectors, for whole-channel scans) |
 
 - Each `Hit` is `{detId, recHitIndex, energy}` (unchanged). `recHitIndex` is the
-  position in the global RecHit ordering from `SimHitToRecHitMapProducer` and is set
+  position in the global RecHit ordering from `DetIdToRecHitMapProducer` and is set
   only for channels that carry a DetId→RecHit link (`Calo`); for the tracker it
   stays `Hit::kInvalidRecHitIndex` (the order is HGCal collections first, then PF
   collections — changing it changes every index). `Hit::hasRecHit()` tests validity.

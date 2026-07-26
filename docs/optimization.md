@@ -54,7 +54,7 @@ hash-based build. Summed **sim-hit energies** agree only to float **reassociatio
 `unordered_map` summed in (non-portable) hash-bucket order — so the new value is the
 more reproducible. The cppunit tolerance (1e-6) covers it.
 
-The **DetId→RecHit map** (`hgcal::DetIdRecHitMap`, from `SimHitToRecHitMapProducer`)
+The **DetId→RecHit map** (`hgcal::DetIdRecHitMap`, from `DetIdToRecHitMapProducer`)
 is a **sorted `vector<pair>` + binary search** (`add`/`finalize`/`find`), ~6× smaller
 than a hash map (8 B/entry vs ~48) with cache-friendly lookups — on a PU0 TTbar event
 it holds tens of thousands of entries and scales to a ~120 MB saving at PU200.

@@ -7,7 +7,7 @@ topologies, regenerated into a small library and audited with the
 ## The relval library
 
 Workflow `34xxx.88` = base workflow + the `enableTruth` UpgradeWorkflow variant
-(offset `.88`, which appends `--procModifiers enableTruth` to the GenSim and
+(offset `.88`, which appends `--procModifiers enableTruth` to the GenSim, HARVESTGlobal and
 RecoGlobal steps). Regenerated with `runTruthRelvals.sh`; DOT gallery with
 `makeTruthGallery.sh`.
 
@@ -61,7 +61,7 @@ The branch was rebased from `CMSSW_17_0_0_pre2` to `CMSSW_20_0_0_pre1`. Because 
 a cross-release dataformat change (see [Findings](findings.md)), the comparison was
 a **full relval re-run** on CMSSW_20. Result: **no change in truth-graph behavior**.
 
-- Clean rebuild from scratch; all 31 cppunit tests pass identically.
+- Clean rebuild from scratch; all cppunit tests pass identically.
 - All 8 workflows PASSED every step (8/8/8/8/8).
 - Structural invariants identical (cycles/multiProd/orphans all 0; one component/event).
 - Mean graph degrees agree within ~1.5%; only the max degrees over 5 events wiggle,
@@ -77,10 +77,11 @@ a **full relval re-run** on CMSSW_20. Result: **no change in truth-graph behavio
 `makeTruthGallery.sh` re-derives the logical graph from each `step3.root` and emits
 per process: a full-graph DOT (`seedPdgIds=0`, reference) and three selected
 DOT/SVG views, with the per-process selection resolved from the generator fragment
-by the [seven presets](usage.md#per-process-presets) (so VBF shows its tagging
+by the [per-process presets](usage.md#per-process-presets) (so VBF shows its tagging
 jets, Drell-Yan its dilepton channel, guns their species). Both galleries
 (`test/dot_gallery` for CMSSW_17, `test/dot_gallery_v20` for CMSSW_20) have the
-identical structure: 8 processes × (1 full + 3 selected) = 32 DOT, 24 SVG, all
+identical structure: one full-graph DOT plus three selected DOT/SVG views per
+process, all
 rendering cleanly (the old mega-vertex would have blown up the layout).
 
 **Browse the rendered gallery:** the full CMSSW_20 set (SVG + DOT) is online and
@@ -238,6 +239,7 @@ makeBranchValidationPlots.sh /path/library /path/branch_plots
 
 - `scram b` clean (only external `vecgeom` warnings).
 - `scram b code-format` and `scram b code-checks` clean for the package.
-- Unit tests (cppunit, `scram b runtests`): **31** assertions across 5 binaries —
-  `TruthLogicalGraphPostProcessor_t` (17), `Branch_t` (4), `BranchHitAssociator_t`
-  (4), `BranchSelector_t` (4), `LogicalGraphHitIndexBuilder_t` (2).
+- Unit tests (cppunit, `scram b runtests`): **41** assertions across 5 binaries:
+  `TruthLogicalGraphPostProcessor_t` (23), `BranchHitAssociator_t` (6), `Branch_t`
+  (5), `BranchSelector_t` (4), `LogicalGraphHitIndexBuilder_t` (3), plus the
+  `truthGraphSelections_t` and `testTruthHistoryGuard` tests.

@@ -102,7 +102,7 @@ hadronic/EM cascade or a τ-decay chain almost every intermediate is well below 
 so the connective tissue between two genuinely-stored tracks is dropped and the
 graph loses the edges linking SIM back to GEN.
 
-**Change:** `enableTruth` keeps `PersistencyEmin` at its default **50 GeV** and
+**Change:** the baseline `g4SimHits` configuration keeps `PersistencyEmin` at its default **50 GeV** and
 instead sets `g4SimHits.TrackingAction.ReconnectDroppedAncestors = True`. When a
 stored track's immediate parent was dropped, its production vertex is reattached to
 the **nearest stored ancestor** — found by walking the full `trackID → parentID`

@@ -21,7 +21,7 @@ legacy truth objects (`TrackingParticle`, `CaloParticle`, `SimCluster`).
 ## What this adds
 
 Two packages, `SimDataFormats/TruthInfo` for the data model and
-`PhysicsTools/TruthInfo` for the analysis layer, plus a `SimHitToRecHitMap`
+`PhysicsTools/TruthInfo` for the analysis layer, plus a `DetIdToRecHitMap`
 producer, the `enableTruth` modifier and a validation sequence. The pre-existing
 files that are touched are listed below.
 
@@ -29,7 +29,7 @@ files that are touched are listed below.
 |---|---|
 | New package | `SimDataFormats/TruthInfo`: the data model (`TruthGraph`, `truth::Graph`, `truth::LogicalGraphHitIndex` and their payload types) |
 | New package | `PhysicsTools/TruthInfo`: producers, dumpers, flat tables, the `Branch` view, hit associator, selector, tests |
-| New producer | `SimCalorimetry/HGCalAssociatorProducers`: `SimHitToRecHitMapProducer` + `DetIdRecHitMap` (not HGCal-specific) |
+| New producer | `SimCalorimetry/HGCalAssociatorProducers`: `DetIdToRecHitMapProducer` + `DetIdRecHitMap` (not HGCal-specific) |
 | New modifier | `Configuration/ProcessModifiers/enableTruth_cff` |
 | New sequence | `Validation/Configuration/truthPrevalidation_cff` |
 | Modified: default-on wiring | `Configuration/Eras` (`enableTruth` on `Phase2C17I13M9`, excluded by `Util_fastSimPhase2_cff`), `Digi_cff.py` (build after mixing), `digitizers_cfi.py` (the accumulator), `EventContent_cff.py` (the truth keeps) |
@@ -48,7 +48,7 @@ HepMC2/HepMC3 + SimTrack/SimVertex
         ▼
 2. truth::Graph      (logical)  bipartite Particle <-> Vertex CSR; GEN+SIM merged,
         │                       intermediate GEN copies collapsible; navigation API
-        │  LogicalGraphHitIndexProducer (+ SimHitToRecHitMapProducer)
+        │  LogicalGraphHitIndexProducer (+ DetIdToRecHitMapProducer)
         ▼
 3. truth::LogicalGraphHitIndex   per-particle calo/tracker hit spans
                                  (direct hits + aggregated subgraph hits)

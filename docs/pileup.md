@@ -179,8 +179,13 @@ variants all inherit it, as does any future geometry era layered on C17:
   the signal-only build producers, which would attach at RECO and shadow the
   DIGI-built products.
 
-**Excluded where it cannot work:** `premix_stage2` (premixed pileup carries no raw PU
-`SimTrack`s) and FastSim (no full-sim `g4SimHits`) both drop `enableTruth`. Phase-2
+**Excluded where it cannot work:** FastSim drops the `enableTruth` modifier itself
+(`Util_fastSimPhase2_cff` excludes it from every FastSim era), because there are no
+full-sim `g4SimHits`. Premixing keeps the modifier, since it comes from the era, and
+instead drops the pieces that cannot run: premixed pileup carries no raw pileup
+`SimTrack`s, so `digitizers_cfi` removes the accumulator, `Digi_cff` reverts to the
+truth-free `pdigiTask`, and the validation and harvesting sequences revert to their
+truth-free form so nothing consumes products that were never built. Phase-2
 uses classic mixing, which is what the accumulator needs: the raw pileup `g4SimHits`
 are overlaid and captured during mixing.
 
