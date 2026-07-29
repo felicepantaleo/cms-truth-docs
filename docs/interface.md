@@ -372,8 +372,8 @@ inline constexpr std::size_t kNumHitChannels = 4;
 ```
 
 Each particle has, per channel, its **direct** hits (on its own `SimTrack`) and its
-**subgraph** hits (its own plus every logical descendant's, coalesced and
-DetId-sorted). The accessors take the channel first, then the particle id:
+**subgraph** hits (its own plus every logical descendant's). The accessors take the
+channel first, then the particle id:
 
 ```cpp
 uint32_t                     nParticles() const;
@@ -381,6 +381,12 @@ static constexpr std::size_t nChannels();   // == kNumHitChannels
 
 std::span<const Hit>  directHits(HitChannel channel, uint32_t particleId) const;
 std::span<const Hit>  subgraphHits(HitChannel channel, uint32_t particleId) const;
+void                  appendSubgraphHits(HitChannel channel, uint32_t particleId,
+                                         std::vector<Hit>& out) const;
+
+bool                       sharedSubgraphStore() const;       // which layout, see below
+std::span<const SlotRange> subgraphRanges(uint32_t particleId) const;
+std::span<const Hit>       rangeHits(HitChannel channel, SlotRange range) const;
 
 bool                  hasChannel(HitChannel channel) const;   // channel is filled
 Channel const&        channel(HitChannel channel) const;      // raw flat storage
@@ -389,10 +395,39 @@ Channel const&        channel(HitChannel channel) const;      // raw flat storag
 A `Hit` is `{ uint32_t detId; uint32_t recHitIndex; float energy; }` with
 `bool hasRecHit() const` (⇔ `recHitIndex != Hit::kInvalidRecHitIndex`). `recHitIndex`
 is set only for channels carrying a DetId→RecHit link (`Calo`); the tracker
-leaves it invalid. A `Channel` is the CSR struct
-`{ directOffsets, directHits, subgraphOffsets, subgraphHits }`, exposed for callers
-that scan a whole channel (e.g. `BranchHitAssociator`'s inverted-index build); most
-consumers use the span accessors above.
+leaves it invalid.
+
+### Two storage layouts
+
+Which layout an index carries is a property of the **data**, not of the reading job.
+`sharedSubgraphStore()` reports it and the accessors handle both, so an index written
+either way reads back correctly.
+
+**Shared, the default.** Each hit is stored once, ordered so that a particle's
+descendants occupy the slots right after it. A subgraph is then a set of ranges of that
+one store and costs no hit storage at all. This removed the dominant cost of the index:
+the materialised layout stored a hit once per ancestor containing it, turning 26744 hits
+per event into 46259 stored entries with no GEN half, and 1467228 with the full one.
+
+**Materialised.** `subgraphOffsets`/`subgraphHits` hold a second, coalesced and
+DetId-sorted copy of every descendant's hits under each ancestor. Every index written
+before the shared layout existed carries this, which is why the read path stays.
+
+!!! warning "A shared range is not coalesced"
+    In the shared layout a subgraph range is in **tree order**, not DetId order, and
+    repeats a DetId hit once per contributing descendant. If you need per-cell energies,
+    sum the entries sharing a DetId yourself. `BranchHitAssociator` does exactly this,
+    once per candidate root when it is constructed, so its own results are unchanged.
+
+    `subgraphHits()` returns a single span, which is correct for every particle that
+    carries hits. A **GEN-only** particle sits above the SIM tree in a DAG and spans
+    several ranges, so it returns an empty span there. Use `appendSubgraphHits()`, which
+    is correct for every particle in both layouts, or iterate `subgraphRanges()`.
+
+A `Channel` is the CSR struct
+`{ directOffsets, directHits, subgraphOffsets, subgraphHits, dfsOffsets }`, exposed for
+callers that scan a whole channel (e.g. `BranchHitAssociator`'s inverted-index build);
+most consumers use the span accessors above.
 
 !!! note "Empty channels return empty spans"
     `directHits`/`subgraphHits` on a channel that was not filled (the `subdetectors`
