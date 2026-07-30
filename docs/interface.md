@@ -466,7 +466,8 @@ explicit BranchHitAssociator(LogicalGraphHitIndex const& hitIndex,
                              std::vector<uint32_t> candidateRoots = {},
                              Metric metric = Metric::SharedEnergy,
                              HitChannel channel = HitChannel::Calo,
-                             bool emptyRootsMeansAll = true);
+                             bool emptyRootsMeansAll = true,
+                             uint32_t denominatorDetectors = kAllDetectors);
 
 std::vector<BranchMatch> bestBranches(std::span<const RecoHit> recoHits,
                                       std::size_t maxResults = 0) const;  // 0 = all
@@ -484,6 +485,15 @@ BranchMatch bestAdaptiveBranch(std::span<const RecoHit> recoHits,
 mean "no candidates", so a selection that legitimately returns nothing does not
 silently widen to the whole event.
 
+`denominatorDetectors` is a bit per `DetId::det()` value and names the detectors the
+`sharedEnergyFraction` denominator covers. One hit channel spans several detectors:
+`HitChannel::Calo` carries the barrel ECAL and HCAL deposits next to the HGCAL ones,
+with sampling energies orders of magnitude apart, so a branch that showered in the
+barrel has a channel-wide energy no endcap reco object can share half of. Pass the
+detectors your reco collection reconstructs; `kAllDetectors` keeps the whole channel.
+The two scores are unaffected: they keep the denominators the TICL association gives
+them.
+
 The result is sorted by `score` ascending (lower is better):
 
 ```cpp
@@ -494,6 +504,8 @@ struct BranchMatch {
   float    sharedEnergy = 0.f;   // (SharedHits metric: number of shared cells)
   float    score = 0.f;          // reco-normalized, lower is better
   float    reverseScore = 0.f;   // branch-normalized: how far the branch spreads
+  float    sharedEnergyFraction = 0.f;  // sim-normalized: shared energy over the
+                                        // branch's energy in denominatorDetectors
 };
 ```
 
