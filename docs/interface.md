@@ -403,7 +403,7 @@ Which layout an index carries is a property of the **data**, not of the reading 
 `sharedSubgraphStore()` reports it and the accessors handle both, so an index written
 either way reads back correctly.
 
-**Shared** (`sharedSubgraphStore=True`, currently **off** by default). Each hit is stored once, ordered so that a particle's
+**Shared, the default.** Each hit is stored once, ordered so that a particle's
 descendants occupy the slots right after it. A subgraph is then a set of ranges of that
 one store, where a range is
 
@@ -415,18 +415,19 @@ and costs no hit storage at all. This removed the dominant cost of the index:
 the materialised layout stored a hit once per ancestor containing it, turning 26744 hits
 per event into 46259 stored entries with no GEN half, and 1467228 with the full one.
 
-**Materialised, the default today.** `subgraphOffsets`/`subgraphHits` hold a second,
+**Materialised** (`sharedSubgraphStore=False`). `subgraphOffsets`/`subgraphHits` hold a second,
 coalesced and DetId-sorted copy of every descendant's hits under each ancestor. Every
 index written before the shared layout existed carries this too, which is why the read
 path stays.
 
-!!! danger "Why shared is not yet the default"
+!!! warning "Use `truth::SubgraphHitView`, not `subgraphHits()`, for an arbitrary particle"
     `subgraphHits()` returns a single span, so under the shared layout it is **empty** for
-    a GEN-only particle, which owns several ranges. Nineteen call sites in the validators
-    and the dumper still assume the materialised semantics, and several use
-    `subgraphHits(...).size()` as a smallest-footprint tie-break, which a zero-size answer
-    inverts. `BranchHitAssociator` has been migrated and is correct under both layouts.
-    Until the rest are migrated to `appendSubgraphHits`, leave `sharedSubgraphStore` off.
+    a GEN-only particle, which owns several ranges. If the particle you pass can be any
+    node of the graph, hold a `truth::SubgraphHitView`
+    (`PhysicsTools/TruthInfo/interface/SubgraphHitView.h`) and call its `subgraphHits`:
+    it returns the coalesced, detId-sorted span in **either** layout, caching the
+    coalesced form for the rest of the event. One per event and per module; it is not
+    thread safe. Every in-tree consumer already goes through it.
 
 !!! warning "A shared range is not coalesced"
     In the shared layout a subgraph range is in **tree order**, not DetId order, and
