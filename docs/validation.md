@@ -246,7 +246,9 @@ reco side and they answer four different questions; the numbers below are measur
 
 | Page | Formula | Question |
 |---|---|---|
-| `fakerate` | `1 - num_assoc(recoToSim)/num_reco` | does the object correspond to **any** truth branch |
+| `fakerate` | `1 - num_dominated/num_reco` | does **one** truth branch own the object |
+| `nocandidate` | `1 - num_assoc(recoToSim)/num_reco` | does it correspond to **any** truth branch (a subset of `fakerate`) |
+| `nolevelcandidate` | `1 - num_levelcandidate/num_reco` | is the dominance question even **defined** for it |
 | `contaminated` | `1 - num_assoc_strict/num_reco` | does its best candidate pass the 0.6 recoToSim score (HGCalValidator's non-fake cut) |
 | `recopurity` | `num_recopurity/num_reco` | how much of the object belongs to the branch it matched, as a **mean** |
 | `pileuprate` | `num_pileup/num_reco` | is the matched branch an overlaid interaction |
@@ -272,28 +274,38 @@ coincidence: the adaptive climb changes *which* branch an object matches, not *w
 matches one, so the gain must appear on the purity page. A fake rate that moves with the
 working point means the association gained or lost candidates.
 
-!!! note "At PU200 the fake rate saturates"
-    PU200 tracking fake rate is 0.000 to 0.006, **lower** than with no pileup, because the
-    truth graph is dense enough that nearly every reco object overlaps something and
-    "matched to nothing" stops discriminating. Read the pileup rate (0.93 to 0.96
-    adaptive) and the purity (0.10 to 0.63) instead.
+!!! note "At PU200 `nocandidate` saturates"
+    PU200 tracking `nocandidate` is 0.000 to 0.001, **lower** than with no pileup, because
+    the truth graph is dense enough that nearly every reco object overlaps something and
+    "matched to nothing" stops discriminating on its own. Read the pileup rate (0.93 to
+    0.95 adaptive) and the purity (0.10 to 0.73) beside it.
 
-### Dominance: a fake as "no truth dominates"
+### A fake is an object no truth branch owns
 
-A calorimetric fake is more naturally defined as an object whose hits come from many
-different generated particles with **none dominating**, rather than one that fails a
-purity cut. Two reco-side monitor elements measure it: `leading_truth_share` (leading
-candidate's shared energy over all candidates') and `dominance_ratio` (leading over
-runner-up, capped at 20). Both are read from the **first** working point's map, the only
-one carrying every candidate, since an adaptive point inserts just the branch it climbed
-to.
+A fake is an object whose hits come from several different generated particles with
+**none dominating**, so there is nothing to attribute it to. That is the criterion the
+`fakerate` page publishes:
 
-They are computed over one **level**, set by `dominanceLevel` (default `caloBoundary`),
-and this is not a detail. It is the same antichain requirement the warning box further up
-states for the first-generation validators, and it bites just as hard here:
+```
+fake = matched to nothing
+       OR (has a candidate at dominanceLevel AND leading share < minLeadingTruthShare)
+```
+
+`minLeadingTruthShare` defaults to **0.5**. `leading_truth_share` (leading contributor's
+shared energy over all contributors') and `dominance_ratio` (leading over runner-up,
+capped at 20) are booked as monitor elements in their own right. Both are read from the
+**first** working point's map, the only one carrying every candidate, since an adaptive
+point inserts just the branch it climbed to. That makes the fake rate **identical at all
+four working points** by construction, which the validation scripts assert as a control.
+
+#### The antichain requirement
+
+Dominance is computed over one **level**, set by `dominanceLevel` (default
+`caloBoundary`), and this is not a detail. "Nothing dominates" is unfalsifiable off an
+antichain, because the leader and the runner-up can be the same particle at two depths:
 `selectedBranchRoots` is every particle passing the selector, so a tau, its daughter pion
 and that pion's descendants are candidates simultaneously with **nested** subgraphs
-carrying nearly identical shared energy, and the leader is compared against its own child.
+carrying nearly identical shared energy.
 
 The control is no-PU TenTau, where ten isolated taus must give one overwhelming winner:
 
@@ -302,18 +314,49 @@ The control is no-PU TenTau, where ten isolated taus must give one overwhelming 
 | `selectedBranchRoots` (nested) | 0.26 | 0.999 |
 | `caloBoundary` (antichain) | 0.98 | 0.064 |
 
-Measured leading share over `caloBoundary`, median / fraction below 0.5: ttbar PU200
-1.00 / 0.032, ttbar no-PU 1.00 / 0.057, DY no-PU 1.00 / 0.004, VBF no-PU 0.98 / 0.110,
-TenTau no-PU 0.98 / 0.054. One truth dominates in about 97% of tracksters, including at
-PU200.
+#### Objects the question does not reach
 
-**No threshold is set in code.** `caloBoundary` is 113 per event at PU200 against 99.7
-with no pileup, only ~14 extra from 200 interactions, because the selector's 1 GeV floor
-removes nearly all soft pileup. The measure therefore asks "does one particle above 1 GeV
-dominate" and never sees soft-PU mush, while a trackster built entirely from sub-GeV
-pileup has no candidate and is already counted by `fakerate`. The two look complementary
-(`fake = no candidate OR leading share < X`, with X = 0.5 costing about 3% at PU200);
-choosing X is a physics decision.
+An object that matched truth but has **no candidate at the dominance level** is not a
+fake. The question is undefined for it rather than answered negatively, and counting it
+as a fake measures how much of the event that level covers instead of how well the
+collection reconstructs. It has its own page, `nolevelcandidate`, and that page must be
+read beside the fake rate.
+
+This was established by measurement, not assumed. Counting those objects as fakes gave
+0.36 to 0.60 on no-PU across every sample and both domains. The cause was isolated three
+ways: it is **not** the threshold (among objects where dominance is defined, the share is
+1.0 for 45% of ttbar tracksters and below 0.5 for only 5.7%), **not** the level (a
+config-only probe moving the tracking level from `caloBoundary` to `stableDecayProducts`
+took the rate from 0.540 to 0.489, with calorimetry identical to four decimals as the
+control), and **not** nesting (projecting each candidate onto the antichain member it
+descends from changed nothing to four decimals, because the associators insert roots that
+are already members or unrelated).
+
+Measured on 200 events per sample, `ticlCandidate`:
+
+| sample | `fakerate` | `nocandidate` | `nolevelcandidate` |
+|---|---|---|---|
+| ttbar no-PU | 0.218 | 0.180 | 0.325 |
+| DY no-PU | 0.406 | 0.403 | 0.537 |
+| VBF no-PU | 0.258 | 0.185 | 0.354 |
+| TenTau no-PU | 0.047 | 0.000 | 0.021 |
+| ttbar PU200 | 0.027 | 0.022 | 0.872 |
+| DY PU200 | 0.085 | 0.084 | 0.930 |
+| VBF PU200 | 0.050 | 0.046 | 0.897 |
+
+!!! warning "At PU200 the fake rate is formed on a small subset"
+    `nolevelcandidate` is **0.87 to 0.93** at PU200, so the fake rate is measured on 7% to
+    13% of the collection. `caloBoundary` holds about 113 objects per event at PU200
+    against 99.7 with no pileup, only ~14 extra from 200 interactions, because the
+    selector's 1 GeV floor removes nearly all soft pileup, while there are thousands of
+    tracksters. The dominance question therefore asks "does one particle above 1 GeV
+    dominate" and is undefined for the soft mush. Never quote a PU200 fake rate without
+    `nolevelcandidate` beside it. TenTau is the counter-example that shows the level works
+    when the event suits it: `nolevelcandidate` is 0.021 there.
+
+DY no-PU is worth reading as a sanity check rather than a defect: its 0.406 is almost
+entirely `nocandidate` (0.403), genuine soft tracksters matching no truth at all in a
+Z to two leptons event.
 
 ### The calorimetric duplicate outcome is not booked
 
