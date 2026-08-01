@@ -26,6 +26,36 @@ RecoGlobal steps). Regenerated with `runTruthRelvals.sh`; DOT gallery with
 | Diboson | WW→2ℓ2ν (custom) | 34997.88 | 23, 24, -24 |
 | VH | ZH→bb,ℓℓ (custom) | 34996.88 | 25 |
 
+## Levels: hardProcess is the legs, signal is the resonance
+
+Measured on one event of each of the eleven templates above, with the level membership
+now stamped on the graph itself (`ParticleData::levelFlags`):
+
+| level | what it actually holds |
+|---|---|
+| `hardProcess` | the **outgoing legs** of the hard scatter. ttbar gives b, b~ and the W decay products, **not** the two tops; H to two photons gives the photons; VBF gives the two tagging quarks plus the four neutrinos. Empty for a particle gun, correctly. |
+| `signal` | the **resonance**: 2 tops, 1 Z, 1 Higgs, 10 taus, W+ and W- for the diboson sample, 1 top for t-channel |
+| `stableDecayProducts` | final-state generator particles, ~45% gamma and ~35% charged pions across every template |
+| `caloBoundary` | those reaching the calorimeter, plus secondaries made in material (ttbar 559 to 649, VBF 231 to 468) |
+| `stableLegsFromUpstream` | preset-dependent, so it varies from 4 (H125) to 2095 (ttbar) |
+
+`isHardProcess` is set on the hard-scatter participants and the deepest-element antichain
+keeps the outgoing ones, which is why that level is the final state rather than the
+resonance. **Use `signal` when you want the object the analysis names.**
+
+The resonance is present in all eleven templates, so the graph never has to invent one.
+A synthetic stand-in exists for a generator that omits it, marked by having neither a GEN
+nor a SIM back-reference and status 0; its momentum is an accounting quantity and is never
+generator truth.
+
+`signal` is the one level bit that cannot be recomputed from the graph alone, so the seed
+PDG ids that produced it are recorded on the graph and the dumper audits every flagged
+particle against them.
+
+A dot and PDF of one event per template, with the levels drawn as coloured rows inside
+each node, is published at
+[truth-graph-levels](https://felice.web.cern.ch/orbit/?path=%2Ftruth-graph-levels).
+
 ## Topology audit (after the immediate-GEN-attach fix)
 
 5 events per sample. **Invariants are clean across all eight**: proper DAG
