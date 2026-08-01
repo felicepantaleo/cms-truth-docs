@@ -13,17 +13,17 @@ RecoGlobal steps). Regenerated with `runTruthRelvals.sh`; DOT gallery with
 
 | Folder | Sample | Workflow | Natural seeds |
 |---|---|---|---|
-| SingleElectron | SingleElectronPt35 | 34002.88 | 11, −11 |
-| TTbar | TTbar 14 TeV | 34034.88 | 6, −6 |
+| SingleElectron | SingleElectronPt35 | 34002.88 | 11, -11 |
+| TTbar | TTbar 14 TeV | 34034.88 | 6, -6 |
 | DYToLL | DYToLL M-50 | 34044.88 | 23 |
 | DYToTauTau | DYToTauTau M-50 | 34045.88 | 23 |
 | ZMM | ZMM 14 TeV | 34050.88 | 23 |
 | H125_diphoton | H125 ggF | 34052.88 | 25 |
 | VBFHZZ4Nu | VBF H→ZZ→4ν | 34131.88 | 25 |
-| TenTau | TenTau E 15–500 | 34087.88 | 15, −15 |
-| SingleTop | ST t-channel (custom) | 34999.88 | 6, −6 |
-| TTbarPowheg | ttbar POWHEG (custom) | 34998.88 | 6, −6 |
-| Diboson | WW→2ℓ2ν (custom) | 34997.88 | 23, 24, −24 |
+| TenTau | TenTau E 15 to 500 | 34087.88 | 15, -15 |
+| SingleTop | ST t-channel (custom) | 34999.88 | 6, -6 |
+| TTbarPowheg | ttbar POWHEG (custom) | 34998.88 | 6, -6 |
+| Diboson | WW→2ℓ2ν (custom) | 34997.88 | 23, 24, -24 |
 | VH | ZH→bb,ℓℓ (custom) | 34996.88 | 25 |
 
 ## Topology audit (after the immediate-GEN-attach fix)
@@ -46,7 +46,7 @@ shower scale.
 | VBFHZZ4Nu | 0 | 0 | 0 | 51 | 30 |
 
 For context, **before** the fix (position-based vertex merge) the same logical
-graphs had a mega-vertex of out-degree 666–936 and cycles in every event — see
+graphs had a mega-vertex of out-degree 666 to 936 and cycles in every event, see
 [Findings](findings.md).
 
 The **raw** graph is also clean everywhere: `multiProd=0`, `cycles=0`, one
@@ -69,8 +69,8 @@ a **full relval re-run** on CMSSW_20. Result: **no change in truth-graph behavio
 
 | | invariants | mean vtx-out | mean parent |
 |---|---|---|---|
-| CMSSW_17 | 0/0/0 (all 8) | 1.06–1.40 | 1.00–1.28 |
-| CMSSW_20 | 0/0/0 (all 8) | 1.06–1.39 | 1.00–1.25 |
+| CMSSW_17 | 0/0/0 (all 8) | 1.06 to 1.40 | 1.00 to 1.28 |
+| CMSSW_20 | 0/0/0 (all 8) | 1.06 to 1.39 | 1.00 to 1.25 |
 
 ## The DOT gallery
 
@@ -86,7 +86,7 @@ rendering cleanly (the old mega-vertex would have blown up the layout).
 
 **Browse the rendered gallery:** the full CMSSW_20 set (SVG + DOT) is online and
 searchable at **[felice.web.cern.ch/truth](https://felice.web.cern.ch/truth/)**
-(an [Orbit](https://github.com/felicepantaleo/orbit) folder browser — click a
+(an [Orbit](https://github.com/felicepantaleo/orbit) folder browser, click a
 process, then a `*_signal_*` / `*_full_*` SVG for the inline zoomable view).
 
 ## DQM performance plots (Branch vs legacy truth objects)
@@ -97,7 +97,7 @@ truth `Branch` graph to the legacy truth objects, in the same fashion as
 build the reco↔Branch links as standalone EDM products, and DQM *analyzers* turn
 them into plots; a `DQMGenericClient` harvester forms the efficiencies.
 
-**Calorimetry** — `BranchHGCalValidator` (folder `HGCAL/BranchValidator/{CaloParticle,SimCluster}`)
+**Calorimetry**: `BranchHGCalValidator` (folder `HGCAL/BranchValidator/{CaloParticle,SimCluster}`)
 compares the Branch subgraph calo hits to each object's `hits_and_fractions`:
 reproduction efficiency vs η/p_T/E, purity, hit/energy completeness, and energy response.
 Three response references are booked. `energy_response` is the **sim-energy containment**
@@ -105,11 +105,11 @@ Three response references are booked. `energy_response` is the **sim-energy cont
 sits well below 1 and varies by region. `raw_energy_response_sim` and
 `raw_energy_response_reco` instead normalise the Branch's energy **on the object's own
 cells** by the object's **fraction-weighted hit energy** (rather than the generator
-energy) — on the deposited (PCaloHit) and reconstructed (RecHit) scales. The deposited
+energy), on the deposited (PCaloHit) and reconstructed (RecHit) scales. The deposited
 one is a **closure test**: a CaloParticle/SimCluster's per-cell fraction *is* its tracks'
 share of the deposit, i.e. the Branch's own sim energy on that cell, so the ratio is
 **== 1 by construction** and any deviation flags a fraction↔deposit bug in PR validation
-(numerator restricted to the object footprint also keeps it finite — un-restricted, a
+(numerator restricted to the object footprint also keeps it finite; un-restricted, a
 tiny object whose `trackId` maps to a large shower would blow the un-thresholded sim
 ratio up to ~10⁵). The reconstructed one is the informative plot: the Branch claims each
 shared cell's **whole** RecHit while the object keeps only its fraction, so it peaks just
@@ -119,12 +119,12 @@ overlapping showers. `TruthBranchCaloAssociationProducer` emits
 `caloParticleToBranch` / `branchToCaloParticle` (+ SimCluster), shared-energy + score,
 best first. Verified on TTbar: CaloParticle eff ≈ 0.76, SimCluster ≈ 0.93.
 
-**Tracking** — a `TrackingParticle` carries *no hits of its own* (only its
+**Tracking**: a `TrackingParticle` carries *no hits of its own* (only its
 `SimTrack`s), so the Branch↔TrackingParticle comparison cannot be a direct hit
 overlap like the calorimeter. The hit-bearing probe is the **reco track**:
 `TruthBranchTrackingAssociationProducer` matches each `reco::Track` to a Branch by
 shared tracker simhit DetIds (`BranchHitAssociator`, tracker channel, shared-hit
-multiplicity — the tracker has no per-cell energy to share), producing
+multiplicity, since the tracker has no per-cell energy to share), producing
 `trackToBranch` / `branchToTrack`. `BranchTrackingValidator` (folder
 `Tracking/BranchValidator/TrackingParticle`, the DQM form of the
 `BranchTrackerReplacementValidator`) closes the loop to the `TrackingParticle` via
@@ -133,7 +133,7 @@ the standard `ClusterTPAssociation` (`tpClusterProducer`) and books a
 shared-hit completeness/multiplicity. Verified on TTbar (CMSSW_20, 5 evt):
 **0.875** (246/281 TP-matched tracks), shared-hit multiplicity ≈ 16/track. In
 Phase-2 D120 only the pixel `TrackerHitsPixel{Barrel,Endcap}*` simhits are populated
-(the TIB/TID/TOB/TEC branches are empty), so the match is pixel-DetId based — still
+(the TIB/TID/TOB/TEC branches are empty), so the match is pixel-DetId based, still
 more than enough to identify the particle.
 
 Standalone drivers: `test/validateBranch{DQM,TrackingDQM}_cfg.py` (→ DQMIO),
@@ -149,20 +149,20 @@ validators and their harvesters stay opt-in (see the antichain caveat below).
 ## Reco-side validators (generic hit exposure)
 
 The validators above compare the Branch graph to the *legacy truth objects*. The
-generic layer below closes the other loop — it matches **reco objects**
+generic layer below closes the other loop: it matches **reco objects**
 (reco tracks, TICL tracksters) directly to the Branch graph through shared hits, and
 books MultiTrackValidator / HGCalValidator-style efficiency, fake-rate, merge-rate
 and duplicate-rate plots. Adding a new reco type is one adapter, no DataFormats
 change.
 
-**The hit-exposure layer** — `interface/RecoHitAdapters.h` provides free functions
+**The hit-exposure layer**: `interface/RecoHitAdapters.h` provides free functions
 that reduce any reco object to a range of `truth::RecoHit{detId, energy, fraction}`,
 the `HasTruthHits` customization point used by `BranchHitAssociator`:
 
-- `truth::recoHits(reco::Track const&)` — the track's valid rechit DetIds, unit
+- `truth::recoHits(reco::Track const&)`: the track's valid rechit DetIds, unit
   weight (the tracker has no per-cell energy, so matching is by shared-hit
   multiplicity).
-- `truth::recoHits(ticl::Trackster const&, std::vector<reco::CaloCluster> const&)` —
+- `truth::recoHits(ticl::Trackster const&, std::vector<reco::CaloCluster> const&)`:
   the trackster's layer-cluster cells with their fractions, coalesced.
 
 These are free functions, not data-format methods, on purpose: a trackster
@@ -171,13 +171,13 @@ couldn't reach them), and returning a `PhysicsTools` type from a `DataFormats` c
 would invert the package dependency. A new reco type = one new adapter returning
 `std::vector<truth::RecoHit>`.
 
-**The validator** — `plugins/BranchRecoValidator.cc` is one template
+**The validator**: `plugins/BranchRecoValidator.cc` is one template
 (`BranchRecoValidatorT<Traits>`) with two concrete modules:
 
-- **`BranchTrackRecoValidator`** — `reco::Track` (default `generalTracks`), tracker
+- **`BranchTrackRecoValidator`**: `reco::Track` (default `generalTracks`), tracker
   channel, shared-hit multiplicity; second axis = p<sub>T</sub>. DQM folder
   `Tracking/BranchValidator/recoTrack`.
-- **`BranchTracksterRecoValidator`** — `ticl::Trackster`
+- **`BranchTracksterRecoValidator`**: `ticl::Trackster`
   (`ticlTrackstersCLUE3DHigh` + `hgcalMergeLayerClusters`), calo channel, shared
   energy; second axis = energy. DQM folder `HGCAL/BranchValidator/Trackster`.
 
@@ -194,7 +194,7 @@ post-processors in `truthGraphDQMHarvester_cff` (`branchTrackRecoPostProcessor`,
     aggregates *all* of a particle's descendants, so against the **full** graph
     every ancestor trivially contains its descendants' hits: every reco object
     "merges" ≥2 nested branches (merge-rate ≈ 1) and almost nothing is uniquely
-    matched (efficiency ≈ 0) — degenerate by construction, not a real performance
+    matched (efficiency ≈ 0), degenerate by construction, not a real performance
     number.
 
     A flat `interestingPdgIds` list is a sufficient antichain **only for
@@ -202,15 +202,15 @@ post-processors in `truthGraphDQMHarvester_cff` (`branchTrackRecoPostProcessor`,
     gives sensible numbers (merge-rate ≈ 0.02, efficiency ≈ 0.56), whereas a broader
     charged-stable list is still degenerate on e.g. TTbar, because pions, protons
     and electrons are deeply nested in the hadronic/EM cascade. The physically
-    correct reference is detector-dependent — `CaloParticle`-like (the particle
+    correct reference is detector-dependent: `CaloParticle`-like (the particle
     entering HGCAL) for calo, `TrackingParticle`-like (per charged track-maker) for
-    tracking — i.e. the `BranchSelector` "interesting particles" antichain, which is
+    tracking, i.e. the `BranchSelector` "interesting particles" antichain, which is
     not yet wired (see the [Roadmap](roadmap.md#validation)). For that reason the two
     modules are **opt-in** (`truthGraphRecoSideValidationSequence`), kept out of the
     default validation sequence; the muon configuration in
     `test/validateBranchRecoDQM_cfg.py` is the working demonstration.
 
-**The plots macro** — `scripts/makeTruthGraphValidationPlots.py` is a self-contained
+**The plots macro**: `scripts/makeTruthGraphValidationPlots.py` is a self-contained
 PyROOT macro (inspired by `makeHGCalValidationPlots.py` but with no framework
 dependency). It reads the analyzer DQMIO output **or** a legacy harvested
 `DQM_V0001` file, locates the Branch-validator folders, derives the
@@ -224,7 +224,7 @@ makeTruthGraphValidationPlots.py tau.root:Tau zmm.root:ZMM ttbar.root:TTbar -o p
 The `FILE:LABEL` form sets the legend entry; passing several samples doubles as the
 per-event guided comparison (cf. [Worked examples](examples.md)).
 
-**The library wrapper** — `test/makeBranchValidationPlots.sh` automates the above
+**The library wrapper**: `test/makeBranchValidationPlots.sh` automates the above
 over a `runTruthRelvals.sh` library: it locates each workflow's harvested legacy
 DQM file (`DQM_V0001_R*__Global__*__RECO.root`) and overlays a few representative
 samples (TTbar / TenTau / ZMM by default; override with `SAMPLES`) in one set of
