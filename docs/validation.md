@@ -235,6 +235,96 @@ cmsenv
 makeBranchValidationPlots.sh /path/library /path/branch_plots
 ```
 
+## Reco-side metrics in `Validation/TruthInfo` (current generation, 2026-08-01)
+
+The sections above describe the first-generation validators. The package that ships the
+DQM pages today is `Validation/TruthInfo`, one templated
+`TruthBranchRecoValidator` over tracks, vertices, secondary vertices and tracksters,
+harvested entirely by `DQMGenericClient` string configuration. Four metrics live on the
+reco side and they answer four different questions; the numbers below are measured on
+200 events per sample.
+
+| Page | Formula | Question |
+|---|---|---|
+| `fakerate` | `1 - num_assoc(recoToSim)/num_reco` | does the object correspond to **any** truth branch |
+| `contaminated` | `1 - num_assoc_strict/num_reco` | does its best candidate pass the 0.6 recoToSim score (HGCalValidator's non-fake cut) |
+| `recopurity` | `num_recopurity/num_reco` | how much of the object belongs to the branch it matched, as a **mean** |
+| `pileuprate` | `num_pileup/num_reco` | is the matched branch an overlaid interaction |
+
+!!! warning "`fakerate` and `contaminated` are not the same question"
+    The recoToSim score is normalised against the cell's **total** truth energy
+    (`recoEnergy = fraction * cellTotalEnergy`), so at PU200 a cell shared with overlaid
+    interactions drives it towards 1 even for a well matched object. Measured on ttbar
+    PU200, `ticlCandidate` / AdaptiveNominal: **73.8%** of tracksters fail the 0.6 cut
+    while only **2.2%** have no candidate at all. Quote `fakerate` for "reconstructed
+    something that is not there" and `contaminated` for "shares its cells with other
+    truth". `contaminated` is kept precisely because it is HGCalValidator's criterion and
+    so stays comparable to the reference.
+
+Each metric has **its own numerator**. `num_assoc(recoToSim)` is filled once per matched
+object, `num_recopurity` is the same objects weighted by the purity of the match. Merging
+the two, which is what the package did until 2026-08-01, turns the fake rate into one
+minus the mean purity: it read 0.83 on no-PU ttbar where the fake rate is 0.003.
+
+The fake rate is **identical at all four working points** while the purity climbs from
+0.28 (`Fixed`) to 0.97 (`AdaptiveNominal`) on no-PU ttbar. That is the control, not a
+coincidence: the adaptive climb changes *which* branch an object matches, not *whether* it
+matches one, so the gain must appear on the purity page. A fake rate that moves with the
+working point means the association gained or lost candidates.
+
+!!! note "At PU200 the fake rate saturates"
+    PU200 tracking fake rate is 0.000 to 0.006, **lower** than with no pileup, because the
+    truth graph is dense enough that nearly every reco object overlaps something and
+    "matched to nothing" stops discriminating. Read the pileup rate (0.93 to 0.96
+    adaptive) and the purity (0.10 to 0.63) instead.
+
+### Dominance: a fake as "no truth dominates"
+
+A calorimetric fake is more naturally defined as an object whose hits come from many
+different generated particles with **none dominating**, rather than one that fails a
+purity cut. Two reco-side monitor elements measure it: `leading_truth_share` (leading
+candidate's shared energy over all candidates') and `dominance_ratio` (leading over
+runner-up, capped at 20). Both are read from the **first** working point's map, the only
+one carrying every candidate, since an adaptive point inserts just the branch it climbed
+to.
+
+They are computed over one **level**, set by `dominanceLevel` (default `caloBoundary`),
+and this is not a detail. It is the same antichain requirement the warning box further up
+states for the first-generation validators, and it bites just as hard here:
+`selectedBranchRoots` is every particle passing the selector, so a tau, its daughter pion
+and that pion's descendants are candidates simultaneously with **nested** subgraphs
+carrying nearly identical shared energy, and the leader is compared against its own child.
+
+The control is no-PU TenTau, where ten isolated taus must give one overwhelming winner:
+
+| candidate set | median leading share | fraction with ratio near 1 |
+|---|---|---|
+| `selectedBranchRoots` (nested) | 0.26 | 0.999 |
+| `caloBoundary` (antichain) | 0.98 | 0.064 |
+
+Measured leading share over `caloBoundary`, median / fraction below 0.5: ttbar PU200
+1.00 / 0.032, ttbar no-PU 1.00 / 0.057, DY no-PU 1.00 / 0.004, VBF no-PU 0.98 / 0.110,
+TenTau no-PU 0.98 / 0.054. One truth dominates in about 97% of tracksters, including at
+PU200.
+
+**No threshold is set in code.** `caloBoundary` is 113 per event at PU200 against 99.7
+with no pileup, only ~14 extra from 200 interactions, because the selector's 1 GeV floor
+removes nearly all soft pileup. The measure therefore asks "does one particle above 1 GeV
+dominate" and never sees soft-PU mush, while a trackster built entirely from sub-GeV
+pileup has no candidate and is already counted by `fakerate`. The two look complementary
+(`fake = no candidate OR leading share < X`, with X = 0.5 costing about 3% at PU200);
+choosing X is a physics decision.
+
+### The calorimetric duplicate outcome is not booked
+
+`num_duplicate` is absent from calorimetric folders. The outcome needs two reco objects
+each below `maxSimToRecoScoreForDuplicate` on the same branch, and two objects built from
+**disjoint** layer clusters have scores summing to at least one. Measured on 200 no-PU
+ttbar events, `ticlCandidate`, `ticlTrackstersCLUE3DHigh` and `ticlTracksterLinks` each
+use every layer cluster in at most one trackster. A collection whose objects share layer
+clusters would make it reachable again. This diverges deliberately from HGCalValidator,
+which books the plot; the split rate carries the calorimetric pathology instead.
+
 ## Build & checks
 
 - `scram b` clean (only external `vecgeom` warnings).
