@@ -38,15 +38,28 @@ now stamped on the graph itself (`ParticleData::levelFlags`):
 | `stableDecayProducts` | final-state generator particles, ~45% gamma and ~35% charged pions across every template |
 | `caloBoundary` | those reaching the calorimeter, plus secondaries made in material (ttbar 559 to 649, VBF 231 to 468) |
 | `stableLegsFromUpstream` | preset-dependent, so it varies from 4 (H125) to 2095 (ttbar) |
+| `reconstructableFromSignal` | the signal's **visible final state**: walk down from each signal root, stop at the first object a detector reconstructs. A pi0 is labelled, its two photons are not; an a1 or rho is walked through; neutrinos are dropped. TenTau gives 18.59 per event |
+| `underlyingEvent` | the stable legs of the underlying event, the counterpart of `stableLegsFromUpstream`. ttbar gives 103.17 per event, a particle gun 0 |
+| `partonJets` | one root per **parton-initiated jet**: the hard-scatter legs that are quarks or gluons, each standing for its whole descendant subgraph. No clustering. ttbar gives 4.80 per event with the b bin at exactly 2.00; QCD flat pT gives exactly 2.00 per event, 67% gluons |
+| `bHadrons`, `cHadrons` | the first hadron of each heavy flavour along a chain, so B* to B counts once. Separate levels because a B decays to a D and one combined level would drop every charm member. ttbar: 2.02 and 3.38 per event. These two also define the secondary-vertex truth below |
 
 `isHardProcess` is set on the hard-scatter participants and the deepest-element antichain
 keeps the outgoing ones, which is why that level is the final state rather than the
 resonance. **Use `signal` when you want the object the analysis names.**
 
 The resonance is present in all eleven templates, so the graph never has to invent one.
-A synthetic stand-in exists for a generator that omits it, marked by having neither a GEN
-nor a SIM back-reference and status 0; its momentum is an accounting quantity and is never
-generator truth.
+A synthetic stand-in exists for a generator that omits it, marked by
+`ParticleRole::SignalStandIn`. The role is the marker on purpose: a connector particle
+has the same empty GEN and SIM back-references and the same status 0, so inferring
+"synthetic" from empty fields cannot tell the two apart. The stand-in's momentum is the
+sum of the hard-process legs, an accounting quantity, never generator truth.
+
+A sample whose configuration names NO resonance has no `signal` level at all: the seed
+list being empty, or the full-graph escape hatch `{0}`, means the question is not
+answerable, and the `signal` and `signalNoSelection` folders are not booked rather than
+booked empty. The associators and the hit-based validators both take the seed list as
+`signalSeedPdgIds`, and the two must carry the SAME value in the DQM configuration, or
+the folders vanish or read wrong.
 
 `signal` is the one level bit that cannot be recomputed from the graph alone, so the seed
 PDG ids that produced it are recorded on the graph and the dumper audits every flagged
@@ -387,6 +400,58 @@ Measured on 200 events per sample, `ticlCandidate`:
 DY no-PU is worth reading as a sanity check rather than a defect: its 0.406 is almost
 entirely `nocandidate` (0.403), genuine soft tracksters matching no truth at all in a
 Z to two leptons event.
+
+### The truth-side denominators are variable-blind (2026-08-05)
+
+An efficiency drawn against pt must not have the pt cut applied to its own denominator,
+or the cut deforms the turn-on the plot exists to show. Measured on 200 no-PU ttbar by
+re-running the associators with the selector open: the `caloBoundary` denominator in the
+first pt bin is 10024 with the 1 GeV floor and 144529 without, a factor 14.4, while the
+second bin moves by 1.05.
+
+The selector therefore reports WHICH plotted-axis cut a branch fails (pt or eta) instead
+of one accept-or-reject, the associator publishes that mask beside each level denominator
+as `truthToRecoTargets<Level>Eligibility`, and a variable is filled only for objects that
+fail nothing except the cut on that variable itself. An object failing both cuts enters
+no plot. Levels whose roots Geant4 never tracked are untouched, the kinematic cuts never
+applying to them: `partonJets`, `bHadrons` and `hardProcess` measure identically with the
+selector open.
+
+### The secondary-vertex denominator is the heavy-flavour decay vertices (2026-08-04)
+
+A secondary vertex is where a b or c hadron decayed, so the denominator is the decay
+vertices of the `bHadrons` and `cHadrons` antichains, switched on by the associator's
+`heavyFlavorOnly`. Measured on no-PU ttbar, per event:
+
+| criterion | truth SVs |
+|---|---|
+| b/c hadron decay vertices | **4.00** (801 over 200 events) |
+| incoming particle's subgraph carries heavy flavour anywhere | 12 to 16 |
+| every graph vertex with two selected roots | 45.9 |
+| what `inclusiveSecondaryVertices` reconstructs | **4.1** |
+
+Only the first matches reco. The others cap the efficiency at a third and a tenth
+whatever the reconstruction does, and the cap is a property of the denominator. With the
+decay-length axis rebinned (below), 17.0% of that denominator lies below 100 microns from
+the beam axis, where no vertex can be separated from the primary; whether to cut it away
+is an open choice, since it changes the published efficiency.
+
+### Axes that span decades are symlog, and every axis was scanned (2026-08-05)
+
+`pt`, `vertpos` and `nhits` cover orders of magnitude and uniform bins lost the ends: 19%
+of `partonJets` entries sat in the pt overflow at 100 GeV, and 93.4% of all truth
+secondary vertices fell in the first 1.5 cm `vertpos` bin. They are now symlog, one
+linear bin up to a threshold (0.1 GeV, 10 microns, 1 hit) and a log ladder above. Symlog
+rather than log because both axes have a real population at EXACTLY zero: on DY, 20.5% of
+the `signal` level is the pre-ISR copy of the resonance at pt exactly 0, which a log axis
+would move into the underflow unseen.
+
+The same scan found one plot that had never drawn anything at all: reco `zpos` in the
+calorimetric domain was 100% out of range, a trackster barycentre sitting at |z| 320 to
+520 cm against the tracker's +-30 cm axis. The truth and reco sides of one domain can now
+carry different ranges for the same quantity. Habit worth keeping: for every `num_*`
+monitor element, check the under-plus-overflow fraction; the same quantity reading 0% in
+one domain and 100% in another is inherited configuration, not physics.
 
 ### The calorimetric duplicate outcome is not booked
 

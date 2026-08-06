@@ -244,3 +244,37 @@ not a same-input shortcut. The rebase was validated by re-running all eight
 workflows on CMSSW_20: identical invariants (cycles/multiProd/orphans all 0), mean
 graph degrees within ~1.5% — differences are confined to expected cross-release
 simulation RNG. See [Validation](validation.md).
+
+## 6. Jets without a clustering algorithm, and what the overlap costs
+
+A parton-initiated jet can be defined with no clustering at all: everything downstream of
+a hard-scatter quark or gluon is one jet, and the flavour is the parton's own PDG id
+(`partonJets` level). This works because `collapseGenShower` deletes every shower parton
+at graph build, so a parton survives only by carrying `isHardProcess`: "the early quark"
+and "the quark that is present" are the same particle. The deepest-element antichain rule
+resolves the top-versus-b nesting by itself, keeping the b, which is also the physics.
+
+Measured on 200 no-PU ttbar events: 4.80 jets per event, the flavour split d 137, u 133,
+s 143, c 147, b 400, the b bin exactly twice the event count. On QCD flat pT: exactly
+2.00 per event, 67% gluon, and there `partonJets` coincides with `hardProcess` bin for
+bin since every QCD hard-scatter leg is a parton; on ttbar the two differ by exactly the
+186 leptonic legs. Read jet efficiency CUMULATIVELY: a jet is many reco objects, never
+one.
+
+The cost of skipping the clustering step is measured, not hypothetical: the jet ROOTS are
+an antichain but the SUBGRAPHS overlap. The u and d~ of a hadronic W are colour connected
+and fragment through one string, so its hadrons descend from both: 1221 of 8096 hits, 15%
+of the union, shared between exactly that one pair, while the b and b~ share nothing and
+a dileptonic event shares 0. Assigning each hadron to exactly one jet is precisely what a
+clustering algorithm is for, and this number is the case for adding one.
+
+## 7. What discarding the generator record costs others
+
+The contrast case for the graph's design, found in a secondary-vertex validation built on
+the legacy truth (cms-sw/cmssw#51577): B and D hadrons are handled by the generator and
+never become TrackingParticles, only their stable descendants do, so identifying the
+mother of a secondary vertex there takes a four-case algorithm ending in an HepMC tree
+climb with a 10-micron merge-radius test. On the graph the same question is
+`hadronHasQuark(pdgId, 5)` plus an antichain, because the B hadron IS a node. The
+comparison is the cost of freezing truth into flat objects, measured in code someone had
+to write.
