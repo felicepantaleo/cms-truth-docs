@@ -11,20 +11,26 @@ The offset `.88` appends `--procModifiers enableTruth` to the GenSim,
 HARVESTGlobal and RecoGlobal steps. `runTruthRelvals.sh` regenerates the library.
 `makeTruthGallery.sh` builds the DOT gallery.
 
-| Folder | Sample | Workflow | Natural seeds |
-|---|---|---|---|
-| SingleElectron | SingleElectronPt35 | 34002.88 | 11, -11 |
-| TTbar | TTbar 14 TeV | 34034.88 | 6, -6 |
-| DYToLL | DYToLL M-50 | 34044.88 | 23 |
-| DYToTauTau | DYToTauTau M-50 | 34045.88 | 23 |
-| ZMM | ZMM 14 TeV | 34050.88 | 23 |
-| H125_diphoton | H125 ggF | 34052.88 | 25 |
-| VBFHZZ4Nu | VBF H→ZZ→4ν | 34131.88 | 25 |
-| TenTau | TenTau E 15 to 500 | 34087.88 | 15, -15 |
-| SingleTop | ST t-channel (custom) | 34999.88 | 6, -6 |
-| TTbarPowheg | ttbar POWHEG (custom) | 34998.88 | 6, -6 |
-| Diboson | WW→2ℓ2ν (custom) | 34997.88 | 23, 24, -24 |
-| VH | ZH→bb,ℓℓ (custom) | 34996.88 | 25 |
+| Folder | Sample | D120 | D122 | Natural seeds |
+|---|---|---|---|---|
+| SingleElectron | SingleElectronPt35 | 34002.88 | 34802.88 | 11, -11 |
+| TTbar | TTbar 14 TeV | 34034.88 | 34834.88 | 6, -6 |
+| DYToLL | DYToLL M-50 | 34044.88 | 34844.88 | 23 |
+| DYToTauTau | DYToTauTau M-50 | 34045.88 | 34845.88 | 23 |
+| ZMM | ZMM 14 TeV | 34050.88 | 34850.88 | 23 |
+| H125_diphoton | H125 ggF | 34052.88 | 34852.88 | 25 |
+| VBFHZZ4Nu | VBF H→ZZ→4ν | 34131.88 | 34931.88 | 25 |
+| TenTau | TenTau E 15 to 500 | 34087.88 | 34887.88 | 15, -15 |
+| SingleTop | ST t-channel (custom) | 34999.88 | D120 only | 6, -6 |
+| TTbarPowheg | ttbar POWHEG (custom) | 34998.88 | D120 only | 6, -6 |
+| Diboson | WW→2ℓ2ν (custom) | 34997.88 | D120 only | 23, 24, -24 |
+| VH | ZH→bb,ℓℓ (custom) | 34996.88 | D120 only | 25 |
+
+The D122 base id is the D120 one plus 800, checked against `runTheMatrix.py -w upgrade -n`
+(34802.0 is `SingleElectronPt35_pythia8_Run4D122`, and likewise for the other seven). The
+last four are locally defined workflows with no upstream D122 counterpart, so a D122
+campaign covers the first eight. Keep the geometry the same on both sides of a mix: a D120
+pileup library overlaid on a D122 signal is not a valid sample.
 
 ## Levels: hardProcess is the legs, signal is the resonance
 
