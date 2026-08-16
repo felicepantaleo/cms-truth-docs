@@ -1,29 +1,31 @@
 # CMS MC-Truth Graph
 
-A prototype **MC-truth graph** for CMS: a single, navigable, event-level graph of
-the generator + simulation truth history, with calorimeter/tracker hit indices
-layered on top. The goal is to let reconstruction and validation code reason about
-truth in terms of **stable physics abstractions** — particles, vertices, decay
-branches, hits — instead of depending directly on the storage details of
-`GenParticle`, `SimTrack`, `GenVertex`, `SimVertex`, `PCaloHit`/`PSimHit`, and the
-legacy truth objects (`TrackingParticle`, `CaloParticle`, `SimCluster`).
+This is a prototype **MC-truth graph** for CMS. The truth graph is one navigable,
+event-level graph of the generator and simulation truth history. It carries
+calorimeter and tracker hit indices on top. The goal is to let reconstruction and
+validation code reason about truth in terms of **stable physics abstractions**:
+particles, vertices, decay branches, and hits. That code then does not depend
+directly on the storage details of the underlying types. Those types are
+`GenParticle`, `SimTrack`, `GenVertex`, `SimVertex`, `PCaloHit`/`PSimHit`, and
+the legacy truth objects (`TrackingParticle`, `CaloParticle`, `SimCluster`).
 
 !!! warning "Status: under active development"
-    The packages are in `CMSSW_20_1_X`. It is **Phase-2 only**. The chain is gated
-    behind the `enableTruth` process modifier, which the Run4 eras apply from
-    `Phase2C17I13M9` onwards, so the truth graph is built at DIGI and persisted in
-    the standard Run4 workflows; Run3 and Run2 workflows are unaffected. The one
-    ungated change is the `g4SimHits` `ReconnectDroppedAncestors` default, a
-    detector-neutral SimVertex connectivity fix applied to every sample. See
-    [Pileup](pileup.md) for the default-for-Run4 wiring. Interfaces are still
-    evolving: check a signature against the headers before relying on it.
+    The packages are in `CMSSW_20_1_X`. The work is **Phase-2 only**. The
+    `enableTruth` process modifier gates the chain. The Run4 eras apply that
+    modifier from `Phase2C17I13M9` onwards. The standard Run4 workflows therefore
+    build the truth graph at DIGI and persist it. Run3 and Run2 workflows are
+    unaffected. One change is not gated: the `g4SimHits`
+    `ReconnectDroppedAncestors` default. That change is a detector-neutral
+    SimVertex connectivity fix, and it applies to every sample. See
+    [Pileup](pileup.md) for the default-for-Run4 wiring. The interfaces are still
+    changing. Check a signature against the headers before you rely on it.
 
 ## What this adds
 
-Two packages, `SimDataFormats/TruthInfo` for the data model and
-`PhysicsTools/TruthInfo` for the analysis layer, plus a `DetIdToRecHitMap`
-producer, the `enableTruth` modifier and a validation sequence. The pre-existing
-files that are touched are listed below.
+The work adds two packages. `SimDataFormats/TruthInfo` holds the data model.
+`PhysicsTools/TruthInfo` holds the analysis layer. The work also adds a
+`DetIdToRecHitMap` producer, the `enableTruth` modifier, and a validation
+sequence. The table below lists the pre-existing files that the work touches.
 
 | Area | What |
 |---|---|
@@ -54,29 +56,30 @@ HepMC2/HepMC3 + SimTrack/SimVertex
                                  (direct hits + aggregated subgraph hits)
 ```
 
-On top of the graph:
+On top of the truth graph:
 
-- **`truth::Branch`** — a recomputed-on-demand subgraph / decay-branch view with
-  configurable closures, kinematics, heavy-flavor tagging, pile-up provenance, and
-  relations.
-- **`truth::BranchHitAssociator`** — generic hit-based reco↔truth matching for any
-  object that exposes a `truthHits()` method.
-- **`truth::BranchSelector`** — kinematic / pdgId / charge / signal-only selection.
+- **`truth::Branch`** is a subgraph or decay-branch view that the code recomputes
+  on demand. It offers configurable closures, kinematics, heavy-flavor tagging,
+  pile-up provenance, and relations.
+- **`truth::BranchHitAssociator`** does generic hit-based reco↔truth matching. It
+  works for any object that exposes a `truthHits()` method.
+- **`truth::BranchSelector`** does kinematic, pdgId, charge, and signal-only
+  selection.
 
 ## Read next
 
-- [Data model](data-model.md) — the layers, the `Branch` view, the associator and selector.
-- [How to use the graph](usage.md) — enabling the producers and a worked tour of the navigation, selection, and hit-matching API.
-- [Worked examples](examples.md) — guided walkthroughs of two real events (Tau and Z→μμ).
-- [Findings & changes](findings.md) — the existing behavior we discovered and what we changed (and why).
-- [Replacing truth objects](replacing-truth-objects.md) — how `Branch` can stand in for `TrackingParticle` / `CaloParticle` / `SimCluster`, with validation.
-- [Validation](validation.md) — the relval workflows, topology audits, the DOT gallery, and the reco-side validators, with data.
-- [Pileup](pileup.md) — the pileup investigation and the Phase-A/B mixing work.
-- [Implementation characteristics](optimization.md) — the applied performance/layout design choices.
-- [Roadmap](roadmap.md) — what's next.
+- [Data model](data-model.md): the layers, the `Branch` view, the associator and selector.
+- [How to use the graph](usage.md): how to enable the producers, plus a worked tour of the navigation, selection, and hit-matching API.
+- [Worked examples](examples.md): guided walkthroughs of two real events (Tau and Z→μμ).
+- [Findings & changes](findings.md): the existing behavior we discovered, what we changed, and why.
+- [Replacing truth objects](replacing-truth-objects.md): how `Branch` can stand in for `TrackingParticle` / `CaloParticle` / `SimCluster`, with validation.
+- [Validation](validation.md): the relval workflows, topology audits, the DOT gallery, and the reco-side validators, with data.
+- [Pileup](pileup.md): the pileup investigation and the Phase-A/B mixing work.
+- [Implementation characteristics](optimization.md): the applied performance and layout design choices.
+- [Roadmap](roadmap.md): the work that comes next.
 
 ## Contact
 
-This is a prototype and is **not yet open to external contributions**. Questions and
-feedback are welcome and go to the author: **Felice Pantaleo** (CERN),
+This is a prototype. It is **not yet open to external contributions**. Questions
+and feedback are welcome. Send them to the author: **Felice Pantaleo** (CERN),
 [felice.pantaleo@cern.ch](mailto:felice.pantaleo@cern.ch).

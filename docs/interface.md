@@ -1,14 +1,14 @@
 # Interface reference
 
-This page is the precise reference for the user-facing C++ interface of the logical
-truth graph: the `truth::Graph` navigation API, the `truth::Branch` subgraph view,
-and the `truth::BranchSelector` / `truth::BranchHitAssociator` helpers. Every
-signature below is quoted from the authoritative headers (with `[[nodiscard]]`
-omitted for brevity), which live in two packages:
-the data-model headers in `SimDataFormats/TruthInfo/interface/` and the analysis-layer
-headers in `PhysicsTools/TruthInfo/interface/`; for the design rationale see the
-[Data model](data-model.md), and for narrative walk-throughs see
-[How to use the graph](usage.md) and [Worked examples](examples.md).
+This page is the precise reference for the user-facing C++ interface of the truth
+graph. It covers the `truth::Graph` navigation API, the `truth::Branch` subgraph
+view, and the `truth::BranchSelector` and `truth::BranchHitAssociator` helpers.
+Every signature below comes from the authoritative headers, with `[[nodiscard]]`
+omitted for brevity. The headers live in two packages.
+`SimDataFormats/TruthInfo/interface/` holds the data-model headers.
+`PhysicsTools/TruthInfo/interface/` holds the analysis-layer headers. For the
+design rationale see the [Data model](data-model.md). For narrative walk-throughs
+see [How to use the graph](usage.md) and [Worked examples](examples.md).
 
 !!! note "Where each symbol lives"
     | Symbol | Header |
@@ -27,9 +27,10 @@ headers in `PhysicsTools/TruthInfo/interface/`; for the design rationale see the
 
 ## The bipartite Particle ↔ Vertex CSR model
 
-`truth::Graph` is the EDM product. It stores two parallel payload arrays —
-`std::vector<ParticleData> particles` and `std::vector<VertexData> vertices` — and
-four CSR adjacency structures that wire particles to vertices and back:
+`truth::Graph` is the EDM product. It stores two parallel payload arrays:
+`std::vector<ParticleData> particles` and `std::vector<VertexData> vertices`. It
+also stores four CSR adjacency structures. These structures wire particles to
+vertices and back:
 
 | Direction | Offsets array | Targets array |
 |---|---|---|
@@ -38,11 +39,12 @@ four CSR adjacency structures that wire particles to vertices and back:
 | vertex → outgoing particles | `vertexToOutgoingParticleOffsets` | `vertexToOutgoingParticles` |
 | vertex → incoming particles | `vertexToIncomingParticleOffsets` | `vertexToIncomingParticles` |
 
-The graph is **bipartite**: an edge always crosses realms — a particle points only
-at vertices, a vertex only at particles. There is no direct particle→particle edge;
-"the children of a particle" means *the outgoing particles of its decay vertices*.
-The handle API hides this for you (`Particle::children()` does the two hops), but
-the raw spans are public if you want to walk the CSR by hand:
+The truth graph is **bipartite**. An edge always crosses realms: a particle points
+only at vertices, and a vertex points only at particles. There is no direct
+particle→particle edge. "The children of a particle" means *the outgoing particles
+of its decay vertices*. The handle API hides this for you, because
+`Particle::children()` does the two hops. The raw spans are public, so you can also
+walk the CSR by hand:
 
 ```cpp
 auto const& graph = event.get(graphToken_);            // truth::Graph
@@ -53,15 +55,16 @@ for (uint32_t pid = 0; pid < graph.nParticles(); ++pid) {
 }
 ```
 
-`Particle` and `Vertex` are **lightweight non-owning handles** — a `(Graph const*,
-uint32_t id)` pair, cheap to copy and pass by value. They are only valid while the
-`Graph` they reference is alive. A default-constructed handle has
-`valid() == false` (its `graph_` is null); `std::optional<Particle>` is returned
-wherever a query may find nothing.
+`Particle` and `Vertex` are **lightweight non-owning handles**. Each one is a
+`(Graph const*, uint32_t id)` pair. They are cheap to copy and to pass by value.
+They are only valid while the `Graph` they reference is alive. A
+default-constructed handle has `valid() == false`, because its `graph_` is null. A
+query that may find nothing returns `std::optional<Particle>`.
 
 ## `truth::ParticleData`
 
-The per-particle payload (`Particle::data()` returns a `const ParticleData&`):
+`Particle::data()` returns a `const ParticleData&`. This is the per-particle
+payload:
 
 | Member | Type | Meaning |
 |---|---|---|
@@ -80,10 +83,10 @@ The per-particle payload (`Particle::data()` returns a `const ParticleData&`):
 `bool valid() const` ⇔ `hasGen() || hasSim()`.
 
 A `Checkpoint` is `{ uint32_t checkpointId; math::XYZTLorentzVectorF position;
-math::XYZTLorentzVectorF momentum; }` — a position/momentum snapshot of the
-trajectory recorded by Geant4 (e.g. as the particle crosses a calorimeter
-boundary). Checkpoints exist only for the merged GEN+SIM particles that Geant4
-propagated far enough.
+math::XYZTLorentzVectorF momentum; }`. It is a snapshot of the position and the
+momentum along the trajectory. Geant4 records it, for example as the particle
+crosses a calorimeter boundary. Checkpoints exist only for the merged GEN+SIM
+particles that Geant4 propagated far enough.
 
 ## `truth::VertexData`
 
@@ -96,33 +99,36 @@ propagated far enough.
 | `reason` | `uint8_t` | a `VertexReason` stored as its underlying type |
 | `position` | `math::XYZTLorentzVectorD` | best-available position (SIM if present, else GEN) |
 
-`hasGen()`/`hasSim()`/`valid()` as above. `VertexRole vertexRole() const` and
-`bool isArtificial() const` decode `role`, and `VertexReason vertexReason() const`
-decodes `reason` (the free helper `vertexReasonName(VertexReason)` gives its name).
+`hasGen()`, `hasSim()` and `valid()` work as above. `VertexRole vertexRole() const`
+and `bool isArtificial() const` decode `role`. `VertexReason vertexReason() const`
+decodes `reason`. The free helper `vertexReasonName(VertexReason)` gives its name.
 The roles are:
 
-- `VertexRole::Normal` — a real GEN/SIM vertex.
-- `VertexRole::Interaction` — the per-interaction artificial source vertex, keyed
-  by the packed `EncodedEventId` (one per pp collision). It is the single root of
-  one interaction and fans out, through artificial connector particles, to that
-  interaction's `Upstream` and `UnderlyingEvent` sub-vertices.
-- `VertexRole::Upstream` — an artificial vertex summarizing the truncated
-  production context of the selected roots (ISR / beam / initial-state activity).
-- `VertexRole::UnderlyingEvent` — an artificial vertex collecting stable
-  final-state particles that are in no selected subgraph (underlying event).
+- `VertexRole::Normal` is a real GEN/SIM vertex.
+- `VertexRole::Interaction` is the per-interaction artificial source vertex. The
+  packed `EncodedEventId` keys it, one key per pp collision. It is the single root
+  of one interaction. It fans out to that interaction's `Upstream` and
+  `UnderlyingEvent` sub-vertices, through artificial connector particles.
+- `VertexRole::Upstream` is an artificial vertex. It summarizes the truncated
+  production context of the selected roots: ISR, beam and initial-state activity.
+- `VertexRole::UnderlyingEvent` is an artificial vertex. It collects the stable
+  final-state particles that are in no selected subgraph, that is the underlying
+  event.
 
-Artificial vertices carry the `genEvent`/`eventId` of the activity they summarize,
-so overlaid pile-up graphs stay distinguishable: the signal is everything reachable
-from the signal `Interaction` vertex, and each pile-up interaction gets its own.
-The `Interaction → {Upstream, UnderlyingEvent}` links go through artificial
-connector particles (`genNode = simNode = -1`, `pdgId = 0`), so a consumer that
-walks particles will encounter them — filter on `isArtificial()` vertices or the
-connector `pdgId` if you need only real particles.
+Artificial vertices carry the `genEvent` and `eventId` of the activity they
+summarize. Overlaid pileup graphs therefore stay distinguishable. The signal is
+everything reachable from the signal `Interaction` vertex. Each pileup interaction
+gets its own `Interaction` vertex. The `Interaction → {Upstream, UnderlyingEvent}`
+links go through artificial connector particles, which carry `genNode = simNode =
+-1` and `pdgId = 0`. A consumer that walks particles will meet these connector
+particles. Filter on `isArtificial()` vertices or on the connector `pdgId` if you
+need only real particles.
 
 ## `truth::Particle`
 
-Construct with `Particle(Graph const* graph, uint32_t id)`; obtain from
-`graph.particle(id)`, `graph.particleViews()`, or any navigation call.
+Construct a `Particle` with `Particle(Graph const* graph, uint32_t id)`. You also
+get one from `graph.particle(id)`, from `graph.particleViews()`, or from any
+navigation call.
 
 ### Identity and payload accessors
 
@@ -177,8 +183,8 @@ std::optional<Particle>    firstAncestorWithPdgId(int pdgId) const;  // nearest 
 std::optional<Particle>    firstCommonAncestor(Particle other) const;  // pairwise LCA
 ```
 
-`Particle` is equality-comparable (`operator==`/`operator!=`) — same graph and same
-id.
+`Particle` is equality-comparable through `operator==` and `operator!=`. Two
+handles are equal when they carry the same `Graph` and the same id.
 
 !!! note "PDG-id matching is signed"
     `pdgId()`, `hasAncestorPdgId()`, `firstAncestorWithPdgId()`, and the selector's
@@ -187,9 +193,10 @@ id.
 
 ## `truth::Vertex`
 
-Construct with `Vertex(Graph const* graph, uint32_t id)`; obtain from
-`graph.vertex(id)`, `graph.vertexViews()`, `graph.sourceVertices()`,
-`graph.sinkVertices()`, or `Particle::productionVertices()` / `decayVertices()`.
+Construct a `Vertex` with `Vertex(Graph const* graph, uint32_t id)`. You also get
+one from `graph.vertex(id)`, `graph.vertexViews()`, `graph.sourceVertices()`,
+`graph.sinkVertices()`, `Particle::productionVertices()` or
+`Particle::decayVertices()`.
 
 ```cpp
 bool      valid() const;
@@ -238,24 +245,25 @@ std::optional<Particle>  lowestCommonAncestor(std::vector<Particle> const& parti
 bool isConsistent() const;   // CSR self-consistency check (debug/tests)
 ```
 
-The raw CSR spans (`decayVertices(id)`, `productionVertices(id)`,
-`outgoingParticles(id)`, `incomingParticles(id)`) each return a
-`std::span<const uint32_t>` of neighbor ids — the zero-copy fast path used by the
-handle methods.
+The raw CSR spans are `decayVertices(id)`, `productionVertices(id)`,
+`outgoingParticles(id)` and `incomingParticles(id)`. Each one returns a
+`std::span<const uint32_t>` of neighbor ids. They are the zero-copy fast path that
+the handle methods use.
 
 !!! note "`roots()`/`leaves()` vs `lowestCommonAncestor`"
-    `roots()` are graph extremities (no parents at all); a `Branch` root is a
-    *selected* particle, not necessarily a graph root. `lowestCommonAncestor`
-    answers "which particle did this set come from" — e.g. the b quark of a b-jet
-    given the jet's truth constituents; walk further up with
-    `firstAncestorWithPdgId` to reach a specific origin species (the top).
+    `roots()` returns the graph extremities, the particles with no parents at all.
+    A `Branch` root is a *selected* particle, and it is not necessarily a graph
+    root. `lowestCommonAncestor` answers "which particle did this set come from".
+    One example is the b quark of a b-jet, given the jet's truth constituents.
+    Walk further up with `firstAncestorWithPdgId` to reach a specific origin
+    species, such as the top.
 
 ## `truth::Branch`
 
-A `Branch` is a non-owning, recomputed-on-demand **view** of a coherent subgraph:
-one or more root particles plus a *closure* of their descendants. It stores no graph
-data and is **not an EDM product**; it is the dynamic successor to the static
-`CaloParticle`/`TrackingParticle`.
+A `Branch` is a non-owning **view** of a coherent subgraph, recomputed on demand.
+It holds one or more root particles plus a *closure* of their descendants. It
+stores no graph data and is **not an EDM product**. It is the dynamic successor to
+the static `CaloParticle` and `TrackingParticle`.
 
 ### Construction and closures
 
@@ -264,7 +272,7 @@ Branch(Graph const* graph, uint32_t rootId,             ClosureSpec spec = Closu
 Branch(Graph const* graph, std::vector<uint32_t> rootIds, ClosureSpec spec = ClosureSpec::subtree());
 ```
 
-The closure (`ClosureSpec` / `ClosureKind`) controls how far below the root(s) the
+The closure (`ClosureSpec` and `ClosureKind`) controls how far below the roots the
 branch extends:
 
 | Factory | Kind | Behavior |
@@ -275,7 +283,7 @@ branch extends:
 | `ClosureSpec::untilPdgId(ids)` | `UntilPdgId` | stop at (and include) particles whose pdgId is in `ids` |
 | `ClosureSpec::predicate(p)` | `Predicate` | stop at (and include) particles where `std::function<bool(Particle)>` is true |
 
-The traversal is a BFS from the roots; `members()`, `memberIds()`, and
+The traversal is a BFS from the roots. `members()`, `memberIds()` and
 `stableLeaves()` return ascending-id, deduplicated results.
 
 ### Members, roots, kinematics
@@ -309,7 +317,8 @@ bool                     hasHeavyFlavor(int32_t quarkFlavor) const;  // any memb
 
 ### Provenance (pile-up aware)
 
-The source event of the root, decoded from its `EncodedEventId`:
+These accessors give the source event of the root. They decode it from the
+`EncodedEventId` of the root:
 
 ```cpp
 int32_t  genEvent() const;
@@ -335,9 +344,9 @@ Branch                   merged(Branch const& other) const;          // union of
 
 ## `truth::BranchSelector`
 
-A configurable predicate over branches, mirroring the cut surface of
-`TrackingParticleSelector` / `CaloParticleSelector`. Branch kinematics are taken
-from the **root** particle.
+`BranchSelector` is a configurable predicate over branches. It mirrors the cut
+surface of `TrackingParticleSelector` and `CaloParticleSelector`. It takes the
+branch kinematics from the **root** particle.
 
 ```cpp
 struct BranchSelector::Config {
@@ -362,18 +371,18 @@ Charge for `chargedOnly` comes from `HepPDT::ParticleID(pdgId).threeCharge()`.
 
 ## `truth::LogicalGraphHitIndex`
 
-The per-logical-particle hit index, indexed by particle id and by detector
-**channel**. Channels are keyed by an enum so detectors can be added without new
-hardcoded members:
+`truth::LogicalGraphHitIndex` is the per-logical-particle hit index. It indexes
+hits by particle id and by detector **channel**. An enum keys the channels, so you
+can add detectors without new hardcoded members:
 
 ```cpp
 enum class HitChannel : uint8_t { Tracker = 0, MTD = 1, Calo = 2, Muon = 3 };
 inline constexpr std::size_t kNumHitChannels = 4;
 ```
 
-Each particle has, per channel, its **direct** hits (on its own `SimTrack`) and its
-**subgraph** hits (its own plus every logical descendant's). The accessors take the
-channel first, then the particle id:
+Each particle has two hit sets per channel. The **direct** hits are the hits on its
+own `SimTrack`. The **subgraph** hits are its own hits plus the hits of every
+logical descendant. The accessors take the channel first, then the particle id:
 
 ```cpp
 uint32_t                     nParticles() const;
@@ -392,72 +401,78 @@ bool                  hasChannel(HitChannel channel) const;   // channel is fill
 Channel const&        channel(HitChannel channel) const;      // raw flat storage
 ```
 
-A `Hit` is `{ uint32_t detId; uint32_t recHitIndex; float energy; }` with
-`bool hasRecHit() const` (⇔ `recHitIndex != Hit::kInvalidRecHitIndex`). `recHitIndex`
-is set only for channels carrying a DetId→RecHit link (`Calo`); the tracker
-leaves it invalid.
+A `Hit` is `{ uint32_t detId; uint32_t recHitIndex; float energy; }`. It carries
+`bool hasRecHit() const` (⇔ `recHitIndex != Hit::kInvalidRecHitIndex`). Only
+channels that carry a DetId→RecHit link set `recHitIndex`, that is `Calo`. The
+tracker leaves it invalid.
 
 ### Two storage layouts
 
-Which layout an index carries is a property of the **data**, not of the reading job.
-`sharedSubgraphStore()` reports it and the accessors handle both, so an index written
-either way reads back correctly.
+The layout an index carries is a property of the **data**, not of the reading job.
+`sharedSubgraphStore()` reports the layout. The accessors handle both layouts, so
+an index written either way reads back correctly.
 
-**Shared, the default.** Each hit is stored once, ordered so that a particle's
-descendants occupy the slots right after it. A subgraph is then a set of ranges of that
-one store, where a range is
+**Shared, the default.** The index stores each hit once. It orders the hits so that
+the descendants of a particle occupy the slots right after it. A subgraph is then a
+set of ranges of that one store. A range is
 
 ```cpp
 struct SlotRange { uint32_t firstSlot = 0; uint32_t slotCount = 0; };
 ```
 
-and costs no hit storage at all. This removed the dominant cost of the index:
-the materialised layout stored a hit once per ancestor containing it, turning 26744 hits
-per event into 46259 stored entries with no GEN half, and 1467228 with the full one.
+and it costs no hit storage at all. This layout removed the dominant cost of the
+index. The materialised layout stored a hit once per ancestor containing it. That
+turned 26744 hits per event into 46259 stored entries with no GEN half, and into
+1467228 stored entries with the full GEN half.
 
-**Materialised** (`sharedSubgraphStore=False`). `subgraphOffsets`/`subgraphHits` hold a second,
-coalesced and DetId-sorted copy of every descendant's hits under each ancestor. Every
-index written before the shared layout existed carries this too, which is why the read
-path stays.
+**Materialised** (`sharedSubgraphStore=False`). Here `subgraphOffsets` and
+`subgraphHits` hold a second copy of the hits of every descendant under each
+ancestor. That copy is coalesced and DetId-sorted. Every index written before the
+shared layout existed carries this layout too, which is why the read path stays.
 
 !!! warning "Use `truth::SubgraphHitView`, not `subgraphHits()`, for an arbitrary particle"
-    `subgraphHits()` returns a single span, so under the shared layout it is **empty** for
-    a GEN-only particle, which owns several ranges. If the particle you pass can be any
-    node of the graph, hold a `truth::SubgraphHitView`
-    (`PhysicsTools/TruthInfo/interface/SubgraphHitView.h`) and call its `subgraphHits`:
-    it returns the coalesced, detId-sorted span in **either** layout, caching the
-    coalesced form for the rest of the event. One per event and per module; it is not
+    `subgraphHits()` returns a single span. A GEN-only particle owns several
+    ranges, so under the shared layout that span is **empty**. Hold a
+    `truth::SubgraphHitView`
+    (`PhysicsTools/TruthInfo/interface/SubgraphHitView.h`) if the particle you pass
+    can be any node of the truth graph. Call its `subgraphHits`. It returns the
+    coalesced, detId-sorted span in **either** layout, and it caches the coalesced
+    form for the rest of the event. Hold one per event and per module. It is not
     thread safe. Every in-tree consumer already goes through it.
 
 !!! warning "A shared range is not coalesced"
-    In the shared layout a subgraph range is in **tree order**, not DetId order, and
-    repeats a DetId hit once per contributing descendant. If you need per-cell energies,
-    sum the entries sharing a DetId yourself. `BranchHitAssociator` does exactly this,
-    once per candidate root when it is constructed, so its own results are unchanged.
+    In the shared layout a subgraph range is in **tree order**, not in DetId order.
+    It repeats a DetId hit once per contributing descendant. Sum the entries that
+    share a DetId yourself if you need per-cell energies. `BranchHitAssociator`
+    does exactly this, once per candidate root at construction, so its own results
+    are unchanged.
 
-    `subgraphHits()` returns a single span, which is correct for every particle that
-    carries hits. A **GEN-only** particle sits above the SIM tree in a DAG and spans
-    several ranges, so it returns an empty span there. Use `appendSubgraphHits()`, which
-    is correct for every particle in both layouts, or iterate `subgraphRanges()`.
+    `subgraphHits()` returns a single span. That is correct for every particle that
+    carries hits. A **GEN-only** particle sits above the SIM tree in a DAG and
+    spans several ranges, so `subgraphHits()` returns an empty span for it. Use
+    `appendSubgraphHits()`, which is correct for every particle in both layouts, or
+    iterate `subgraphRanges()`.
 
 A `Channel` is the CSR struct
-`{ directOffsets, directHits, subgraphOffsets, subgraphHits, dfsOffsets }`, exposed for
-callers that scan a whole channel (e.g. `BranchHitAssociator`'s inverted-index build);
-most consumers use the span accessors above.
+`{ directOffsets, directHits, subgraphOffsets, subgraphHits, dfsOffsets }`. The
+index exposes it for callers that scan a whole channel, for example the
+inverted-index build of `BranchHitAssociator`. Most consumers use the span
+accessors above.
 
 !!! note "Empty channels return empty spans"
-    `directHits`/`subgraphHits` on a channel that was not filled (the `subdetectors`
-    list selects which ones are) or an
-    out-of-range particle id return an **empty span**, not an error. Gate on
-    `hasChannel(channel)` if you need to distinguish "no hits" from "channel not
-    built".
+    `directHits` and `subgraphHits` return an **empty span**, not an error, on a
+    channel that was not filled. They also return an empty span for an
+    out-of-range particle id. The `subdetectors` list selects which channels are
+    filled. Gate on `hasChannel(channel)` if you need to distinguish "no hits" from
+    "channel not built".
 
 ## `truth::BranchHitAssociator`
 
-Matches reco objects to truth branches by shared detector hits. Built once per
-event over a set of candidate branch roots (empty = every particle); it caches an
-inverted `detId → roots` index plus per-cell total sim energy as flat sorted arrays
-(binary-searched, no per-event hashing).
+`BranchHitAssociator` matches reco objects to truth branches by shared detector
+hits. You build it once per event over a set of candidate branch roots, where an
+empty set means every particle. It caches an inverted `detId → roots` index plus
+the per-cell total sim energy. It holds both as flat sorted arrays, binary-searched,
+with no per-event hashing.
 
 ```cpp
 enum class Metric { SharedEnergy, SharedHits };
@@ -480,21 +495,21 @@ BranchMatch bestAdaptiveBranch(std::span<const RecoHit> recoHits,
                                float maxReverseScore = 1.f) const;
 ```
 
-`emptyRootsMeansAll` guards the restricted-root case: with the default, an empty
-`candidateRoots` means "every particle"; pass `false` when an empty list must instead
-mean "no candidates", so a selection that legitimately returns nothing does not
-silently widen to the whole event.
+`emptyRootsMeansAll` guards the restricted-root case. With the default, an empty
+`candidateRoots` means "every particle". Pass `false` when an empty list must
+instead mean "no candidates". A selection that legitimately returns nothing then
+does not silently widen to the whole event.
 
-`denominatorDetectors` is a bit per `DetId::det()` value and names the detectors the
-`sharedEnergyFraction` denominator covers. One hit channel spans several detectors:
-`HitChannel::Calo` carries the barrel ECAL and HCAL deposits next to the HGCAL ones,
-with sampling energies orders of magnitude apart, so a branch that showered in the
-barrel has a channel-wide energy no endcap reco object can share half of. Pass the
-detectors your reco collection reconstructs; `kAllDetectors` keeps the whole channel.
-The two scores are unaffected: they keep the denominators the TICL association gives
-them.
+`denominatorDetectors` is a bit per `DetId::det()` value. It names the detectors
+that the `sharedEnergyFraction` denominator covers. One hit channel spans several
+detectors. `HitChannel::Calo` carries the barrel ECAL and HCAL deposits next to the
+HGCAL ones. Their sampling energies are orders of magnitude apart. A branch that
+showered in the barrel therefore has a channel-wide energy that no endcap reco
+object can share half of. Pass the detectors that your reco collection
+reconstructs. `kAllDetectors` keeps the whole channel. This does not affect the two
+scores. They keep the denominators that the TICL association gives them.
 
-The result is sorted by `score` ascending (lower is better):
+`bestBranches` sorts the result by `score` ascending, where lower is better:
 
 ```cpp
 struct BranchMatch {
@@ -511,28 +526,31 @@ struct BranchMatch {
 
 ### Adaptive-level matching
 
-`bestAdaptiveBranch` answers a different question from `bestBranches`: not "which
-branches share hits with this object" but "at which level of the graph does this
-object best correspond to a single branch". Among every candidate root sharing hits
-with the reco object (leaves and their ancestors, when the candidate set is the
-ancestor closure) it returns the one minimizing
+`bestAdaptiveBranch` answers a different question from `bestBranches`.
+`bestBranches` answers "which branches share hits with this object".
+`bestAdaptiveBranch` answers "at which level of the truth graph does this object
+best correspond to a single branch". It looks at every candidate root that shares
+hits with the reco object. When the candidate set is the ancestor closure, those
+candidate roots are the leaves and their ancestors. It returns the root that
+minimizes
 
 ```
 score + reverseWeight * reverseScore
 ```
 
-`score` falls as the branch climbs and covers more of the reco object, while
-`reverseScore` rises as the branch spreads into energy the reco object does not have,
-so the minimum is the level that matches the object best. Candidates whose
-`reverseScore` exceeds `maxReverseScore` are rejected; if that empties the candidate
-set the ceiling is ignored and the global minimum is returned. When the reco object
-shares no hits with any root, `rootParticleId` is `BranchMatch::kInvalidRoot`.
+`score` falls as the branch climbs and covers more of the reco object.
+`reverseScore` rises as the branch spreads into energy that the reco object does
+not have. The minimum is therefore the level that matches the object best.
+`bestAdaptiveBranch` rejects candidates whose `reverseScore` exceeds
+`maxReverseScore`. If that leaves no candidate, it ignores the ceiling and returns
+the global minimum. When the reco object shares no hits with any root,
+`rootParticleId` is `BranchMatch::kInvalidRoot`.
 
 The hit format is `truth::RecoHit { uint32_t detId; float energy; float fraction; }`.
-Any reco object that satisfies the `HasTruthHits` concept — exposes a `truthHits()`
-member returning a range of `RecoHit` — works with the templated `bestBranches`
-overload directly. For objects that do not own their hits, use the free-function
-adapters in `RecoHitAdapters.h`:
+A reco object satisfies the `HasTruthHits` concept when it exposes a `truthHits()`
+member returning a range of `RecoHit`. Any such object works with the templated
+`bestBranches` overload directly. For objects that do not own their hits, use the
+free-function adapters in `RecoHitAdapters.h`:
 
 ```cpp
 std::vector<RecoHit> truth::recoHits(reco::Track const& track);
@@ -541,14 +559,16 @@ std::vector<RecoHit> truth::recoHits(ticl::Trackster const& trackster,
                                      std::vector<reco::CaloCluster> const& layerClusters);
 ```
 
-- `Metric::SharedEnergy` is the HGCal-style by-hits score comparing cell fractions
-  (the convention the calo association producers use).
-- `Metric::SharedHits` counts shared cells (`sharedEnergy` then holds that count);
-  the natural metric for the tracker, where hits carry no per-cell energy.
+- `Metric::SharedEnergy` is the HGCal-style by-hits score that compares cell
+  fractions. It is the convention that the calo association producers use.
+- `Metric::SharedHits` counts shared cells, and `sharedEnergy` then holds that
+  count. It is the natural metric for the tracker, where hits carry no per-cell
+  energy.
 - The `channel` argument selects which `HitChannel` of the hit index `bestBranches`
-  matches against: `HitChannel::Calo` (the default) for calorimeter objects,
-  `HitChannel::Tracker` for tracks, and so on once MTD/Muon are filled.
+  matches against. Use `HitChannel::Calo`, the default, for calorimeter objects.
+  Use `HitChannel::Tracker` for tracks. More channels follow once MTD and Muon are
+  filled.
 
 See [How to use the graph → matching an arbitrary reco object](usage.md#matching-an-arbitrary-reco-object-to-a-branch)
-for end-to-end snippets, and [Physics questions](examples.md#physics-questions-the-interface-answers)
+for end-to-end snippets. See [Physics questions](examples.md#physics-questions-the-interface-answers)
 for what these methods let you ask.
