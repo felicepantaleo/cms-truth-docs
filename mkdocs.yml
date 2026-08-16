@@ -33,6 +33,7 @@ nav:
   - Pileup: pileup.md
   - 'Tutorial: adaptive associator': adaptive-associator.md
   - Implementation characteristics: optimization.md
+  - Computing cost: resource-cost.md
   - Roadmap: roadmap.md
 
 markdown_extensions:
