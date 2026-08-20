@@ -463,10 +463,19 @@ decay vertices of the `bHadrons` and `cHadrons` antichains. The associator's
 | what `inclusiveSecondaryVertices` reconstructs | **4.1** |
 
 Only the first criterion matches reco. The others cap the efficiency at a third and a
-tenth, whatever the reconstruction does. That cap is a property of the denominator. With
-the decay-length axis rebinned (below), 17.0% of that denominator lies below 100 microns
-from the beam axis. No vertex there can be separated from the primary. Whether to cut
-those vertices away is an open choice, because it changes the published efficiency.
+tenth, whatever the reconstruction does. That cap is a property of the denominator.
+
+The levels name the **weakly decaying** hadron of each chain (2026-08-20). Before that,
+they kept the first hadron of the chain. For most chains the first hadron is an excited
+state, and it decays electromagnetically at its production point. The count was identical,
+but 35.3% of the denominator vertices sat below 100 microns from the beam axis, at the
+primary vertex, where no secondary vertex exists to reconstruct. With the weak-decay
+convention that fraction is 3.2%, and the median decay radius moves from 0.046 cm to
+0.41 cm (10 ttbar PU200 events; the 20-event sample gives 6.30 truth SVs per event). The
+unchanged count is why the old convention looked correct: only the vertex positions were
+wrong. The earlier 17.0% below-100-micron figure for no-PU ttbar was measured with the old
+convention; re-measure it before quoting it. Whether to cut the residual sub-100-micron
+vertices away is still an open choice, because it changes the published efficiency.
 
 ### Axes that span decades are symlog, and every axis was scanned (2026-08-05)
 
