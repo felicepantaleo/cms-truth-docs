@@ -318,7 +318,7 @@ Provenance is per-branch and pileup aware. `Branch` decodes it from the
 ```cpp
 truth::Branch b(&graph, rootId);
 
-if (b.isFromPileup()) {                 // bunchCrossing() != 0
+if (b.isFromPileup()) {                 // !isSignal()
   int bx       = b.bunchCrossing();     // out-of-time bunch crossing
   int evt      = b.event();             // which pile-up event in that crossing
   int32_t comp = b.genEvent();          // GEN connected-component id in the raw graph

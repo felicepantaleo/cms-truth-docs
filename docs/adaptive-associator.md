@@ -36,7 +36,10 @@ Notes:
 - Compile on one socket only.
 - The customise used below is
   `PhysicsTools/TruthInfo/python/addAdaptiveAssociator.py`. It ships with the
-  branch, so you create nothing by hand.
+  `truth-adaptive-associator` development branch this tutorial merges, so you
+  create nothing by hand. It is not in the upstream pull requests: those carry
+  the `SimGeneral/TruthGraphAssociatorProducers` associators, which schedule
+  three working points per collection instead of this standalone producer.
 
 ## 2. Single electron in HGCAL (no PU, D122)
 

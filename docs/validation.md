@@ -47,7 +47,9 @@ membership now sits on the truth graph itself (`ParticleData::levelFlags`).
 | `reconstructableFromSignal` | the signal's **visible final state**: walk down from each signal root, stop at the first object a detector reconstructs. A pi0 is labelled, its two photons are not; an a1 or rho is walked through; neutrinos are dropped. TenTau gives 18.59 per event |
 | `underlyingEvent` | the stable legs of the underlying event, the counterpart of `stableLegsFromUpstream`. ttbar gives 103.17 per event, a particle gun 0 |
 | `partonJets` | one root per **parton-initiated jet**: the hard-scatter legs that are quarks or gluons, each standing for its whole descendant subgraph. No clustering. ttbar gives 4.80 per event with the b bin at exactly 2.00; QCD flat pT gives exactly 2.00 per event, 67% gluons |
-| `bHadrons`, `cHadrons` | the first hadron of each heavy flavour along a chain, so B* to B counts once. Separate levels because a B decays to a D and one combined level would drop every charm member. ttbar: 2.02 and 3.38 per event. These two also define the secondary-vertex truth below |
+| `bHadrons`, `cHadrons` | the hadron of each heavy-flavour chain that **decays weakly**, the hadron CMS ghost association names: the generated b and c hadrons that do not have b and c hadrons as daughters (CMS-BTV-16-002). A B* to B chain counts once, as the B. Separate levels because a B decays to a D and one combined level would drop every charm member. ttbar: 2.0 b per event, one per top. These two also define the secondary-vertex truth below |
+| `reconstructableFinalState` | the `reconstructableFromSignal` walk seeded from **every GEN root**, so the pi0-as-one-object final state exists on samples with no resonance: QCD jets, the underlying event, every pileup interaction. On a tau gun it equals `reconstructableFromSignal` at 18.85 per event, the required identity when the signal is the whole event |
+| `visibleTau` | one entry per **hadronically decaying tau**: the last tau of each radiative chain, with a GEN decay record and no electron and no muon among the children (the `TauGenJetProducer` rule). 6.53 per event on a 10-tau gun, which is the 64.8% hadronic branching fraction |
 
 `isHardProcess` marks the hard-scatter participants. The deepest-element antichain
 keeps the outgoing ones. That is why this level holds the final state and not the
@@ -335,7 +337,7 @@ the match. Merging the two turns the fake rate into one minus the mean purity. T
 package did merge them until 2026-08-01: the fake rate then read 0.83 on no-PU ttbar,
 where the fake rate is 0.003.
 
-The fake rate is **identical at all four working points**. The purity meanwhile climbs
+The fake rate is **identical at all working points**. The purity meanwhile climbs
 from 0.28 (`Fixed`) to 0.97 (`AdaptiveNominal`) on no-PU ttbar. That is the control,
 not a coincidence. The adaptive climb changes *which* branch an object matches, not
 *whether* it matches one. The gain must therefore appear on the purity page. A fake
@@ -364,7 +366,7 @@ the leading contributor's shared energy over all contributors'. `dominance_ratio
 the leading contributor over the runner-up, capped at 20. The validator reads both from
 the **first** working point's map. That map is the only one carrying every candidate,
 because an adaptive point inserts just the branch it climbed to. That makes the fake
-rate **identical at all four working points** by construction. The validation scripts
+rate **identical at all working points** by construction. The validation scripts
 assert this as a control.
 
 #### The antichain requirement

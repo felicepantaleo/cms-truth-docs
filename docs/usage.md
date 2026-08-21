@@ -280,7 +280,7 @@ bool fromB         = full.hasHeavyFlavor(5);  // any member is a b-flavored hadr
 
 // provenance (pile-up aware):
 bool signal  = full.isSignal();        // bunchCrossing()==0 && event()==0
-bool fromPU  = full.isFromPileup();    // bunchCrossing()!=0
+bool fromPU  = full.isFromPileup();    // !isSignal(): any interaction but the signal one
 int  bx      = full.bunchCrossing();
 ```
 
@@ -511,9 +511,12 @@ library.
 ## Trackster-to-branch associations and the training dataset
 
 !!! warning "Partly on the development branch"
-    `AllTracksterToTruthBranchAssociatorsProducer` is in the release. The NanoAOD
-    table producers and the training customise described from here on live on the
-    `ticl-v6-dev` development branch. They are **not** in `CMSSW_20_1_X`. They are
+    Everything described from here on lives on development branches, not in
+    `CMSSW_20_1_X`. `AllTracksterToTruthBranchAssociatorsProducer` and its
+    `addAdaptiveAssociator` customise are on `truth-adaptive-associator`; the
+    upstream pull requests carry the `SimGeneral/TruthGraphAssociatorProducers`
+    associators instead. The NanoAOD table producers and the training customise
+    live on the `ticl-v6-dev` development branch. They are
     `TracksterTruthBranchTableProducer`, `TracksterFeatureFlatTableProducer`,
     `BranchSimTracksterProducer`, `customiseTruthBranchTraining`, the `@HGCALTruth`
     autoNANO block and the `labelClass` / `label_adaptive` columns. Merge that

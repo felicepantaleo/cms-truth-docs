@@ -216,7 +216,7 @@ framework TimeReport agrees to the microsecond.
 | total | 4.28 | 1964.9 |
 
 That is **0.38% of the 1119.7 ms/event** summed over all scheduled RECO modules. It is
-with four working points per domain. No legacy truth producer runs in this RECO
+with three working points per domain. No legacy truth producer runs in this RECO
 sequence. There is therefore no legacy counterpart to compare the associators against.
 
 ## 4. What the graph does NOT save

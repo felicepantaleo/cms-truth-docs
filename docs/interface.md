@@ -325,7 +325,10 @@ int32_t  genEvent() const;
 int      bunchCrossing() const;
 int      event() const;
 bool     isInTime() const;     // bunchCrossing() == 0
-bool     isFromPileup() const; // bunchCrossing() != 0
+bool     isFromPileup() const; // !isSignal(). In-time pileup has bunchCrossing() 0
+                               // and a nonzero event(), and the default production
+                               // keeps in-time pileup only, so a bunch-crossing test
+                               // would miss every pileup particle in it.
 bool     isSignal() const;     // bunchCrossing() == 0 && event() == 0
 ```
 
