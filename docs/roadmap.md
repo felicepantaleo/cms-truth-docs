@@ -49,13 +49,13 @@ Sub-events therefore cannot collide. See [Pileup](pileup.md).)
    `vector<pair<nodeId,target>>` plus binary search, like the DetId-map rework.
    The fix keeps the `nodeSim*` API. It touches `TruthGraph.h`, all three
    producers and the dictionary. Guard the change with the topology audit.
-2. **M4: subgraph hit-storage reduction.** The subgraph hit CSR re-stores
-   `{detId, recHitIndex, energy}` for every ancestor (≈ Σ subtree hits). The
-   `Branch` view and the `BranchHitAssociator` merge-join rely on a contiguous
-   coalesced span. Storing subgraph spans as indices into the direct-hit storage
-   breaks that span. The item therefore needs a contract decision: compute on
-   read, or store coalesced. The cheap safe first step is to drop `recHitIndex`
-   from subgraph storage and to resolve it again from the DetId map.
+2. **M4: subgraph hit-storage reduction. Done, and the default.** The shared
+   subgraph store keeps each hit exactly once, in DFS order, and expresses a
+   subgraph as ranges over that single store. See
+   [the two layouts](data-model.md#layer-3-truthlogicalgraphhitindex) for what a
+   reader must do differently, and [Resource cost](resource-cost.md) for the
+   measured saving. The materialised layout remains as the fallback for a graph
+   whose hit-carrying particles do not form a forest.
 
 ## Cleanup
 
@@ -67,9 +67,7 @@ Sub-events therefore cannot collide. See [Pileup](pileup.md).)
   are large multi-phase functions. Extract the phases to make them testable.
 - **L1-L5**: use `std::ranges` transform views for one-shot view-returning
   helpers. Avoid redundant reco-hit copies in `bestBranches`. Cap the diagnostic
-  O(n²) scan in `TruthGraphTopologyChecker`. **Refresh the stale package README**:
-  it still references `TruthLogicalGraphHitIndexProducer` and an old `python/`
-  layout, and it lists `truth::Branch` as "not yet implemented". De-duplicate the
+  O(n²) scan in `TruthGraphTopologyChecker`. De-duplicate the
   `EncodedEventId` pack/unpack helper into one shared header.
 
 ## Multi-surface boundary crossings (CMSSW-core follow-up PR)
@@ -91,14 +89,14 @@ and `SaveCaloBoundaryInformation = True` under the Phase-2 modifier. On the
 transition Geant4 calls `TrackInformation::setCrossedBoundary(...)`
 (`SimG4Core/Notification/interface/TrackInformation.h`). The chain propagates
 that call through `TrackWithHistory` → `TmpSimTrack` → the persistent `SimTrack`
-(`DataFormats/Track/interface/SimTrack.h`). There it lands as a **single**
+(`SimDataFormats/Track/interface/SimTrack.h`). There it lands as a **single**
 `idAtBoundary_` / `positionAtBoundary_` / `momentumAtBoundary_` plus one
 `crossedBoundary_` bit.
 
 **Why config alone is not enough.** `SimTrack` stores exactly one crossing.
 Multiple surfaces therefore need a data-format change *and* a `SimG4Core` change:
 
-1. **`SimTrack` (DataFormats/Track)**: replace the single boundary fields with a
+1. **`SimTrack` (SimDataFormats/Track)**: replace the single boundary fields with a
    `std::vector<BoundaryCrossing>` (`{int surfaceId; XYZTLorentzVectorF position;
    XYZTLorentzVectorF momentum;}`). This needs a class-version bump and schema
    evolution.

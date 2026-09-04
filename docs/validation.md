@@ -306,7 +306,9 @@ makeBranchValidationPlots.sh /path/library /path/branch_plots
 ## Reco-side metrics in `Validation/TruthInfo` (current generation, 2026-08-01)
 
 The sections above describe the first-generation validators. `Validation/TruthInfo` is
-the package that ships the DQM pages today. It holds one templated
+the current-generation package. It is not in `CMSSW_20_1_X`: it lives on the
+`truth-adaptive-associator` development branch, on top of the association layer, and
+follows that layer upstream. It holds one templated
 `TruthBranchRecoValidator` over tracks, vertices, secondary vertices and tracksters.
 `DQMGenericClient` string configuration harvests all of it. Six metrics live on the
 reco side and they answer four different questions. The numbers below come from 200
@@ -511,7 +513,8 @@ instead.
 
 - `scram b` is clean, apart from external `vecgeom` warnings.
 - `scram b code-format` and `scram b code-checks` are clean for the package.
-- Unit tests (cppunit, `scram b runtests`): **41** assertions across 5 binaries:
-  `TruthLogicalGraphPostProcessor_t` (23), `BranchHitAssociator_t` (6), `Branch_t`
-  (5), `BranchSelector_t` (4), `LogicalGraphHitIndexBuilder_t` (3), plus the
+- Unit tests (cppunit, `scram b runtests`): **526** assertions across 7 binaries:
+  `TruthLogicalGraphPostProcessor_t` (246), `LevelFlags_t` (114),
+  `LogicalGraphHitIndexBuilder_t` (43), `Branch_t` (41), `GenGraphBuild_t` (40),
+  `BranchHitAssociator_t` (25), `BranchSelector_t` (17), plus the
   `truthGraphSelections_t` and `testTruthHistoryGuard` tests.

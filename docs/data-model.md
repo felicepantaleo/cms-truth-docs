@@ -33,6 +33,13 @@ user-facing **bipartite Particle ↔ Vertex** graph from the raw graph.
   `ParticleData` / `VertexData`. It holds the provenance back-refs
   `genNode`/`simNode`, `pdgId`, `status`, `EncodedEventId`, `genEvent`,
   four-momentum / position, and optional trajectory checkpoints.
+- `ParticleData` also carries `levelFlags`, the bitwise OR of the
+  [truth levels](validation.md#levels-hardprocess-is-the-legs-signal-is-the-resonance) the particle belongs to, and `role`
+  (`ParticleRole`: `Normal`, `Connector`, `SignalStandIn`). A particle is
+  artificial when its role says so; do not infer it from empty `genNode` and
+  `simNode`, which conflates a connector with a stand-in. `isSynthetic()`,
+  `isAtLevel()` and `particleRole()` are the accessors. A `levelFlags` of zero is
+  ambiguous, so a reader that needs certainty re-derives with `levelAntichain()`.
 - The producer **merges** GEN and SIM particles/vertices when they are robustly
   associated. A merged particle takes its production vertex from its **immediate
   GEN production vertex** (see [Findings](findings.md)). Intermediate GEN-only
@@ -132,33 +139,60 @@ recHit links never mix:
 - **Direct hits**: a single particle's local detector contribution, which is the
   set of hits on its own `SimTrack`.
 - **Subgraph hits**: the full detector footprint of a shower / decay branch, which
-  is its own hits plus those of every logical descendant. The builder coalesces
-  them and stores them as a **contiguous, DetId-sorted span** (CSR). A zero-gather
-  merge-join can therefore merge two particles' footprints.
+  is its own hits plus those of every logical descendant.
 
-A channel is one `Channel { directOffsets, directHits, subgraphOffsets, subgraphHits }`
-CSR struct. You reach the per-particle spans through the channel accessors:
+A channel is one
+`Channel { directOffsets, directHits, subgraphOffsets, subgraphHits, dfsOffsets }`
+CSR struct.
+
+**Two storage layouts exist.** Which one an index carries is a property of the
+data, not of the reading job. `sharedSubgraphStore()` reports it, and the
+accessors read both.
+
+- **shared**, the default: `dfsOffsets` and `directHits` hold each hit exactly
+  once, ordered so that a particle's descendants occupy the slots right after it.
+  A subgraph is then a set of ranges over that single store and costs no extra hit
+  storage. The hits of a range are in **tree order, not DetId order**, and a DetId
+  repeats once per descendant that deposited in it.
+- **materialised**: `subgraphOffsets` and `subgraphHits` hold a second, coalesced,
+  DetId-sorted copy of every descendant's hits under each ancestor, so a hit is
+  stored once per ancestor that contains it.
+
+You reach the per-particle hits through the channel accessors:
 
 | Method | Returns |
 |---|---|
 | `directHits(HitChannel, particleId)` | `std::span<const Hit>`: particle's direct hits in that channel |
-| `subgraphHits(HitChannel, particleId)` | `std::span<const Hit>`: particle's subgraph hits in that channel |
+| `appendSubgraphHits(HitChannel, particleId, out)` | appends the subgraph hits; the only accessor correct for every particle in both layouts |
+| `subgraphHits(HitChannel, particleId)` | `std::span<const Hit>`, valid only when the subgraph is a single range; see the warning below |
+| `subgraphRanges(particleId)` | the `SlotRange`s a particle's subgraph spans in the shared layout |
 | `hasChannel(HitChannel)` | whether the channel is filled |
 | `channel(HitChannel)` | the raw `Channel const&` (flat vectors, for whole-channel scans) |
 
-- Each `Hit` is `{detId, recHitIndex, energy}` (unchanged). `recHitIndex` is the
-  position in the global RecHit ordering from `DetIdToRecHitMapProducer`. Only
-  channels that carry a DetId→RecHit link (`Calo`) set it. For the tracker it
-  stays `Hit::kInvalidRecHitIndex`. The order is HGCal collections first, then PF
-  collections; changing that order changes every index. `Hit::hasRecHit()` tests
+!!! warning "`subgraphHits()` returns an empty span for a GEN-only particle"
+    In the shared layout every particle that carries hits owns exactly one range,
+    so `subgraphHits()` is correct for it. A GEN-only particle owns several ranges,
+    because the GEN half is a DAG, and `subgraphHits()` returns an **empty span**
+    for it. Use `appendSubgraphHits()`, or iterate `subgraphRanges()`. In
+    `PhysicsTools/TruthInfo`, `truth::SubgraphHitView` wraps this and caches the
+    result per particle.
+
+- Each `Hit` is `{detId, recHitIndex, energy}`. Two channels set `recHitIndex`,
+  each in its own index space. For `Calo` it is the position in the global RecHit
+  ordering from `DetIdToRecHitMapProducer`, HGCal collections first and then PF
+  collections; changing that order changes every index. For `MTD` it is the global
+  index in the barrel-then-endcap `FTLCluster` concatenation. For the tracker and
+  the muon channels it stays `Hit::kInvalidRecHitIndex`. `Hit::hasRecHit()` tests
   validity.
-- **One entry per DetId; `energy` is the summed sim deposit.** A particle can
-  deposit in the same cell more than once, and for subgraph hits several of its
-  descendants can deposit in the same cell. `coalesce()` merges those deposits into
-  a **single** `Hit` whose `energy` is the **sum** of the deposits. So if two
-  leaves of the same mother both hit cell `D` with `e1` and `e2`, the mother's
-  subgraph holds `D` once with `energy = e1 + e2`. The contributions accumulate,
-  they never duplicate.
+- **`energy` is the summed sim deposit of the entries a reader coalesces.** A
+  particle can deposit in the same cell more than once, and several descendants of
+  one ancestor can deposit in the same cell. In the materialised layout the builder
+  coalesces those deposits into a **single** `Hit` whose `energy` is their **sum**.
+  In the shared layout the entries stay separate, in tree order, so a consumer that
+  needs per-cell energies coalesces them itself. Either way the contributions
+  accumulate, they never duplicate: if two leaves of the same mother both hit cell
+  `D` with `e1` and `e2`, the mother's subgraph accounts `D` once with
+  `energy = e1 + e2`.
 
 !!! warning "Sim energy is per-particle; reco attribution is whole-cell, not fractional"
     `energy` is the particle's (or subtree's) **own** sim energy in the cell. This

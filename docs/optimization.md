@@ -35,16 +35,23 @@ sets and their order do not change.
 The multi-source LCA additionally **iterates only the visited set**. It reuses one
 distance buffer with per-ancestor hit counts. It does not scan all `nParticles`,
 and it does not allocate a dense `k×N` distance matrix. On a ~260k-particle tree
-the two-input LCA query dropped from ~1 ms to a few µs (~138×).
+the two-input LCA query dropped from ~1 ms to a few microseconds (~138x). The
+sample that tree came from is not recorded, so treat the ratio as indicative and
+re-measure before quoting it.
 
 ## Flat per-particle hit index
 
 *Relevant to: [`truth::LogicalGraphHitIndex`](data-model.md#layer-3-truthlogicalgraphhitindex).*
 
-The hit-index builder keeps a flat `vector<Hit>` per particle, for the calo and
-tracker channels. It coalesces that vector lazily by sort-on-DetId plus sum.
-Subgraphs aggregate by appending the already-coalesced span of each child and
-coalescing once. That step is a k-way merge of sorted spans. The original code
+The hit-index builder keeps a flat `vector<Hit>` per particle, one per channel.
+It coalesces that vector lazily by sort-on-DetId plus sum. Two subgraph layouts
+exist and the builder writes the **shared** one by default: each hit is stored
+exactly once in DFS order, and a subgraph is a set of ranges over that single
+store, so subgraph aggregation costs no hit storage at all. In the materialised
+fallback, subgraphs aggregate by appending the already-coalesced span of each
+child and coalescing once, a k-way merge of sorted spans, which stores a hit once
+per ancestor. See
+[the two layouts](data-model.md#layer-3-truthlogicalgraphhitindex). The original code
 instead used an `unordered_map<detId, accumulator>` **per particle × 4 channels**,
 which re-hashed each hit roughly once per ancestor depth. This is the hottest
 producer, because it handles the full calo and tracker hit volume. The gain in
@@ -61,7 +68,7 @@ The **DetId→RecHit map** (`hgcal::DetIdRecHitMap`, from
 `DetIdToRecHitMapProducer`) is a **sorted `vector<pair>` plus binary search**
 (`add`/`finalize`/`find`). It is ~6× smaller than a hash map (8 B/entry vs ~48),
 and its lookups are cache-friendly. On a PU0 TTbar event it holds tens of
-thousands of entries. It scales to a ~120 MB saving at PU200.
+thousands of entries. The PU200 saving is not measured.
 
 ## Flat inverted index in `BranchHitAssociator`
 

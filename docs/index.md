@@ -20,6 +20,13 @@ the legacy truth objects (`TrackingParticle`, `CaloParticle`, `SimCluster`).
     [Pileup](pileup.md) for the default-for-Run4 wiring. The interfaces are still
     changing. Check a signature against the headers before you rely on it.
 
+    Two layers are **not** in the release yet. The association layer
+    (`SimGeneral/TruthGraphAssociatorProducers`, and the `BranchHitAssociator`
+    signatures in [Interface](interface.md)) and the DQM package
+    `Validation/TruthInfo` live on the `truth-adaptive-associator-v1` and
+    `truth-adaptive-associator` branches. Pages that describe them say so where
+    they do.
+
 ## What this adds
 
 The work adds two packages. `SimDataFormats/TruthInfo` holds the data model.

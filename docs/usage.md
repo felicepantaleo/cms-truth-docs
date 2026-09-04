@@ -349,7 +349,7 @@ only on the physics. The selections collapse to these archetypes:
 | `top` | `TTbar*`, **ttX** (`ttH`/`ttW`/`ttZ`/`ttbb`/four-top/`ttDM`), `Tprime*` | seed the top(s) **+ keepProductionSiblings** |
 | `singletop` | `ST_t*`/`ST_tW`/`ST_s-channel` | seed top **+ keepProductionSiblings** (production partner) |
 | `diboson` | **`WW*`/`WZ*`/`ZZ*`/`VBS*`/same-sign WW** | seed the bosons `{23,24,−24}` **+ keepProductionSiblings** |
-| `heavyflavor` | `Bs*`/`Bu*`/`Jpsi*`/`Upsilon*` | seed by heavy-flavor content (b/c) |
+| `heavyflavor` | `Bs*`/`Bu*`/`Jpsi*`/`Upsilon*` | seed by heavy-flavor content (`seedHadronFlavors=[5]`, beauty) |
 | `full` | QCD / MinBias / NuGun / **SUSY / LLP / DM / EFT / BSM** / unknown | keep the whole graph |
 
 The exotic/BSM set (SUSY, long-lived, dark-matter, EFT, generic BSM resonances) has no
@@ -424,25 +424,34 @@ then the particle id:
 auto const& hitIndex = event.get(hitIndexToken_);  // truth::LogicalGraphHitIndex
 using truth::HitChannel;
 
+std::vector<truth::LogicalGraphHitIndex::Hit> subgraph;  // reused across particles
+
 for (uint32_t pid = 0; pid < hitIndex.nParticles(); ++pid) {
   std::span<const truth::LogicalGraphHitIndex::Hit> direct =
       hitIndex.directHits(HitChannel::Calo, pid);
-  std::span<const truth::LogicalGraphHitIndex::Hit> subgraph =
-      hitIndex.subgraphHits(HitChannel::Calo, pid);
-  std::span<const truth::LogicalGraphHitIndex::Hit> trk =
-      hitIndex.subgraphHits(HitChannel::Tracker, pid);
+
+  // appendSubgraphHits is correct for every particle in both storage layouts.
+  // subgraphHits() returns an empty span for a GEN-only particle when the index
+  // carries the shared layout, which is the default.
+  subgraph.clear();
+  hitIndex.appendSubgraphHits(HitChannel::Calo, pid, subgraph);
 
   float e = 0.f;
   for (auto const& h : subgraph) {
-    e += h.energy;                 // accumulated SimHit energy on this DetId
+    e += h.energy;                 // SimHit energy of this entry on this DetId
     if (h.hasRecHit())
       auto idx = h.recHitIndex;    // position in the global RecHit ordering
   }
 }
 ```
 
-Each `Hit` is `{detId, recHitIndex, energy}`. Subgraph spans are contiguous and
-DetId-sorted, so two particles' footprints merge by a linear merge-join. `recHitIndex`
+Each `Hit` is `{detId, recHitIndex, energy}`. Summing `energy` over a subgraph is
+correct in both layouts. Per-DetId work is not. In the shared layout the entries
+arrive in tree order and a DetId repeats once per descendant that deposited in it, so
+sort and coalesce by `detId` before any per-cell arithmetic, and never accumulate
+`recHitEnergies[recHitIndex]` entry by entry, which credits a cell once per
+contributing descendant. See
+[the two layouts](data-model.md#layer-3-truthlogicalgraphhitindex). `recHitIndex`
 is set where a recHit link exists: `Calo` (the HGCal recHit ordering) and `MTD` (the
 FTLCluster ordering). The MTD ordering is *channel-relative*, not the same ordering as
 calo. `Tracker` and `Muon` carry `energyLoss` as the hit energy but have no recHit
@@ -513,9 +522,9 @@ library.
 !!! warning "Partly on the development branch"
     Everything described from here on lives on development branches, not in
     `CMSSW_20_1_X`. `AllTracksterToTruthBranchAssociatorsProducer` and its
-    `addAdaptiveAssociator` customise are on `truth-adaptive-associator`; the
-    upstream pull requests carry the `SimGeneral/TruthGraphAssociatorProducers`
-    associators instead. The NanoAOD table producers and the training customise
+    `addAdaptiveAssociator` customise are on `truth-adaptive-associator`. The
+    `SimGeneral/TruthGraphAssociatorProducers` associators, which supersede them,
+    are on `truth-adaptive-associator-v1` and are the ones offered upstream. The NanoAOD table producers and the training customise
     live on the `ticl-v6-dev` development branch. They are
     `TracksterTruthBranchTableProducer`, `TracksterFeatureFlatTableProducer`,
     `BranchSimTracksterProducer`, `customiseTruthBranchTraining`, the `@HGCALTruth`
@@ -525,7 +534,7 @@ library.
 
 `AllTracksterToTruthBranchAssociatorsProducer` (PhysicsTools/TruthInfo) associates
 TICL trackster collections to truth branches. It emits two pairs of
-`ticl::AssociationMap` products per configured collection. The fixed-level pair is
+`ticl::TICLAssociationMap` products per configured collection. The fixed-level pair is
 `<label>ToTruthBranch` / `TruthBranchTo<label>`. The adaptive-level pair is
 `<label>ToTruthBranchAdaptive` / `TruthBranchTo<label>Adaptive`. Each entry carries the
 shared HGCAL rechit energy and the normalized association score of

@@ -78,9 +78,21 @@ payload:
 | `momentum` | `math::XYZTLorentzVectorD` | four-momentum (GEN p4 for GEN+SIM, SimTrack p4 for SIM-only) |
 | `checkpoints` | `std::vector<Checkpoint>` | optional trajectory checkpoints |
 | `backscattered` | `bool` | Geant4 marked the track as inward albedo crossing CALO to Tracker |
+| `levelFlags` | `uint32_t` | bitwise OR of the `LevelFlag` bits this particle belongs to |
+| `role` | `uint8_t` | `ParticleRole`: `Normal`, `Connector`, `SignalStandIn` |
 
 `bool hasGen() const` ⇔ `genNode >= 0`; `bool hasSim() const` ⇔ `simNode >= 0`;
 `bool valid() const` ⇔ `hasGen() || hasSim()`.
+
+`ParticleRole particleRole() const` returns the role, `bool isSynthetic() const`
+is true for the two artificial roles, and `bool isAtLevel(LevelFlag) const` tests
+a level bit. Ask the role; do not infer "artificial" from empty `genNode` and
+`simNode`, because a connector and a stand-in both have neither. `levelFlags` is
+written by `fillLevelFlags` (`PhysicsTools/TruthInfo/interface/TruthLevels.h`),
+which owns every bit except `Signal`. A value of zero means "no level, or written
+before the particle was stamped", so a reader that needs certainty re-derives with
+`levelAntichain()`. The levels themselves are listed in
+[Validation](validation.md#levels-hardprocess-is-the-legs-signal-is-the-resonance).
 
 A `Checkpoint` is `{ uint32_t checkpointId; math::XYZTLorentzVectorF position;
 math::XYZTLorentzVectorF momentum; }`. It is a snapshot of the position and the
@@ -405,9 +417,10 @@ Channel const&        channel(HitChannel channel) const;      // raw flat storag
 ```
 
 A `Hit` is `{ uint32_t detId; uint32_t recHitIndex; float energy; }`. It carries
-`bool hasRecHit() const` (⇔ `recHitIndex != Hit::kInvalidRecHitIndex`). Only
-channels that carry a DetId→RecHit link set `recHitIndex`, that is `Calo`. The
-tracker leaves it invalid.
+`bool hasRecHit() const` (⇔ `recHitIndex != Hit::kInvalidRecHitIndex`). Two
+channels set `recHitIndex`, each in its own index space: `Calo`, in the global
+ordering of `DetIdToRecHitMapProducer`, and `MTD`, in the barrel-then-endcap
+`FTLCluster` ordering. The tracker and muon channels leave it invalid.
 
 ### Two storage layouts
 
@@ -470,6 +483,15 @@ accessors above.
     "channel not built".
 
 ## `truth::BranchHitAssociator`
+
+!!! warning "Association layer: not in `CMSSW_20_1_X`"
+    The signatures in this section, including `denominatorDetectors`,
+    `sharedEnergyFraction`, `BranchMatch::kInvalidRoot`, `bestAdaptiveBranch` and
+    the `reco::CaloCluster` hit adapter, are those of the association layer on the
+    `truth-adaptive-associator-v1` branch. The release carries an earlier
+    `BranchHitAssociator` with a five-argument constructor, a four-field
+    `BranchMatch`, and adapters for tracks and tracksters only. Build against the
+    branch before using them.
 
 `BranchHitAssociator` matches reco objects to truth branches by shared detector
 hits. You build it once per event over a set of candidate branch roots, where an

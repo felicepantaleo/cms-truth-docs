@@ -228,9 +228,12 @@ the same reason. Pileup sub-event SimTracks, SimVertices and SimHits are only re
 through `PileUpEventPrincipal` while mixing runs. They are never in the output event.
 The sources make this explicit:
 
-- `SimGeneral/TrackingAnalysis/plugins/TrackingTruthAccumulator.cc:407` and `:471`
-- `SimGeneral/CaloAnalysis/plugins/CaloTruthAccumulator.cc:684` and `:782`
-- `PhysicsTools/TruthInfo/plugins/TruthGraphAccumulator.cc:458` and `:469`
+- `TrackingTruthAccumulator::accumulate`, both the `edm::Event` and the
+  `PileUpEventPrincipal` overloads
+- `CaloTruthAccumulator::accumulate`, likewise
+- `TruthGraphAccumulator::accumulate`, likewise
+
+Line numbers move; the overload pair is the thing to look at.
 
 The truth graph replaces two accumulators with one. It does not eliminate the step. The
 saving is in what that step allocates and writes, not in skipping it.

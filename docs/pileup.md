@@ -36,7 +36,7 @@ track has one production vertex, and there are no cycles. But **flattening the
 sub-event, and a small fraction do not re-resolve. This gives ~1017
 components/event. That weakness motivated Route B.
 
-### Phase B: `TruthGraphAccumulator` (the production route, in progress)
+### Phase B: `TruthGraphAccumulator` (the production route, merged and default for Run4)
 
 This is a `DigiAccumulatorMixMod`, like `TrackingTruthAccumulator`. The framework
 feeds it one sub-event at a time with its **native** `SimTrack`/`SimVertex`/HepMC

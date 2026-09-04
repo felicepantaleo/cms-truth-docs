@@ -11,8 +11,11 @@ All commands are single-thread and need CVMFS.
 ```bash
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
-cmsrel CMSSW_20_1_X_2026-07-22-2300
-cd CMSSW_20_1_X_2026-07-22-2300/src
+# Pick a recent IB: scram list CMSSW_20_1_X shows what is on cvmfs today.
+# IBs age off cvmfs after a few weeks, so do not pin an old one.
+IB=CMSSW_20_1_X_2026-09-03-1100
+cmsrel $IB
+cd $IB/src
 cmsenv
 
 git cms-init
@@ -27,18 +30,20 @@ scram b -j 8
 Notes:
 
 - Do not set `SCRAM_ARCH` by hand. `cmsrel` picks the architecture that matches
-  your machine. This IB is built for both `el8_amd64_gcc13` and `el9_amd64_gcc13`.
-  If your OS is not one of those, first run inside the matching CMS container, for
-  example `cmssw-el8` or `cmssw-el9`. Then follow the same commands.
+  your machine, and it warns and selects the closest one when your OS has no
+  build. If your OS matches no build, first run inside the matching CMS
+  container, for example `cmssw-el8` or `cmssw-el9`. Then follow the same
+  commands.
 - The base truth-graph packages (`SimDataFormats/TruthInfo`,
-  `PhysicsTools/TruthInfo`) are already in this IB. The merge adds the default-on
-  wiring, the `Calo` channel rename, and the adaptive associator.
+  `PhysicsTools/TruthInfo`) are already in the IB, including the truth levels.
+  The merge adds the association layer, the DQM validation package and the
+  adaptive associator.
 - Compile on one socket only.
 - The customise used below is
   `PhysicsTools/TruthInfo/python/addAdaptiveAssociator.py`. It ships with the
   `truth-adaptive-associator` development branch this tutorial merges, so you
-  create nothing by hand. It is not in the upstream pull requests: those carry
-  the `SimGeneral/TruthGraphAssociatorProducers` associators, which schedule
+  create nothing by hand. It is not part of what is offered upstream: the
+  `SimGeneral/TruthGraphAssociatorProducers` associators are, and they schedule
   three working points per collection instead of this standalone producer.
 
 ## 2. Single electron in HGCAL (no PU, D122)
@@ -163,7 +168,7 @@ process = addAdaptiveAssociator(
 
 ## 6. Reading the maps
 
-The products are `ticl::AssociationMap<ticl::mapWithSharedEnergyAndScore>`. Read
+The products are `ticl::TICLAssociationMap<ticl::mapWithSharedEnergyAndScore>`. Read
 them from a compiled `EDAnalyzer`, because bare FWLite/cppyy cannot instantiate
 this template reliably. Each entry gives the branch key (the root particle index in
 the `truth::Graph`), the shared energy, and the normalized score.
