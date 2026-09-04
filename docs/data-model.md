@@ -1,9 +1,10 @@
 # Data model
 
-The package has three deliberate layers. The first is a compact **raw** graph
-close to the EDM inputs. The second is a user-facing **logical** graph with a
-physics navigation API. The third is an auxiliary **hit index**. All three use
-cache-friendly CSR (compressed sparse-row) layouts.
+The graph is built in three layers, and each layer answers a different question.
+
+The raw layer keeps the generator record and the Geant4 record as they arrive, joined into one graph. The logical layer merges the two records into a single physics history, where one particle is one node whatever produced it, and adds the navigation you need to walk a decay chain. The hit index attaches detector hits to each node of that history.
+
+All three use a compressed sparse-row layout. That means the neighbours of a node sit next to each other in memory, which keeps a walk over the graph cache-friendly and makes the whole structure cheap to write to disk.
 
 ## Layer 1: `TruthGraph` (raw)
 

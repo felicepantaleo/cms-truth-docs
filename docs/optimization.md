@@ -1,10 +1,8 @@
 # Implementation characteristics
 
-This page describes the performance design of the package and what that design
-gains. It is a reference for anyone who reads or extends the code. These are
-**implemented** design choices, not a wish list. The remaining, not-yet-done
-ideas live in the [Roadmap](roadmap.md). Each feature page links here for the
-detail. This page is the single place that collects that detail.
+The truth graph runs on every simulated event, so its cost is charged to every production. This page collects the choices that keep that cost small, and what each one gains.
+
+Everything here is implemented. Ideas that are not yet done live in the [Roadmap](roadmap.md).
 
 ## Foundations (by design from the start)
 

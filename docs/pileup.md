@@ -1,10 +1,10 @@
 # Pileup
 
+At the HL-LHC every interesting collision arrives with about 200 others in the same bunch crossing. Truth that covers only the interesting collision cannot measure anything in that environment: every object from the other 200 collisions has no truth to match, so it counts as a fake. This page describes how the truth graph reaches the pileup as well.
+
 ## The starting point: the truth graph was signal-only
 
-The truth producers read `g4SimHits` / `generatorSmeared`. Those collections are
-**signal only** (bunch crossing 0). The pileup truth is elsewhere, and it is mostly
-inaccessible:
+The truth producers read `g4SimHits` and `generatorSmeared`. Those collections hold the signal collision only, at bunch crossing 0. The pileup truth lives elsewhere, and it is mostly out of reach:
 
 - **Standard mixing:** pileup `SimTrack`s live in the **transient**
   `CrossingFrame<SimTrack>`. The digitizers consume that frame, and CMSSW never

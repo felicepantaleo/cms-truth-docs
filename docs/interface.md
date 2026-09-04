@@ -1,10 +1,8 @@
 # Interface reference
 
-This page is the precise reference for the user-facing C++ interface of the truth
-graph. It covers the `truth::Graph` navigation API, the `truth::Branch` subgraph
-view, and the `truth::BranchSelector` and `truth::BranchHitAssociator` helpers.
-Every signature below comes from the authoritative headers, with `[[nodiscard]]`
-omitted for brevity. The headers live in two packages.
+This page is the exact reference for the C++ interface. Read [How to use the graph](usage.md) first if you want the guided version; this page is for checking a signature while you write code.
+
+Every signature below is copied from the headers, with `[[nodiscard]]` removed to keep the lines short. The headers live in two packages.
 `SimDataFormats/TruthInfo/interface/` holds the data-model headers.
 `PhysicsTools/TruthInfo/interface/` holds the analysis-layer headers. For the
 design rationale see the [Data model](data-model.md). For narrative walk-throughs

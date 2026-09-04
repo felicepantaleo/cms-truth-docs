@@ -1,12 +1,10 @@
 # Computing cost
 
-The truth graph against the legacy frozen truth objects.
+The truth graph replaces four frozen truth collections with one graph, so the fair question is what each option costs in CPU time and in disk space.
 
-This page gives what it costs to keep `TrackingParticle`, `TrackingVertex`,
-`CaloParticle` and `SimCluster`. It also gives what it costs to keep the truth
-graph plus its associators instead. Every number below comes from a measurement on
-one sample. Nothing here is extrapolated. A quantity that was not measured is
-listed as not measured, never as an estimate.
+This page measures both. It gives the cost of keeping `TrackingParticle`, `TrackingVertex`, `CaloParticle` and `SimCluster`, and the cost of keeping the truth graph and its associators instead.
+
+Every number comes from a measurement on one named sample. Nothing is extrapolated. A quantity that was not measured is listed as not measured, never as an estimate.
 
 ## Sample and conditions
 

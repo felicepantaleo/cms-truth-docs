@@ -1,8 +1,10 @@
 # Validation
 
-All numbers below come from the eight `enableTruth` Run4 D120 (no-PU) relval
-topologies. `runTruthRelvals.sh` regenerates them into a small library. The
-`TruthGraphTopologyChecker` audits that library.
+This page collects the evidence that the truth graph is correct.
+
+The checks fall into three groups. The first group asks whether the graph itself is sound: it must be acyclic, connected, and free of particles with two production vertices. The second group asks whether the truth definitions are right: every level is recomputed from the graph and compared with what was stored. The third group measures reconstruction against the graph and compares the answer with the legacy truth objects, which is the test that the graph can replace them.
+
+Unless a section says otherwise, the numbers come from the eight `enableTruth` Run4 D120 relval topologies without pileup. `runTruthRelvals.sh` regenerates that small library, and `TruthGraphTopologyChecker` audits it.
 
 ## The relval library
 
@@ -34,8 +36,11 @@ pileup library overlaid on a D122 signal is not a valid sample.
 
 ## Levels: hardProcess is the legs, signal is the resonance
 
-These numbers come from one event of each of the twelve templates above. The level
-membership now sits on the truth graph itself (`ParticleData::levelFlags`).
+A truth level is a named rule that decides which particles count as truth objects. It is the denominator of an efficiency, written down and given a name. Different questions need different levels: a calorimeter study counts the particles that reach the calorimeter, a b-tagging study counts the hadrons that carry a b quark, and neither answer is more correct than the other.
+
+Every level obeys one rule. It never holds a particle together with one of its own ancestors, so no object is counted twice out of the same energy. Mathematicians call such a set an antichain. Practically it means a level cannot ask for a tau and, at the same time, for the three pions that the tau decayed into.
+
+Each particle carries the levels it belongs to, as bits on the graph itself (`ParticleData::levelFlags`). Software can therefore recompute a level and compare it with what was stored, which is how the checks below work. The numbers come from one event of each of the twelve templates above.
 
 | level | what it holds |
 |---|---|

@@ -1,11 +1,8 @@
 # How to use the graph
 
-This page is a worked tour of the API. It shows how to put the products in a job. It
-also shows how to navigate the logical graph and how to select interesting particles.
-It shows how to match an arbitrary reco object to a truth branch. Every method, field, and
-config label below exists in `PhysicsTools/TruthInfo`. See the
-[Data model](data-model.md) for the design. See [Validation](validation.md) for
-performance plots.
+This page shows how to use the truth graph in your own job. It starts with the configuration that produces the graph. It then walks through the four things you are likely to want: navigating the decay history, selecting the particles that define your denominator, reading the detector hits of a particle, and matching a reconstructed object to the truth.
+
+Every method, field and configuration label on this page exists in `PhysicsTools/TruthInfo`. Read [Data model](data-model.md) first if you want the design behind the API, and [Validation](validation.md) for the performance plots.
 
 ## The three layers and their producers
 

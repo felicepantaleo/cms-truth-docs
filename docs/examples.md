@@ -1,10 +1,8 @@
 # Worked examples
 
-Three concrete events, end to end. This page shows what the truth graph looks like.
-It shows how the selection picks out the interesting particles. It shows how the
-picture maps onto the navigation API in [How to use the graph](usage.md). All three
-graphs are real renders from the DOT gallery (`test/dot_gallery_v20`).
-`makeTruthGallery.sh` generates them; see [Validation](validation.md).
+The fastest way to understand the truth graph is to look at one. This page walks through three real events and reads the picture out loud: what each node is, why the selection kept it, and which call in the API would return it.
+
+All three pictures are real renders from the graph gallery, not drawings. `makeTruthGallery.sh` produces them; see [Validation](validation.md).
 
 !!! note "How to read these graphs"
     The truth graph is **bipartite**. Ellipses are `Particle`s and diamonds are

@@ -1,8 +1,8 @@
 # Findings & changes
 
-Building the truth graph showed several non-obvious behaviors in the existing CMS
-truth machinery. This page records what we found and what we changed. The
-`enableTruth` modifier gates all the changes.
+Building the truth graph meant reading the simulation record closely, and that turned up behaviour in the existing CMS machinery that nobody had written down. Some of it changes what the truth means, so it is recorded here rather than left in commit messages.
+
+Each section states what we found, what we changed, and the measurement that supports the change. The `enableTruth` modifier gates every change on this page.
 
 ## 1. Orphan SimVertices: generator-history retention
 

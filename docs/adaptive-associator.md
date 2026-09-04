@@ -1,8 +1,8 @@
 # Tutorial: the adaptive branch associator on single electron and single pion
 
-Associate reco tracksters to truth-graph branches, including the **adaptive-level**
-match. The samples are single-electron and single-pion in the HGCAL acceptance.
-There is no pileup, and the geometry is Run4 **D122**.
+A reconstructed shower in the calorimeter has to be compared with something in the truth. The question is what. A single photon is the obvious answer when the shower comes from one photon. It is the wrong answer when the shower merges two photons from one neutral pion, because then neither photon explains the shower and the pion does. The adaptive match makes that choice per object instead of once for the whole sample.
+
+This tutorial runs the match on two samples where the answer is known: a single electron, which radiates and therefore builds a small decay branch, and a single pion, which showers hadronically. Both are inside the HGCAL acceptance, without pileup, on the Run4 D122 geometry.
 
 All commands are single-thread and need CVMFS.
 

@@ -1,9 +1,8 @@
 # Roadmap
 
-This page lists the work that is **not yet done**. For the data model, the
-validation results, and the already-applied performance work, see the respective
-pages. See [Implementation characteristics](optimization.md) in particular for
-the optimizations that are already applied.
+This page lists the work that is not yet done, so that a reader can tell a missing feature from a defect.
+
+The design, the measured results and the performance work that is already applied live on their own pages. See [Implementation characteristics](optimization.md) for the optimisations that are in the code today.
 
 ## Pileup / Phase B
 
