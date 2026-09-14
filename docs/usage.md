@@ -94,10 +94,10 @@ process.detIdToRecHitMapProducer = cms.EDProducer(
         cms.InputTag("HGCalRecHit", "HGCHEBRecHits", "RECO"),
     ),
     pfRecHits = cms.VInputTag(
-        cms.InputTag("particleFlowRecHitECAL", "Cleaned", "RECO"),
-        cms.InputTag("particleFlowRecHitHBHE", "Cleaned", "RECO"),
-        cms.InputTag("particleFlowRecHitHF",   "Cleaned", "RECO"),
-        cms.InputTag("particleFlowRecHitHO",   "Cleaned", "RECO"),
+        cms.InputTag("particleFlowRecHitECAL", "", "RECO"),
+        cms.InputTag("particleFlowRecHitHBHE", "", "RECO"),
+        cms.InputTag("particleFlowRecHitHF", "", "RECO"),
+        cms.InputTag("particleFlowRecHitHO", "", "RECO"),
     ),
 )
 

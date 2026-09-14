@@ -236,6 +236,16 @@ range is the `HasTruthHits` customization point, which `BranchHitAssociator` use
 - `truth::recoHits(ticl::Trackster const&, std::vector<reco::CaloCluster> const&)`:
   the trackster's layer-cluster cells with their fractions, coalesced.
 
+The shared-energy metric weights every cell the way the TICL associators do. The
+associator producer reads the HGCAL rechits and the barrel PFRecHits the layer clusters
+were built from, and gives `BranchHitAssociator` a `truth::CellEnergyTable` of rechit
+energy per cell. The reco object then owns `fraction * rechit energy` of a cell, the
+branch owns its sim fraction of the same rechit energy, and a cell with a rechit but no
+simhit (noise) is paid for in full in the reco-side score. Without a table, in the unit
+tests and in the legacy-object validators, the weight is the cell's total sim energy
+from the hit index. The `Cleaned` instance of a PFRecHit producer holds the hits that
+failed its quality tests; every truth configuration reads the plain instance.
+
 These are free functions, not data-format methods, on purpose. A trackster references
 layer clusters that live in a separate collection, and a member method could not reach
 them. Returning a `PhysicsTools` type from a `DataFormats` class would also invert the
