@@ -133,9 +133,38 @@ score + adaptiveReverseWeight * reverseScore
 trackster. `reverseScore` rises as the branch spreads into energy that the
 trackster does not have. The associator rejects levels whose contamination exceeds
 `adaptiveMaxReverseScore`. If that empties the candidate set, it ignores the
-ceiling and returns the global minimum. The climb stops at physical particles: it
-never selects or crosses a bare parton, diquark, string/cluster node, or
-electroweak boson.
+ceiling and returns the global minimum.
+
+The climb stops at physical particles. A candidate root carries the hits of its
+whole subgraph, so a parton or a beam proton covers the reco object entirely and
+would win on score alone. `TruthBranchTargetsProducer` therefore publishes
+`assignableRoots`, the subset of the candidate roots an adaptive working point may
+answer with, and the associators drop every other row before the climb. Barred
+are the nodes the graph invents (the connectors and the signal stand-in), anything
+produced at an `Upstream`, `UnderlyingEvent` or `Interaction` vertex, a particle
+with no production vertex, which is a beam particle, the partons, and the W, the Z
+and the Higgs. Strings, clusters and diquarks never reach the graph: they are
+collapsed away before it is built.
+
+The rule is about what the ancestor IS, not about the vertex between it and the
+reco object's particle. The merged pi0 the climb exists for is reached by crossing
+a decay vertex, so no vertex process can be a barrier. Each clause is a flag of the
+`assignableTargets` PSet on the targets producer, and `extraBarredPdgIds` adds
+species by absolute value.
+
+Measured on 20 ttbar events at PU200: the rule bars 10 to 14 roots per event out of
+about 13000 selected ones, the two beam protons, the top quarks, the b quarks, a
+few gluons and the two W bosons. It moves 4.1% of the tracks at `AdaptiveTight`
+from one of those to the particle they came from, which is why the pileup rate of
+the tracking page rises from 0.842 to 0.882: at PU200 most tracks are pileup, and a
+track labelled with a signal parton was labelled wrongly.
+
+The barred roots stay in `selectedRoots` and in the `Fixed` map. That map is the
+candidate list rather than an answer, and the truth-driven direction reads its pair
+scores from it, so removing them there costs the levels made of exactly these
+particles their numerator: measured on 20 ttbar events at PU200, `partonJets` falls
+from 91 of 92 to 0 of 92. A truth object that is not a candidate root can never be
+matched at all.
 
 So for a clean single electron the adaptive level is the electron itself, and for a
 charged pion it is the pion. The climb becomes useful for a converted photon or a

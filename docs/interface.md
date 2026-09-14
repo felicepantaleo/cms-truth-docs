@@ -132,7 +132,9 @@ gets its own `Interaction` vertex. The `Interaction → {Upstream, UnderlyingEve
 links go through artificial connector particles, which carry `genNode = simNode =
 -1` and `pdgId = 0`. A consumer that walks particles will meet these connector
 particles. Filter on `isArtificial()` vertices or on the connector `pdgId` if you
-need only real particles.
+need only real particles. The association maps need no such filter: their
+reco-driven rows already hold only the particles a reco object may be assigned to
+(see [the adaptive associator](adaptive-associator.md)).
 
 ## `truth::Particle`
 
