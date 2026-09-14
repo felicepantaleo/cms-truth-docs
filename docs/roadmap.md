@@ -26,16 +26,11 @@ Sub-events therefore cannot collide. See [Pileup](pileup.md).)
 
 ## Validation
 
-- **Disjoint "interesting particles" reference for the reco-side validators.** The
-  generic reco-side efficiency/merge/duplicate is only well-defined against a
-  disjoint (antichain) set of truth branches. A flat PDG-id selection is a
-  sufficient antichain only for non-showering species (muons). The two reco-side
-  modules therefore stay **opt-in**, that is, out of the default validation
-  sequence. They stay opt-in until the physically correct, detector-dependent
-  reference is wired in. That reference is the `BranchSelector` "interesting
-  particles" antichain (`CaloParticle`-like for calo, `TrackingParticle`-like for
-  tracking). See the caveat in
-  [Validation](validation.md#reco-side-validators-generic-hit-exposure).
+- **Disjoint "interesting particles" reference for the reco-side validators.**
+  Done. The truth levels are antichains by construction, and
+  `TruthBranchRecoValidator` in `Validation/TruthInfo` takes the level as an axis.
+  The first-generation opt-in `BranchRecoValidator` is removed in PR 51829. See
+  [Validation](validation.md#the-hit-exposure-layer).
 
 ## Storage / data layout (deliberate changes, not mechanical)
 

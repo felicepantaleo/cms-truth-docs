@@ -502,10 +502,9 @@ matchable, add one adapter that returns `std::vector<truth::RecoHit>`, or a
 `truthHits()` member. The same `BranchHitAssociator` then matches it, and it replaces
 the per-object bespoke associators.
 
-These same adapters drive the generic reco-side DQM validators
-(`BranchTrackRecoValidator` for tracks, `BranchTracksterRecoValidator` for
-tracksters). They also drive the `makeTruthGraphValidationPlots.py` overlay macro. See
-[Validation → reco-side validators](validation.md#reco-side-validators-generic-hit-exposure).
+These same adapters drive the reco-to-truth associators in
+`SimGeneral/TruthGraphAssociatorProducers`. See
+[Validation, the hit-exposure layer](validation.md#the-hit-exposure-layer).
 
 ## Performance plots
 

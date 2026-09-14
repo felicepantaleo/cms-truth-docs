@@ -151,6 +151,8 @@ process, then a `*_signal_*` / `*_full_*` SVG for the inline zoomable view.
 ## DQM performance plots (Branch vs legacy truth objects)
 
 A parallel DQM section compares the truth `Branch` graph to the legacy truth objects.
+The validators, their association-map producers and both sequences live in
+`Validation/TruthInfo`; `PhysicsTools/TruthInfo` holds no DQM module.
 It does **not** fork the release validators. It works in the same fashion as
 `HGCalValidator` / `MultiTrackValidator`. TICL-style `AssociationMap` *producers* build
 the reco↔Branch links as standalone EDM products. DQM *analyzers* turn those links into
@@ -207,8 +209,9 @@ populated. The TIB/TID/TOB/TEC branches are empty. The match is therefore
 pixel-DetId based, which is still more than enough to identify the particle.
 
 Standalone drivers: `test/validateBranch{DQM,TrackingDQM}_cfg.py` (→ DQMIO),
-`test/harvestBranchDQM_cfg.py` (→ legacy `DQM_V0001`). Both sequences live in
-`PhysicsTools/TruthInfo/python/truthGraphValidation_cff.py` and
+`test/harvestBranchDQM_cfg.py` (-> legacy `DQM_V0001`), all under
+`Validation/TruthInfo`. Both sequences live in
+`Validation/TruthInfo/python/truthGraphValidation_cff.py` and
 `truthGraphDQMHarvester_cff.py`. The release sequences take both behind `enableTruth`.
 The association producers go into `baseCommonPreValidation`. The DQM analyzers go into
 `baseCommonValidation` (`globalValidation_cff`). The matching harvesting attaches to
@@ -216,19 +219,16 @@ The association producers go into `baseCommonPreValidation`. The DQM analyzers g
 these modules run in the standard Phase-2 validation. The reco-side validators and
 their harvesters stay opt-in (see the antichain caveat below).
 
-## Reco-side validators (generic hit exposure)
+## The hit-exposure layer
 
 The validators above compare the Branch graph to the *legacy truth objects*. The
-generic layer below closes the other loop. It matches **reco objects** (reco tracks,
-TICL tracksters) directly to the Branch graph through shared hits. It books
-MultiTrackValidator / HGCalValidator-style efficiency, fake-rate, merge-rate and
-duplicate-rate plots. Adding a new reco type takes one adapter and no DataFormats
-change.
+reco-to-truth associators close the other loop: they match **reco objects** directly
+to the Branch graph through shared hits. Adding a new reco type takes one adapter and
+no DataFormats change.
 
-**The hit-exposure layer**: `interface/RecoHitAdapters.h` provides free functions.
-They reduce any reco object to a range of `truth::RecoHit{detId, energy, fraction}`.
-That range is the `HasTruthHits` customization point, which `BranchHitAssociator`
-uses:
+`PhysicsTools/TruthInfo/interface/RecoHitAdapters.h` provides free functions. They
+reduce any reco object to a range of `truth::RecoHit{detId, energy, fraction}`. That
+range is the `HasTruthHits` customization point, which `BranchHitAssociator` uses:
 
 - `truth::recoHits(reco::Track const&)`: the track's valid rechit DetIds, unit
   weight. The tracker has no per-cell energy, so the associator matches by
@@ -242,47 +242,15 @@ them. Returning a `PhysicsTools` type from a `DataFormats` class would also inve
 package dependency. A new reco type = one new adapter returning
 `std::vector<truth::RecoHit>`.
 
-**The validator**: `plugins/BranchRecoValidator.cc` is one template
-(`BranchRecoValidatorT<Traits>`) with two concrete modules:
+The first-generation `BranchRecoValidator` (two modules, `BranchTrackRecoValidator`
+and `BranchTracksterRecoValidator`, opt-in behind
+`truthGraphRecoSideValidationSequence`) is removed in PR 51829. It matched at one
+fixed truth definition and needed a disjoint truth reference that was never wired.
+`TruthBranchRecoValidator` in `Validation/TruthInfo` books the same efficiency, fake,
+merge and duplicate plots with the truth level and the working point as axes; see the
+next section.
 
-- **`BranchTrackRecoValidator`**: `reco::Track` (default `generalTracks`), tracker
-  channel, shared-hit multiplicity; second axis = p<sub>T</sub>. DQM folder
-  `Tracking/BranchValidator/recoTrack`.
-- **`BranchTracksterRecoValidator`**: `ticl::Trackster`
-  (`ticlTrackstersCLUE3DHigh` + `hgcalMergeLayerClusters`), calo channel, shared
-  energy; second axis = energy. DQM folder `HGCAL/BranchValidator/Trackster`.
-
-Each module books two truth-side plots **vs η and the second axis**: an efficiency
-(`effnum`/`denom`) and a duplicate rate (`dupnum`/`denom`). It books two reco-side
-plots on the same axes: a fake rate (`fakenum`/`recodenom`) and a merge rate
-(`mergenum`/`recodenom`). It also books a best-branch match-`purity` distribution.
-`DQMGenericClient` post-processors in `truthGraphDQMHarvester_cff` form the ratios
-(`branchTrackRecoPostProcessor`, `branchTracksterRecoPostProcessor`).
-
-!!! warning "Reco-side metrics need a disjoint truth reference"
-    The reco-side efficiency, merge rate and duplicate rate are only meaningful
-    against a **disjoint (antichain)** set of interesting truth branches. A Branch
-    subgraph aggregates *all* of a particle's descendants. Against the **full**
-    truth graph every ancestor therefore contains its descendants' hits. Every reco
-    object then "merges" ≥2 nested branches (merge-rate ≈ 1). Almost nothing is
-    uniquely matched (efficiency ≈ 0). That result is degenerate by construction,
-    not a real performance number.
-
-    A flat `interestingPdgIds` list is a sufficient antichain **only for
-    non-showering species**. Restricting the track validator to **muons** on Z→μμ
-    gives sensible numbers (merge-rate ≈ 0.02, efficiency ≈ 0.56). A broader
-    charged-stable list is still degenerate on TTbar, for example, because pions,
-    protons and electrons are deeply nested in the hadronic/EM cascade. The
-    physically correct reference depends on the detector: `CaloParticle`-like (the
-    particle entering HGCAL) for calo, and `TrackingParticle`-like (per charged
-    track-maker) for tracking. That reference is the `BranchSelector` "interesting
-    particles" antichain, which is not yet wired (see the
-    [Roadmap](roadmap.md#validation)). For that reason the two modules are
-    **opt-in** (`truthGraphRecoSideValidationSequence`) and stay out of the default
-    validation sequence. The muon configuration in
-    `test/validateBranchRecoDQM_cfg.py` is the working demonstration.
-
-**The plots macro**: `scripts/makeTruthGraphValidationPlots.py` is a self-contained
+**The plots macro**: `Validation/TruthInfo/scripts/makeTruthGraphValidationPlots.py` is a self-contained
 PyROOT macro. It follows `makeHGCalValidationPlots.py` but has no framework
 dependency. It reads the analyzer DQMIO output **or** a legacy harvested `DQM_V0001`
 file. It locates the Branch-validator folders. It derives the efficiency, fake, merge
@@ -296,7 +264,7 @@ makeTruthGraphValidationPlots.py tau.root:Tau zmm.root:ZMM ttbar.root:TTbar -o p
 The `FILE:LABEL` form sets the legend entry. Passing several samples also gives the
 per-event guided comparison (cf. [Worked examples](examples.md)).
 
-**The library wrapper**: `test/makeBranchValidationPlots.sh` automates the above over
+**The library wrapper**: `Validation/TruthInfo/test/makeBranchValidationPlots.sh` automates the above over
 a `runTruthRelvals.sh` library. It locates each workflow's harvested legacy DQM file
 (`DQM_V0001_R*__Global__*__RECO.root`). It then overlays a few representative samples
 in one set of PNGs plus an `index.html`. The default samples are TTbar, TenTau and

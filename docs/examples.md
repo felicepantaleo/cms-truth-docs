@@ -163,11 +163,8 @@ truth::BranchHitAssociator trk(hitIndex, /*roots=*/{},
 auto best = trk.bestBranches(truth::recoHits(recoTrack));
 ```
 
-This is the configuration that `BranchTrackRecoValidator` uses. Restrict its truth
-side to muons on ZMM and you get a sensible reco-track efficiency (≈0.56) and a
-near-zero merge rate.
-[Validation](validation.md#reco-side-validators-generic-hit-exposure) discusses
-this clean reference case.
+This is the configuration the track associators use.
+[Validation](validation.md#the-hit-exposure-layer) describes the adapter layer.
 
 ## SingleElectron: an EM shower read off its vertex reasons
 
