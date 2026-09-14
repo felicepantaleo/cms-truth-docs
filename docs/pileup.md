@@ -52,6 +52,20 @@ It is **configurable**:
 | `collapsePileupGen` | `true` | for pileup, collapse the GEN chain to the stable particles on a single gen vertex, keep the SIM |
 | `collapseSignalGen` | `false` | keep the signal's full graph (full signal GEN+SIM is the next step) |
 
+The accumulator also emits every sub-event's `SimTrack` and `SimVertex` collections as
+`mix:mergedSimTracks` and `mix:mergedSimVertices`, each object tagged with its
+sub-event `EncodedEventId`. `TruthLogicalGraphProducer` reads momenta and positions
+from them by `(event id, trackId)` and `(event id, index)`, and applies the HepMC
+payload of the signal only to signal nodes. Both are transient DIGI products. Before
+this (2026-09-14) the mixed logical graph read the signal `g4SimHits` collections by
+bare `trackId` and the signal HepMC by barcode, so every pileup particle carried a
+signal particle's momentum, or none: on ttbar at PU200 the stored pt of the particle
+behind a track was 0.58 of the track pt at the median, a quarter of them sat at
+|eta| above 4, and the association candidate cuts dropped the true particle for
+65% of the tracks. With the merged collections the median is 0.997 and the
+particle behind a track above 1.2 GeV is a candidate for 92% of the tracks; the
+rest fail the 1 GeV candidate cut on their own momentum.
+
 The pileup default is exactly this: *all the stable particles connected to the same
 gen vertex, collapse the gen, keep the sim*. There is one GEN vertex per pileup
 interaction, and it carries all the stable (status-1) particles of that
