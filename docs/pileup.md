@@ -68,7 +68,7 @@ rest fail the 1 GeV candidate cut on their own momentum.
 
 The index producer also reads the tracker digi sim links, the inner ones and the outer
 ones, so the tracker truth is keyed by (module, cell): a tracker DetId names a module,
-and at PU200 about two hundred particles share one track's modules. See [Validation](validation.md#the-hit-exposure-layer).
+and at PU200 about two hundred unrelated particles share one track's modules. See [Validation](validation.md#the-hit-exposure-layer).
 
 The pileup default is exactly this: *all the stable particles connected to the same
 gen vertex, collapse the gen, keep the sim*. There is one GEN vertex per pileup

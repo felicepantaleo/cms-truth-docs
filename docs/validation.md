@@ -242,14 +242,20 @@ range is the `HasTruthHits` customization point, which `BranchHitAssociator` use
   reaches keeps its module-level entry. A job whose input dropped the links keeps
   working, keyed by module, and says so once.
 
-  What the key buys is the removal of ambiguity, and the agreement number cannot show it
-  because it saturates. Measured on 20 ttbar events at PU200, on the same tracks and the
-  same index, the truth particles sharing at least a tenth of a track fall from 194 on
-  average, median 151, keyed by module, to 1.4, median 1, keyed by cell. On the earlier
-  sample with only the inner tracker keyed the mean was 17.3, so the outer tracker, which
-  carries about ten of a track's fifteen modules, dominates what is left. The truth DQM
-  sees the same thing above 1 GeV: the share of tracks whose leading truth contributor
-  owns less than half of them falls from 4.7% to 0.02%.
+  What the key buys is the removal of unrelated competitors, and the agreement number
+  cannot show it because it saturates. Count only the UNRELATED candidates: those sharing
+  at least a tenth of a track that are neither the best match nor an ancestor or a
+  descendant of it. The lineage owns the same hits by construction, a signal track always
+  carries its own decay chain, 6.8 particles here, and a pileup particle is a root of the
+  graph with no chain above it, so a count that includes the lineage means different
+  things in the two populations. Measured on 20 ttbar events at PU200, tracks above 1 GeV,
+  on the same tracks and the same index: the unrelated particles are 192.9 on average
+  keyed by module, when no track has none, and 0.09 keyed by cell, when 97.4% of tracks
+  have none. With only the inner tracker keyed the mean is 10.7 and 42.9% have none, so
+  the outer tracker, which carries about ten of a track's fifteen modules, removes most
+  of what is left. The truth DQM sees the same thing above 1 GeV: the share of tracks
+  whose leading truth contributor owns less than half of them falls from 4.7% to 0.02%.
+  That test projects the candidates onto a truth level first, so a chain counts once.
 
   The match then agrees with `QuickTrackAssociatorByHits` for 98.39% of the tracks it
   matches and names an unrelated particle for none of them, 0 of 30170, against 93.15%
