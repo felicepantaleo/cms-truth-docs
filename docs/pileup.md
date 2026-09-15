@@ -66,9 +66,9 @@ behind a track was 0.58 of the track pt at the median, a quarter of them sat at
 particle behind a track above 1.2 GeV is a candidate for 92% of the tracks; the
 rest fail the 1 GeV candidate cut on their own momentum.
 
-The index producer also reads the inner-tracker digi sim links, so the tracker truth is
-keyed by (module, cell) there: a tracker DetId names a module, and at PU200 several
-particles cross one. See [Validation](validation.md#the-hit-exposure-layer).
+The index producer also reads the tracker digi sim links, the inner ones and the outer
+ones, so the tracker truth is keyed by (module, cell): a tracker DetId names a module,
+and at PU200 about two hundred particles share one track's modules. See [Validation](validation.md#the-hit-exposure-layer).
 
 The pileup default is exactly this: *all the stable particles connected to the same
 gen vertex, collapse the gen, keep the sim*. There is one GEN vertex per pileup
