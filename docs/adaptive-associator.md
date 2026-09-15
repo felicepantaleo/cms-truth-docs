@@ -19,10 +19,10 @@ cd $IB/src
 cmsenv
 
 git cms-init
-# One merge brings everything: truth-adaptive-associator is stacked on the
+# One merge brings everything: truth-adaptive-associator-v1 is stacked on the
 # "MC-truth graph by default for Run4" branch, so this single topic pulls in both
-# the default-on truth graph and the adaptive associator.
-git cms-merge-topic felicepantaleo:truth-adaptive-associator
+# the default-on truth graph and the association layer.
+git cms-merge-topic felicepantaleo:truth-adaptive-associator-v1
 
 scram b -j 8
 ```
@@ -36,15 +36,14 @@ Notes:
   commands.
 - The base truth-graph packages (`SimDataFormats/TruthInfo`,
   `PhysicsTools/TruthInfo`) are already in the IB, including the truth levels.
-  The merge adds the association layer, the DQM validation package and the
-  adaptive associator.
+  The merge adds the association layer (`SimGeneral/TruthGraphAssociatorProducers`)
+  and the DQM validation package (`Validation/TruthInfo`).
 - Compile on one socket only.
-- The customise used below is
-  `PhysicsTools/TruthInfo/python/addAdaptiveAssociator.py`. It ships with the
-  `truth-adaptive-associator` development branch this tutorial merges, so you
-  create nothing by hand. It is not part of what is offered upstream: the
-  `SimGeneral/TruthGraphAssociatorProducers` associators are, and they schedule
-  three working points per collection instead of this standalone producer.
+- The associators run in the release validation on their own, with no customise: the
+  Run4 eras carry `enableTruth`, which schedules them in the prevalidation Path and
+  the DQM analyzers in the validation EndPath. The customise used below,
+  `SimGeneral/TruthGraphAssociatorProducers/python/customiseTruthGraphAssociators.py`,
+  is for a job that wants the maps kept in its own output.
 
 ## 2. Single electron in HGCAL (no PU, D122)
 
@@ -76,7 +75,7 @@ cmsDriver.py step3 \
   --geometry ExtendedRun4D122 --era Phase2C26I13M9 \
   --datatier GEN-SIM-RECO --eventcontent FEVTDEBUGHLT \
   --filein file:ele_step2.root --fileout file:ele_step3.root \
-  --customise PhysicsTools/TruthInfo/addAdaptiveAssociator.addAdaptiveAssociator
+  --customise SimGeneral/TruthGraphAssociatorProducers/customiseTruthGraphAssociators.customiseTruthGraphAssociators
 ```
 
 ## 3. Single pion in HGCAL (no PU, D122)
@@ -104,7 +103,7 @@ cmsDriver.py step3 \
   --geometry ExtendedRun4D122 --era Phase2C26I13M9 \
   --datatier GEN-SIM-RECO --eventcontent FEVTDEBUGHLT \
   --filein file:pi_step2.root --fileout file:pi_step3.root \
-  --customise PhysicsTools/TruthInfo/addAdaptiveAssociator.addAdaptiveAssociator
+  --customise SimGeneral/TruthGraphAssociatorProducers/customiseTruthGraphAssociators.customiseTruthGraphAssociators
 ```
 
 ## 4. What comes out
@@ -113,16 +112,17 @@ cmsDriver.py step3 \
 edmDumpEventContent ele_step3.root | grep -i tracksterToTruthBranch
 ```
 
-Four association products per trackster collection (here `ticlTrackstersCLUE3DHigh`):
+Four association products per trackster collection (here `ticlTrackstersCLUE3DHigh`),
+one reco-driven map per working point and one truth-driven map:
 
 | Product | Meaning |
 |---|---|
-| `ticlTrackstersCLUE3DHighToTruthBranch` | trackster to branch, fixed-level (every branch root) |
-| `TruthBranchToticlTrackstersCLUE3DHigh` | reverse, branch to trackster |
-| `ticlTrackstersCLUE3DHighToTruthBranchAdaptive` | trackster to its single adaptive-level branch |
-| `TruthBranchToticlTrackstersCLUE3DHighAdaptive` | reverse of the adaptive match |
+| `ticlTrackstersCLUE3DHighRecoToTruthFixed` | trackster to branch, every candidate root, best first |
+| `ticlTrackstersCLUE3DHighRecoToTruthAdaptiveTight` | trackster to its single adaptive branch, reverse score at most 0.6 |
+| `ticlTrackstersCLUE3DHighRecoToTruthAdaptiveNominal` | trackster to its single adaptive branch, unconstrained |
+| `ticlTrackstersCLUE3DHighTruthToReco` | reverse, branch to trackster, one row per candidate |
 
-The `...Adaptive` maps are the point of this associator. For each trackster the
+The adaptive maps are the point of this associator. For each trackster the
 associator walks up the truth graph. It keeps the single level that minimizes
 
 ```
@@ -173,27 +173,27 @@ individual daughters.
 
 ## 5. Tuning
 
-Both parameters are arguments of the customise:
-
-```bash
---customise PhysicsTools/TruthInfo/addAdaptiveAssociator.addAdaptiveAssociator \
---customise_commands "process.tracksterToTruthBranch.adaptiveReverseWeight = 2.0; \
-process.tracksterToTruthBranch.adaptiveMaxReverseScore = 0.6"
-```
-
-- `adaptiveReverseWeight` (default 1.0): how much the associator penalizes the
-  climb for spreading. Larger values keep the match lower in the truth graph.
-- `adaptiveMaxReverseScore` (default 1.0): the contamination ceiling per level.
-
-To associate more collections, call the customise from your own snippet:
+The working points are one list per parameter, in
+`SimGeneral/TruthGraphAssociatorProducers/python/truthGraphAssociationLabels_cff.py`,
+and every associator reads the same three:
 
 ```python
-from PhysicsTools.TruthInfo.addAdaptiveAssociator import addAdaptiveAssociator
-process = addAdaptiveAssociator(
-    process,
-    tracksterCollections=("ticlTrackstersCLUE3DHigh", "ticlTracksterLinks"),
-)
+names                   = ("Fixed", "AdaptiveTight", "AdaptiveNominal")
+adaptiveReverseWeight   = (0.0, 1.0, 1.0)
+adaptiveMaxReverseScore = (0.0, 0.6, 1.0)
 ```
+
+- `adaptiveReverseWeight`: how much the associator penalizes the climb for spreading.
+  Larger values keep the match lower in the truth graph.
+- `adaptiveMaxReverseScore`: the contamination ceiling per level. The reverse score is
+  a fraction of the branch's own energy, so it lies in [0, 1] and a ceiling of 1 never
+  rejects anything: `AdaptiveNominal` is the unconstrained weighted minimum.
+- `Fixed` is not a climb. Its map keeps every candidate root, best first, and its two
+  numbers are unused.
+
+To change them for a study, override the PSet before the associator cff is imported.
+The collections come from the label lists in the same file, so a new trackster
+collection is added there rather than per job.
 
 ## 6. Reading the maps
 
@@ -202,49 +202,9 @@ them from a compiled `EDAnalyzer`, because bare FWLite/cppyy cannot instantiate
 this template reliably. Each entry gives the branch key (the root particle index in
 the `truth::Graph`), the shared energy, and the normalized score.
 
-`AdaptiveAssociationDumper` ships with this branch and prints them directly:
-
-```python
-# dump.py
-import FWCore.ParameterSet.Config as cms
-process = cms.Process("DUMP")
-process.load("FWCore.MessageService.MessageLogger_cfi")
-process.source = cms.Source("PoolSource",
-                            fileNames=cms.untracked.vstring("file:ele_step3.root"))
-process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(5))
-process.d = cms.EDAnalyzer(
-    "AdaptiveAssociationDumper",
-    fixed    = cms.InputTag("tracksterToTruthBranch",
-                            "ticlTrackstersCLUE3DHighToTruthBranch"),
-    adaptive = cms.InputTag("tracksterToTruthBranch",
-                            "ticlTrackstersCLUE3DHighToTruthBranchAdaptive"),
-)
-process.p = cms.Path(process.d)
-```
-
-```bash
-cmsRun dump.py
-```
-
-Output on a single-electron event (5 events, D122, no PU):
-
-```
-=== event 1 ===
-FIXED   [ticlTrackstersCLUE3DHighToTruthBranch]: 3 tracksters, 3 with >=1 match
-    trackster 0 -> branch 1  sharedEnergy=585      score=0.00340715
-    trackster 0 -> branch 7  sharedEnergy=99.4849  score=0.792751
-    ...
-    trackster 2 -> branch 0  sharedEnergy=666      score=1.3336e-16
-ADAPTIVE[ticlTrackstersCLUE3DHighToTruthBranchAdaptive]: 3 tracksters, 3 with >=1 match
-    trackster 0 -> branch 1  sharedEnergy=585      score=0.00340715
-    trackster 1 -> branch 1  sharedEnergy=46       score=0.0212766
-    trackster 2 -> branch 0  sharedEnergy=666      score=1.3336e-16
-```
-
-Read it like this. The FIXED map ranks every candidate branch per trackster, with
-shared energy falling and score rising. The ADAPTIVE map keeps exactly **one**
-branch per trackster, the level that best matches it. A low score means a good
-match.
+`TruthBranchAssociationDumper` is not part of the package. Read the maps from a
+compiled `EDAnalyzer`, or read the DQM output of `Validation/TruthInfo`, which books
+the score, the purity and the efficiency per working point and per truth level.
 
 ## 7. What to expect: electron versus pion
 
@@ -281,27 +241,9 @@ early pion interaction. Test the climb there, not on a clean pion.
 
 The association matches truth to reco by `DetId`. It therefore works only where the
 hit index stores the same `DetId` that the reco rechits use.
-`CaloRecHitMatchAnalyzer` checks exactly that, per calorimeter. It reports how many
-index cells, and how much index sim energy, it finds in the HGCAL, ECAL barrel and
-HBHE reco rechit collections.
-
-```python
-# calomatch.py
-import FWCore.ParameterSet.Config as cms
-process = cms.Process("CALOMATCH")
-process.load("FWCore.MessageService.MessageLogger_cfi")
-process.source = cms.Source("PoolSource",
-                            fileNames=cms.untracked.vstring("file:pi_step3.root"))
-process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(3))
-process.m = cms.EDAnalyzer("CaloRecHitMatchAnalyzer")
-process.p = cms.Path(process.m)
-```
-
-```bash
-cmsRun calomatch.py
-```
-
-Output on a 100 GeV pion in the HGCAL acceptance:
+The numbers below were measured per calorimeter with a standalone analyzer that counts
+how many index cells, and how much index sim energy, appear in the HGCAL, ECAL barrel
+and HBHE reco rechit collections. On a 100 GeV pion in the HGCAL acceptance:
 
 ```
 === event 1: reco rechits  HGCAL=21278  ECAL(EB)=1419  HCAL(HBHE)=4

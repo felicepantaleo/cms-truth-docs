@@ -487,8 +487,8 @@ accessors above.
 !!! warning "Association layer: not in `CMSSW_20_1_X`"
     The signatures in this section, including `denominatorDetectors`,
     `sharedEnergyFraction`, `BranchMatch::kInvalidRoot`, `bestAdaptiveBranch` and
-    the `reco::CaloCluster` hit adapter, are those of the association layer on the
-    `truth-adaptive-associator-v1` branch. The release carries an earlier
+    the `reco::CaloCluster` hit adapter, are those of the association layer offered
+    upstream in cms-sw/cmssw#51829. The release carries an earlier
     `BranchHitAssociator` with a five-argument constructor, a four-field
     `BranchMatch`, and adapters for tracks and tracksters only. Build against the
     branch before using them.
@@ -541,7 +541,7 @@ struct BranchMatch {
   static constexpr uint32_t kInvalidRoot = 0xFFFFFFFFu;
 
   uint32_t rootParticleId = 0;
-  float    sharedEnergy = 0.f;   // (SharedHits metric: number of shared cells)
+  float    sharedEnergy = 0.f;   // (SharedHits metric: number of shared reco hits)
   float    score = 0.f;          // reco-normalized, lower is better
   float    reverseScore = 0.f;   // branch-normalized: how far the branch spreads
   float    sharedEnergyFraction = 0.f;  // sim-normalized: shared energy over the
@@ -586,9 +586,14 @@ std::vector<RecoHit> truth::recoHits(ticl::Trackster const& trackster,
 
 - `Metric::SharedEnergy` is the HGCal-style by-hits score that compares cell
   fractions. It is the convention that the calo association producers use.
-- `Metric::SharedHits` counts shared cells, and `sharedEnergy` then holds that
-  count. It is the natural metric for the tracker, where hits carry no per-cell
-  energy.
+- `Metric::SharedHits` ignores energy and counts objects. It is the natural metric for
+  the tracker, where hits carry no per-cell energy. The two sides are counted
+  differently on purpose: the reco side counts one entry per rechit, so a pixel cluster
+  counts once however many cells it spans and `score` is comparable with
+  `numberOfSharedClusters / numberOfValidTrackClusters` of
+  `QuickTrackAssociatorByHits`; the branch side counts cells, so a branch that spreads
+  over more of a module keeps the higher `reverseScore` and the tie-break still ranks
+  the tightest branch first. `sharedEnergy` holds the shared rechit count.
 - The `channel` argument selects which `HitChannel` of the hit index `bestBranches`
   matches against. Use `HitChannel::Calo`, the default, for calorimeter objects.
   Use `HitChannel::Tracker` for tracks. More channels follow once MTD and Muon are

@@ -185,20 +185,15 @@ just above 1 (TenTau: CaloParticle ⟨E^{rec}_Branch/E^{rec}_hits⟩ ≈ 1.1, Si
 ≈ 1.2). It measures the non-fractional reco energy the Branch picks up in cells shared
 between overlapping showers.
 
-`TruthBranchCaloAssociationProducer` emits `caloParticleToBranch` /
-`branchToCaloParticle` (+ SimCluster), shared-energy + score, best first. Verified on
-TTbar: CaloParticle eff ≈ 0.76, SimCluster ≈ 0.93.
-
 **Tracking**: a `TrackingParticle` carries *no hits of its own*, only its
 `SimTrack`s. The Branch↔TrackingParticle comparison therefore cannot be a direct hit
 overlap like the calorimeter one. The hit-bearing probe is the **reco track**.
-`TruthBranchTrackingAssociationProducer` matches each `reco::Track` to a Branch by
-shared tracker simhit DetIds. It uses `BranchHitAssociator` on the tracker channel with
-shared-hit multiplicity, because the tracker has no per-cell energy to share. It
-produces `trackToBranch` / `branchToTrack`.
+`allTrackToTruthBranchAssociators` matches each `reco::Track` to a Branch by shared
+tracker elements. It uses `BranchHitAssociator` on the tracker channel with the
+shared-hit metric, because the tracker has no per-cell energy to share.
 
-`BranchTrackingValidator` (folder `Tracking/BranchValidator/TrackingParticle`) is the
-DQM form of the `BranchTrackerReplacementValidator`. It closes the loop to the
+`BranchTrackingValidator` (folder `Tracking/BranchValidator/TrackingParticle`) closes
+the loop to the
 `TrackingParticle` through the standard `ClusterTPAssociation` (`tpClusterProducer`).
 It books a "Branch reproduces the TP track→truth assignment" efficiency vs η/p_T. It
 also books the shared-hit completeness/multiplicity. Verified on TTbar (CMSSW_20,
@@ -303,9 +298,8 @@ makeBranchValidationPlots.sh /path/library /path/branch_plots
 ## Reco-side metrics in `Validation/TruthInfo` (current generation, 2026-08-01)
 
 The sections above describe the first-generation validators. `Validation/TruthInfo` is
-the current-generation package. It is not in `CMSSW_20_1_X`: it lives on the
-`truth-adaptive-associator` development branch, on top of the association layer, and
-follows that layer upstream. It holds one templated
+the current-generation package. It is not in `CMSSW_20_1_X`: it is offered upstream in
+cms-sw/cmssw#51829, on top of the association layer. It holds one templated
 `TruthBranchRecoValidator` over tracks, vertices, secondary vertices and tracksters.
 `DQMGenericClient` string configuration harvests all of it. Six metrics live on the
 reco side and they answer four different questions. The numbers below come from 200
@@ -373,7 +367,7 @@ assert this as a control.
 The validator computes dominance over one **level**, set by `dominanceLevel` (default
 `caloBoundary`). This is not a detail. "Nothing dominates" is unfalsifiable off an
 antichain, because the leader and the runner-up can be the same particle at two depths.
-`selectedBranchRoots` is every particle passing the selector. A tau, its daughter pion
+`selectedRoots` is every particle passing the selector. A tau, its daughter pion
 and that pion's descendants are therefore candidates at the same time, with **nested**
 subgraphs carrying nearly identical shared energy.
 
@@ -381,7 +375,7 @@ The control is no-PU TenTau. There, ten isolated taus must give one clear winner
 
 | candidate set | median leading share | fraction with ratio near 1 |
 |---|---|---|
-| `selectedBranchRoots` (nested) | 0.26 | 0.999 |
+| `selectedRoots` (nested) | 0.26 | 0.999 |
 | `caloBoundary` (antichain) | 0.98 | 0.064 |
 
 #### Objects the question does not reach
@@ -510,8 +504,8 @@ instead.
 
 - `scram b` is clean, apart from external `vecgeom` warnings.
 - `scram b code-format` and `scram b code-checks` are clean for the package.
-- Unit tests (cppunit, `scram b runtests`): **526** assertions across 7 binaries:
-  `TruthLogicalGraphPostProcessor_t` (246), `LevelFlags_t` (114),
-  `LogicalGraphHitIndexBuilder_t` (43), `Branch_t` (41), `GenGraphBuild_t` (40),
-  `BranchHitAssociator_t` (25), `BranchSelector_t` (17), plus the
+- Unit tests (cppunit, `scram b runtests`): **640** assertions across 8 binaries:
+  `TruthLogicalGraphPostProcessor_t` (246), `LevelFlags_t` (122),
+  `BranchHitAssociator_t` (103), `Branch_t` (47), `LogicalGraphHitIndexBuilder_t` (43),
+  `GenGraphBuild_t` (40), `BranchSelector_t` (20), `AssignableTarget_t` (19), plus the
   `truthGraphSelections_t` and `testTruthHistoryGuard` tests.

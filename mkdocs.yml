@@ -1,5 +1,5 @@
 site_name: CMS MC-Truth Graph
-site_description: A single, navigable, physics-oriented truth graph for CMS (PhysicsTools/TruthInfo)
+site_description: A single, navigable, physics-oriented truth graph for CMS (SimDataFormats/TruthInfo, PhysicsTools/TruthInfo, SimGeneral/TruthGraphAssociatorProducers, Validation/TruthInfo)
 site_author: Felice Pantaleo (CERN)
 
 theme:
@@ -29,6 +29,7 @@ nav:
   - Worked examples: examples.md
   - Findings & changes: findings.md
   - Replacing truth objects: replacing-truth-objects.md
+  - Association layer: association-layer.md
   - Validation: validation.md
   - Pileup: pileup.md
   - 'Tutorial: adaptive associator': adaptive-associator.md

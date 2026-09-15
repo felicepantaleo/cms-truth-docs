@@ -2,7 +2,9 @@
 
 This page shows how to use the truth graph in your own job. It starts with the configuration that produces the graph. It then walks through the four things you are likely to want: navigating the decay history, selecting the particles that define your denominator, reading the detector hits of a particle, and matching a reconstructed object to the truth.
 
-Every method, field and configuration label on this page exists in `PhysicsTools/TruthInfo`. Read [Data model](data-model.md) first if you want the design behind the API, and [Validation](validation.md) for the performance plots.
+Every method, field and configuration label on this page exists in
+`SimDataFormats/TruthInfo`, `PhysicsTools/TruthInfo`,
+`SimGeneral/TruthGraphAssociatorProducers` or `Validation/TruthInfo`. Read [Data model](data-model.md) first if you want the design behind the API, and [Validation](validation.md) for the performance plots.
 
 ## The three layers and their producers
 
@@ -139,9 +141,8 @@ process.truthLogicalGraphHitIndexProducer = cms.EDProducer(
 The three products are ordinary EDM products: `truth::Graph`,
 `truth::LogicalGraphHitIndex`, and the raw `TruthGraph` if you need provenance
 back-references. Declare a token in the constructor. Fetch the product with
-`event.get` in `analyze`. The bundled validators (`BranchTrackingValidator`,
-`BranchTrackerReplacementValidator`, `TruthBranchCaloAssociationProducer`) use
-exactly this pattern:
+`event.get` in `analyze`. The bundled validators in `Validation/TruthInfo` (`BranchTrackingValidator`,
+`BranchHGCalValidator`, `TruthBranchRecoValidator`) use exactly this pattern:
 
 ```cpp
 #include "FWCore/Framework/interface/global/EDAnalyzer.h"
@@ -464,7 +465,7 @@ the hit index once per event. `bestBranches()` then answers any reco object. It
 merge-joins the object's hits against each candidate's subgraph span. It scores the
 candidates and sorts them best-first (`score` ascending). Two metrics exist:
 `SharedEnergy` (the HGCal by-hits score, comparing cell fractions) and `SharedHits`
-(cell multiplicity). A `truth::HitChannel` constructor argument (default
+(multiplicity: rechits on the reco side, cells on the branch side). A `truth::HitChannel` constructor argument (default
 `HitChannel::Calo`) selects which channel of the hit index the associator matches
 against. Pass `HitChannel::Tracker` for tracks.
 
@@ -516,35 +517,33 @@ library.
 ## Trackster-to-branch associations and the training dataset
 
 !!! warning "Partly on the development branch"
-    Everything described from here on lives on development branches, not in
-    `CMSSW_20_1_X`. `AllTracksterToTruthBranchAssociatorsProducer` and its
-    `addAdaptiveAssociator` customise are on `truth-adaptive-associator`. The
-    `SimGeneral/TruthGraphAssociatorProducers` associators, which supersede them,
-    are on `truth-adaptive-associator-v1` and are the ones offered upstream. The NanoAOD table producers and the training customise
-    live on the `ticl-v6-dev` development branch. They are
-    `TracksterTruthBranchTableProducer`, `TracksterFeatureFlatTableProducer`,
+    The association layer, `SimGeneral/TruthGraphAssociatorProducers`, is offered
+    upstream in cms-sw/cmssw#51829 and is not in `CMSSW_20_1_X` yet. The NanoAOD table
+    producers and the training customise live on the `ticl-v6-dev` development branch.
+    They are `TracksterTruthBranchTableProducer`, `TracksterFeatureFlatTableProducer`,
     `BranchSimTracksterProducer`, `customiseTruthBranchTraining`, the `@HGCALTruth`
-    autoNANO block and the `labelClass` / `label_adaptive` columns. Merge that
-    branch before following these recipes.
+    autoNANO block and the `labelClass` / `label_adaptive` columns. Merge that branch
+    before following these recipes.
 
 
-`AllTracksterToTruthBranchAssociatorsProducer` (PhysicsTools/TruthInfo) associates
-TICL trackster collections to truth branches. It emits two pairs of
-`ticl::TICLAssociationMap` products per configured collection. The fixed-level pair is
-`<label>ToTruthBranch` / `TruthBranchTo<label>`. The adaptive-level pair is
-`<label>ToTruthBranchAdaptive` / `TruthBranchTo<label>Adaptive`. Each entry carries the
-shared HGCAL rechit energy and the normalized association score of
-`truth::BranchHitAssociator`, in both directions. The branch key is the root particle
-index in the `truth::Graph`.
+`TruthBranchTracksterAssociatorsProducer`
+(`SimGeneral/TruthGraphAssociatorProducers`, cfi label `truthBranchTracksterAssociators`)
+associates TICL trackster collections to truth branches. It emits
+`ticl::TICLAssociationMap` products per configured collection: one reco-driven map per
+working point, `<key>RecoToTruth<WorkingPoint>`, and one truth-driven map,
+`<key>TruthToReco`, where `<key>` is the collection label with any instance joined by an
+underscore. Each entry carries the shared rechit energy and the normalized association
+score of `truth::BranchHitAssociator`. The branch key is the root particle index in the
+`truth::Graph`.
 
 The branch roots are the particles that physically entered the calorimeter. They come
 from the SimTrack tracker-calo boundary checkpoint (`Checkpoint::checkpointId == 0`),
 excluding back-scattered re-entries. This is the CaloParticle boundary semantics read
 off the truth graph. It forms an antichain by construction. Beam particles never cross
 the boundary. In-calo shower secondaries are born inside and never cross it. A particle
-that interacts or converts before the calorimeter promotes its crossing products. An
-optional `branchPdgIds` restriction narrows the species. The default (empty) keeps
-every crossing particle.
+that interacts or converts before the calorimeter promotes its crossing products. The `branchSelector.pdgIds` list narrows the species, and the `assignableTargets` PSet
+bars whole classes from being an answer. Both default to keeping every crossing
+particle.
 
 `TracksterTruthBranchTableProducer` (DPGAnalysis/HGCalNanoAOD) dumps the associations
 to NanoAOD. It writes a `TruthBranch` table (pdgId, kinematics, gen/sim provenance,
@@ -638,7 +637,8 @@ the regressed energy. The node species sets a one-hot PID. The whole SimTrackste
 toolchain therefore works against any level.
 
 Parallel products carry `level`, `rootId` and `pdgId`. They also carry a `roots` list.
-`AllTracksterToTruthBranchAssociatorsProducer` consumes that list (`rootsSrc`) and
+`truthBranchTracksterAssociators` consumes that list (`targetsSrc`, with
+`assignableTargetsSrc` for the roots an adaptive point may answer with) and
 produces reco associations against every level at once. The `@HGCALTruth` NanoAOD
 flavour dumps them as the `TruthBranchAllLevels` and `*ToTruthBranchAllLevels` tables.
 Together with the leaf-level labels this lets you score an ambiguous trackster against

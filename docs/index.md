@@ -27,7 +27,7 @@ If you want to understand the design, read [Data model](data-model.md). If you w
 !!! warning "Status: under active development"
     The two packages `SimDataFormats/TruthInfo` and `PhysicsTools/TruthInfo` are in `CMSSW_20_1_X`. The work is Phase-2 only. The `enableTruth` process modifier gates the chain, and the Run4 eras apply it from `Phase2C17I13M9` onwards, so a standard Run4 workflow builds the truth graph during digitisation and stores it. Run2 and Run3 workflows are unaffected. One change is not gated: the `g4SimHits` `ReconnectDroppedAncestors` default, which is a detector-neutral fix of the simulated vertex connectivity and applies to every sample. See [Pileup](pileup.md) for the default wiring.
 
-    Two layers are not in the release yet. The association layer (`SimGeneral/TruthGraphAssociatorProducers`) and the DQM package `Validation/TruthInfo` live on the `truth-adaptive-associator-v1` and `truth-adaptive-associator` branches. Pages that describe them say so.
+    Two layers are not in the release yet. The association layer (`SimGeneral/TruthGraphAssociatorProducers`) and the DQM package `Validation/TruthInfo` are offered upstream in cms-sw/cmssw#51829. Pages that describe them say so.
 
     The interfaces still change. Check a signature against the headers before you rely on it.
 

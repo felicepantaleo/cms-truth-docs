@@ -27,16 +27,16 @@ closures, unified calo and tracker, provenance, and tagging.
 
 ## How the validation works
 
-Two EDAnalyzers map each legacy object to its logical particle. The mapping goes
-through `obj.g4Tracks().front().trackId()` into the trackId→logical-particle map.
-The two analyzers then compare:
+Two DQM analyzers in `Validation/TruthInfo` map each legacy object to its logical
+particle. The mapping goes through `obj.g4Tracks().front().trackId()` into the
+trackId→logical-particle map. The two analyzers then compare:
 
-- **Calo** (`BranchTruthReplacementValidator`): it compares the `subgraphHits` of
+- **Calo** (`BranchHGCalValidator`): it compares the `subgraphHits` of
   the Branch against the `hits_and_fractions()` of the object. It reports
   **completeness** (object hits covered by the Branch) and **purity** (Branch hits
   that are the object's). It also runs the `BranchHitAssociator`. It then checks
   that the tightest best-score branch is the mapped particle.
-- **Tracker** (`BranchTrackerReplacementValidator`): for each reco track it
+- **Tracker** (`BranchTrackingValidator`): for each reco track it
   compares the TrackingParticle from `ClusterTPAssociation` against the Branch
   from the tracker hit channel. It checks that both point to the **same truth
   particle**.
