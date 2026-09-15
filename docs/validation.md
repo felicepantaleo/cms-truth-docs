@@ -225,43 +225,40 @@ no DataFormats change.
 reduce any reco object to a range of `truth::RecoHit{detId, energy, fraction}`. That
 range is the `HasTruthHits` customization point, which `BranchHitAssociator` uses:
 
-- `truth::recoHits(reco::Track const&)`: the track's valid rechits, unit weight. The
-  tracker has no per-cell energy, so the associator matches by shared-hit multiplicity,
-  counting rechits on the reco side and cells on the branch side. A tracker DetId names
-  a module, not a cell, so the adapter expands a hit into the cells of its cluster and
-  the index carries the digi channel of each simulated cell, in the `recHitIndex` field
-  that channel never used. A missing cell on either side means the whole module and
-  still matches, so a module-keyed index and a cell-aware adapter work together.
+- `truth::recoHits(reco::Track const&)`: the track's cells, unit weight. The tracker
+  has no per-cell energy, so the associator matches by shared-hit multiplicity, counting
+  rechits on the reco side and cells on the branch side. A tracker DetId names a module,
+  not a cell, so the tracker truth is keyed by (module, cell): the adapter expands each
+  hit into the cells of its cluster, and the index carries the digi channel of each
+  simulated cell in the `recHitIndex` field. Two tracker hits match only on the same
+  cell. A hit that carries no cluster names no cell and is not emitted.
 
-  Both trackers are keyed. The two digi packings are mirror images, the inner tracker
-  putting the row in the high bits and the outer one the column, so the adapter chooses
-  by cluster type, `cluster_pixel()` against `cluster_phase2OT()`, and never by
-  subdetector. Which modules are keyed by cell is decided by the links products the job
-  read, listed in `trackerDigiSimLinks` on the index producer: the PSimHit pass then
-  leaves alone exactly the modules the cells cover, and a module no links product
-  reaches keeps its module-level entry. A job whose input dropped the links keeps
-  working, keyed by module, and says so once.
+  The index producer reads the tracker truth from the digi sim links alone, the products
+  listed in `trackerDigiSimLinks`, and not from the tracker PSimHits. The two digi
+  packings are mirror images, the inner tracker putting the row in the high bits and the
+  outer one the column, so the adapter chooses by cluster type, `cluster_pixel()` against
+  `cluster_phase2OT()`, and never by subdetector. An input whose tracker index carries no
+  cell, which is what a sample digitised before this keying holds, matches no track; the
+  associator producer recognises it and says so once per job, and the fix is to
+  reprocess from the DIGI step.
 
-  What the key buys is the removal of unrelated competitors, and the agreement number
-  cannot show it because it saturates. Count only the UNRELATED candidates: those sharing
-  at least a tenth of a track that are neither the best match nor an ancestor or a
-  descendant of it. The lineage owns the same hits by construction, a signal track always
-  carries its own decay chain, 6.8 particles here, and a pileup particle is a root of the
-  graph with no chain above it, so a count that includes the lineage means different
-  things in the two populations. Measured on 20 ttbar events at PU200, tracks above 1 GeV,
-  on the same tracks and the same index: the unrelated particles are 192.9 on average
-  keyed by module, when no track has none, and 0.09 keyed by cell, when 97.4% of tracks
-  have none. With only the inner tracker keyed the mean is 10.7 and 42.9% have none, so
-  the outer tracker, which carries about ten of a track's fifteen modules, removes most
-  of what is left. The truth DQM sees the same thing above 1 GeV: the share of tracks
-  whose leading truth contributor owns less than half of them falls from 4.7% to 0.02%.
-  That test projects the candidates onto a truth level first, so a chain counts once.
+  What the cell key buys is the removal of unrelated competitors, and the agreement
+  number cannot show it because it saturates. Count only the UNRELATED candidates: those
+  sharing at least a tenth of a track that are neither the best match nor an ancestor or
+  a descendant of it. The lineage owns the same hits by construction, a signal track
+  always carries its own decay chain, 6.8 particles here, and a pileup particle is a root
+  of the graph with no chain above it. Measured on 20 ttbar events at PU200, tracks above
+  1 GeV: a track competes with 0.09 unrelated particles on average, and 97.4% of tracks
+  compete with none. A DetId-level definition, one entry per module, gives 192.9 on the
+  same tracks and no track with none, which is why the tracker is keyed by cell. The truth
+  DQM sees the same thing: above 1 GeV the share of tracks whose leading truth contributor
+  owns less than half of them is 0.02%. That test projects the candidates onto a truth
+  level first, so a chain counts once.
 
-  The match then agrees with `QuickTrackAssociatorByHits` for 98.39% of the tracks it
-  matches and names an unrelated particle for none of them, 0 of 30170, against 93.15%
-  and 5.31% keyed by module. The remaining 1.61% are an ancestor or a daughter of the
-  particle the baseline names. Per event the index grows from 8.26 MB on disk keyed by
-  module to 9.12 MB with the inner tracker keyed and 10.61 MB with both.
+  The match agrees with `QuickTrackAssociatorByHits` for 98.39% of the tracks it matches
+  and names an unrelated particle for none of them, 0 of 30170. The remaining 1.61% are an
+  ancestor or a daughter of the particle the baseline names. Per event the index is
+  10.61 MB on disk, against 8.26 MB for a DetId-level index.
 - `truth::recoHits(ticl::Trackster const&, std::vector<reco::CaloCluster> const&)`:
   the trackster's layer-cluster cells with their fractions, coalesced.
 
