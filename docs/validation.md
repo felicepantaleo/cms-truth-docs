@@ -237,13 +237,16 @@ range is the `HasTruthHits` customization point, which `BranchHitAssociator` use
   digi channel of each simulated cell, in the `recHitIndex` field that channel never
   used. A missing cell on either side means the whole module and still matches, so a
   module-keyed index and a cell-aware adapter work together. It is configured with
-  `trackerDigiSimLinks` on the index producer, empty by default.
+  `trackerDigiSimLinks` on the index producer, which the production configurations set
+  to the inner-tracker links; a job whose input dropped them keeps working, keyed by
+  module, and says so once.
 
   Measured on 20 ttbar events at PU200, both granularities on the same tracks and the
   same index: the match agrees with `QuickTrackAssociatorByHits` for 99.54% of the
   tracks by cell against 93.21% by module, and lands on an unrelated particle 0.04%
-  of the time against 5.50%. Above 10 GeV it is 88.2% against 69.1%. The index grows
-  about 20% and the association costs no more time.
+  of the time against 5.50%. Above 10 GeV it is 88.2% against 69.1%. Per event the index
+  grows from 18.3 MB to 21.8 MB uncompressed and from 8.26 MB to 9.12 MB on disk, and
+  the association costs no more time.
 - `truth::recoHits(ticl::Trackster const&, std::vector<reco::CaloCluster> const&)`:
   the trackster's layer-cluster cells with their fractions, coalesced.
 
