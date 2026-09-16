@@ -125,13 +125,18 @@ The roles are:
 - `VertexRole::UnderlyingEvent` is an artificial vertex. It collects the stable
   final-state particles that are in no selected subgraph, that is the underlying
   event. Each keeps its SIM subgraph, which is where its hits are.
-- `VertexRole::InitialStateRadiation` is an artificial vertex. A connector runs from
-  it into every kept vertex that also received a GEN particle the selection dropped.
-  That is where a colour string spans the hard scatter and the beam remnant, so part
-  of what the vertex produced came from the beam side. Measured on one ttbar event
-  with the top preset: 2 vertices, 79 particles produced there, carrying 7141
-  calorimeter and 6620 tracker sim hits. Empty for a colourless final state such as
-  H to two photons or Z to two electrons, and for a particle gun.
+- `VertexRole::BeamSideInput` is an artificial vertex. It holds the GEN parents that a
+  kept vertex received from outside the selection, which the selection would otherwise
+  drop. That is where a colour string spans the hard scatter and the beam remnant, so
+  part of what the vertex produced came from the beam side. Measured on one ttbar event
+  with the top preset: 42 partons, 40 gluons and 2 quarks, feeding 2 vertices that make
+  79 particles, which carry 7141 calorimeter and 6620 tracker sim hits. VBF gives 38 and
+  16 partons in two events. Empty for a colourless final state such as H to two photons
+  or Z to two electrons, and for a particle gun.
+- The main event keeps its parton shower, so those partons are real: `collapseGenShower`
+  is false for the main event in `TruthGraphProducer` and `collapseGenShowerSignal` is
+  false in `TruthGraphAccumulator`, while the pile-up interactions stay collapsed. On one
+  ttbar event the unselected graph grows from 2427 to 2597 particles, 7%.
 
 Artificial vertices carry the `genEvent` and `eventId` of the activity they
 summarize. Overlaid pileup graphs therefore stay distinguishable. The signal is
