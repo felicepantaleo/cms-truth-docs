@@ -141,7 +141,7 @@ would win on score alone. `TruthBranchTargetsProducer` therefore publishes
 `assignableRoots`, the subset of the candidate roots an adaptive working point may
 answer with, and the associators drop every other row before the climb. Barred
 are the nodes the graph invents (the connectors and the signal stand-in), anything
-produced at an `Upstream`, `UnderlyingEvent` or `Interaction` vertex, a particle
+produced at an `InitialState`, `UnderlyingEvent` or `Interaction` vertex, a particle
 with no production vertex, which is a beam particle, the partons, and the W, the Z
 and the Higgs. Strings, clusters and diquarks never reach the graph: they are
 collapsed away before it is built.

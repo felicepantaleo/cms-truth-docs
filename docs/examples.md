@@ -39,13 +39,13 @@ taus and their immediate decay products, before the Geant4 shower. It has one
 deliberate feature: **all ten taus descend from a single artificial "signal"
 interaction vertex** (red, on the left). One `Interaction` source vertex
 summarizes each interaction. That vertex fans out through artificial connector
-particles to an `Upstream` (ISR / hard-scatter) vertex, and to an
-`UnderlyingEvent` vertex when there is one. The ten taus hang off the Upstream
+particles to an `InitialState` vertex, and to an
+`UnderlyingEvent` vertex when there is one. The ten taus hang off the InitialState
 node of this event. That single interaction vertex lets you say *exactly* what is
 signal and what is not. The signal is, by definition, everything reachable from
 it. With pileup overlaid, **each extra interaction gets its own Interaction
 vertex**. Signal against pileup is then a plain reachability test rather than a
-guess. (This TenTau gun has no underlying event, so only the Upstream branch
+guess. (This TenTau gun has no underlying event, so only the InitialState branch
 appears. The full *detectable* truth graph has ~10<sup>4</sup> nodes once every
 hit-leaving shower secondary is attached. The GEN core is the didactic part, and
 the [hit index](data-model.md) links each particle to its detector footprint.)
@@ -55,9 +55,9 @@ the [hit index](data-model.md) links each particle to its detector footprint.)
 What to look at:
 
 - **One interaction vertex, then the upstream node, then ten τ branches.** The red
-  box is the per-interaction `Interaction` vertex. The orange box is its `Upstream`
+  box is the per-interaction `Interaction` vertex. The orange box is its `InitialState`
   child, reached through an artificial connector particle. The ten outgoing edges
-  of the Upstream node are the ten τ particles (gold, pdgId ±15). All three
+  of the InitialState node are the ten τ particles (gold, pdgId ±15). All three
   artificial nodes carry the signal provenance, that is bunch crossing 0 and event
   0. Descending from the Interaction vertex therefore enumerates the whole signal
   and nothing else.
@@ -74,7 +74,7 @@ This is how the **Branch** selection produces the picture. The cut is
 `seedPdgIds = {15, -15}`, `seedParentDepth = 0` and `keepStableSpectators = false`.
 It keeps each τ and its downstream subtree. With `attachSelectionSources = true`,
 the default, the selection summarizes the truncated upstream into the single
-per-interaction Interaction → Upstream structure. With the standalone dumper that
+per-interaction Interaction → InitialState structure. With the standalone dumper that
 is
 
 ```bash
@@ -127,7 +127,7 @@ What to look at:
   anti-`d` quarks. These give the hard-scatter context.
 - **The signal interaction structure.** As in TenTau, the whole event descends from
   a single artificial **Interaction** vertex (red). It fans out through an
-  **ISR/upstream** node, here the partons, and an **UnderlyingEvent** node, the
+  **initial state** node, here the partons, and an **UnderlyingEvent** node, the
   spectators. These graph-internal nodes are not GEN or SIM. They therefore carry
   their own **`Internal`** domain and inherit the **primary-vertex 4-position** of
   the collision. Everything reachable from the Interaction vertex is, by
@@ -321,7 +321,7 @@ if (b.isFromPileup()) {                 // !isSignal()
 bool isHardScatter = b.isSignal();      // bunchCrossing() == 0 && event() == 0
 ```
 
-The artificial `Upstream` and `UnderlyingEvent` vertices carry the same fields,
+The artificial `InitialState` and `UnderlyingEvent` vertices carry the same fields,
 `VertexData::genEvent` and `eventId`. Overlaid pileup graphs therefore stay
 distinguishable.
 

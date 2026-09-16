@@ -117,10 +117,11 @@ The roles are:
 - `VertexRole::Normal` is a real GEN/SIM vertex.
 - `VertexRole::Interaction` is the per-interaction artificial source vertex. The
   packed `EncodedEventId` keys it, one key per pp collision. It is the single root
-  of one interaction. It fans out to that interaction's `Upstream` and
+  of one interaction. It fans out to that interaction's `InitialState` and
   `UnderlyingEvent` sub-vertices, through artificial connector particles.
-- `VertexRole::Upstream` is an artificial vertex. It summarizes the truncated
-  production context of the selected roots: ISR, beam and initial-state activity.
+- `VertexRole::InitialState` is an artificial vertex. It summarizes the truncated
+  production context of the selected roots: the beam, the hard-scatter ancestry
+  and the ISR.
 - `VertexRole::UnderlyingEvent` is an artificial vertex. It collects the stable
   final-state particles that are in no selected subgraph, that is the underlying
   event.
@@ -128,7 +129,7 @@ The roles are:
 Artificial vertices carry the `genEvent` and `eventId` of the activity they
 summarize. Overlaid pileup graphs therefore stay distinguishable. The signal is
 everything reachable from the signal `Interaction` vertex. Each pileup interaction
-gets its own `Interaction` vertex. The `Interaction → {Upstream, UnderlyingEvent}`
+gets its own `Interaction` vertex. The `Interaction → {InitialState, UnderlyingEvent}`
 links go through artificial connector particles, which carry `genNode = simNode =
 -1` and `pdgId = 0`. A consumer that walks particles will meet these connector
 particles. Filter on `isArtificial()` vertices or on the connector `pdgId` if you

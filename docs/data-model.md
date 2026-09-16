@@ -45,11 +45,11 @@ user-facing **bipartite Particle ↔ Vertex** graph from the raw graph.
   associated. A merged particle takes its production vertex from its **immediate
   GEN production vertex** (see [Findings](findings.md)). Intermediate GEN-only
   copies can be collapsed.
-- **Vertex roles** (`VertexRole`): `Normal`, `Interaction`, `Upstream`,
+- **Vertex roles** (`VertexRole`): `Normal`, `Interaction`, `InitialState`,
   `UnderlyingEvent`. When a selection truncates the upstream history, one
   artificial `Interaction` source vertex summarizes each interaction. That vertex
-  fans out, through artificial connector particles, to its `Upstream`
-  (ISR/hard-scatter) and `UnderlyingEvent` sub-vertices. The whole interaction
+  fans out, through artificial connector particles, to its `InitialState` and
+  `UnderlyingEvent` sub-vertices. The whole interaction
   therefore descends from a single node. The Interaction vertices are keyed by the
   packed `EncodedEventId`, one per pp collision. The signal is therefore
   everything reachable from the signal `Interaction` vertex (bunch crossing 0,

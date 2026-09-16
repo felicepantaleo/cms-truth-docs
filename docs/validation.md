@@ -48,9 +48,9 @@ Each particle carries the levels it belongs to, as bits on the graph itself (`Pa
 | `signal` | the **resonance**: 2 tops, 1 Z, 1 Higgs, 10 taus, W+ and W- for the diboson sample, 1 top for t-channel |
 | `stableDecayProducts` | final-state generator particles, ~45% gamma and ~35% charged pions across every template |
 | `caloBoundary` | those reaching the calorimeter, plus secondaries made in material (ttbar 559 to 649, VBF 231 to 468) |
-| `stableLegsFromUpstream` | preset-dependent, so it varies from 4 (H125) to 2095 (ttbar) |
+| `stableLegsFromInitialState` | preset-dependent, so it varies from 4 (H125) to 2095 (ttbar) |
 | `reconstructableFromSignal` | the signal's **visible final state**: walk down from each signal root, stop at the first object a detector reconstructs. A pi0 is labelled, its two photons are not; an a1 or rho is walked through; neutrinos are dropped. TenTau gives 18.59 per event |
-| `underlyingEvent` | the stable legs of the underlying event, the counterpart of `stableLegsFromUpstream`. ttbar gives 103.17 per event, a particle gun 0 |
+| `underlyingEvent` | the stable legs of the underlying event, the counterpart of `stableLegsFromInitialState`. ttbar gives 103.17 per event, a particle gun 0 |
 | `partonJets` | one root per **parton-initiated jet**: the hard-scatter legs that are quarks or gluons, each standing for its whole descendant subgraph. No clustering. ttbar gives 4.80 per event with the b bin at exactly 2.00; QCD flat pT gives exactly 2.00 per event, 67% gluons |
 | `bHadrons`, `cHadrons` | the hadron of each heavy-flavour chain that **decays weakly**, the hadron CMS ghost association names: the generated b and c hadrons that do not have b and c hadrons as daughters (CMS-BTV-16-002). A B* to B chain counts once, as the B. Separate levels because a B decays to a D and one combined level would drop every charm member. ttbar: 2.0 b per event, one per top. These two also define the secondary-vertex truth below |
 | `reconstructableFinalState` | the `reconstructableFromSignal` walk seeded from **every GEN root**, so the pi0-as-one-object final state exists on samples with no resonance: QCD jets, the underlying event, every pileup interaction. On a tau gun it equals `reconstructableFromSignal` at 18.85 per event, the required identity when the signal is the whole event |

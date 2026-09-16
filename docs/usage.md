@@ -323,7 +323,7 @@ is a debugging escape hatch.
     `keepProductionSiblings = True` keeps that production vertex and its other
     outgoing particles, with their subtrees. The recoiling quarks and their jets
     then appear. The real hard vertex is now kept, so the dumper shows it in place
-    of the artificial Upstream summary. Standalone: `--keepProductionSiblings`.
+    of the artificial InitialState summary. Standalone: `--keepProductionSiblings`.
 
     A worked VBF H→ZZ→4ν event uses `-s 25 --keepProductionSiblings`. The Higgs and
     the two tagging quarks share the hard vertex, and the quarks spread out into
