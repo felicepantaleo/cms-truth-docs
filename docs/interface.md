@@ -124,7 +124,14 @@ The roles are:
   and the ISR.
 - `VertexRole::UnderlyingEvent` is an artificial vertex. It collects the stable
   final-state particles that are in no selected subgraph, that is the underlying
-  event.
+  event. Each keeps its SIM subgraph, which is where its hits are.
+- `VertexRole::InitialStateRadiation` is an artificial vertex. A connector runs from
+  it into every kept vertex that also received a GEN particle the selection dropped.
+  That is where a colour string spans the hard scatter and the beam remnant, so part
+  of what the vertex produced came from the beam side. Measured on one ttbar event
+  with the top preset: 2 vertices, 79 particles produced there, carrying 7141
+  calorimeter and 6620 tracker sim hits. Empty for a colourless final state such as
+  H to two photons or Z to two electrons, and for a particle gun.
 
 Artificial vertices carry the `genEvent` and `eventId` of the activity they
 summarize. Overlaid pileup graphs therefore stay distinguishable. The signal is

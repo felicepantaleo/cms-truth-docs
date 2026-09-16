@@ -46,7 +46,7 @@ user-facing **bipartite Particle ↔ Vertex** graph from the raw graph.
   GEN production vertex** (see [Findings](findings.md)). Intermediate GEN-only
   copies can be collapsed.
 - **Vertex roles** (`VertexRole`): `Normal`, `Interaction`, `InitialState`,
-  `UnderlyingEvent`. When a selection truncates the upstream history, one
+  `UnderlyingEvent`, `InitialStateRadiation`. When a selection truncates the upstream history, one
   artificial `Interaction` source vertex summarizes each interaction. That vertex
   fans out, through artificial connector particles, to its `InitialState` and
   `UnderlyingEvent` sub-vertices. The whole interaction
