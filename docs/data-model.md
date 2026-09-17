@@ -69,6 +69,25 @@ user-facing **bipartite Particle ↔ Vertex** graph from the raw graph.
   break down, most-frequent first, as hadronic-inelastic, e⁺e⁻ annihilation,
   bremsstrahlung, pair-conversion, decay, nuclear capture, hadron-at-rest, and so
   on. The reason therefore tells you *why* a given branch point exists.
+
+    A GEN-only vertex has no creator process, so it takes its reason from the
+    particles that meet there, through `truth::genVertexReason` in
+    `PhysicsTools/TruthInfo/interface/TruthLevels.h`. The additional values are
+    `HardScatter`, `ShowerBranching` and `Hadronization`; a generator decay reuses
+    `Decay`, which is the same statement on either side. Each rule leads with the
+    species of the particles at the vertex, because a generator status code
+    belongs to a particle's own history and not to the vertex: a hadron decay
+    whose muon carries a shower copy code is still a decay. `HardScatter` needs
+    two or more incoming hard-process legs, read from the `isHardProcess` status
+    flag, or from the Pythia incoming-hard-parton code where the flag is absent,
+    which is the case on the HepMC3 path. Anything the rules do not cover stays
+    `Unknown`. The producer stamps the byte on the complete GEN topology, before
+    the post-processor rewrites the graph.
+
+    Measured on TTbar event 38, 129 GEN-only vertices: 106 `Decay`, 16
+    `ShowerBranching`, 6 `Hadronization`, 1 `HardScatter`, none `Unknown`. With
+    the intermediate copy chains kept the same event has 172 GEN vertices: 118
+    `Decay`, 29 `ShowerBranching`, 24 `Hadronization`, 1 `HardScatter`.
 - **Back-scattering** (`Particle::backscattered()`): the producer flags a SIM
   particle when Geant4 marked its track as inward albedo crossing the
   CALO→Tracker boundary (`SimTrack::isFromBackScattering()`). This is a
