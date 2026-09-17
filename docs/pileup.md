@@ -50,6 +50,7 @@ It is **configurable**:
 |---|---|---|
 | `pileupBunchCrossings` | `{0}` | which bunch crossings to include for pileup (in-time only by default) |
 | `collapsePileupGen` | `true` | for pileup, collapse the GEN chain to the stable particles on a single gen vertex, keep the SIM |
+| `collapsedGenKeptPdgIds` | `{111}` | decaying species the collapsed GEN record keeps, each on its own decay vertex with its decay products below it. It must equal `reconstructablePdgIds` of the logical graph, so `reconstructableFinalState` stops at a pileup pi0 as it does at a signal pi0. The logical producer gives such a particle the summed momentum of its tracked decay products. The sum is exact when Geant4 tracked all of them, misses a product below the Geant4 primary cuts (p < 40 MeV or \|eta\| > 5.5) otherwise, and stays zero when none was tracked |
 | `collapseSignalGen` | `false` | keep the signal's full graph (full signal GEN+SIM is the next step) |
 
 The accumulator also emits every sub-event's `SimTrack` and `SimVertex` collections as
@@ -72,9 +73,9 @@ and at PU200 about two hundred unrelated particles share one track's modules. Se
 
 The pileup default is exactly this: *all the stable particles connected to the same
 gen vertex, collapse the gen, keep the sim*. There is one GEN vertex per pileup
-interaction, and it carries all the stable (status-1) particles of that
-interaction. It has `GenToSim` links to the SIM primaries, and the accumulator
-keeps the SIM continuation.
+interaction. It carries the stable (status-1) particles of that interaction and the
+kept species, and a kept pi0 carries its own photons on its decay vertex. It has
+`GenToSim` links to the SIM primaries, and the accumulator keeps the SIM continuation.
 
 ## Results (PU=2, self-mixed TTbar, 3 events)
 

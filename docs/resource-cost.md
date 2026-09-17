@@ -330,9 +330,19 @@ persisted layout in 10 of 10 events, with no fallback and no degradation warning
 MTD legacy truth, which neither scheme replaces, is a further 9859 kB/event at PU200.
 
 The pileup GEN half is collapsed (`collapsePileupGen=True`). Each pileup interaction
-carries one Interaction vertex and one UnderlyingEvent vertex holding its stable
-particles, and nothing else. The SIM tracks and hits of the 200 extra interactions
-therefore dominate their graph cost, not their generator records.
+carries its stable particles and the species in `collapsedGenKeptPdgIds` (pi0 by
+default), each kept species on its own decay vertex. The SIM tracks and hits of the
+200 extra interactions therefore dominate their graph cost, not their generator records.
+
+Keeping the pileup pi0 was measured as an A/B on the same ttbar signal and the same
+pileup draw (PU200, 3 events, one thread, 2026-09-17). The pileup gains 8570 GEN pi0 per
+event, and 5.5% more pileup particles in total. The persisted production graph grows
+from 12.61 to 12.90 MB per event compressed (+2.3%) and from 33.17 to 34.83 MB
+uncompressed (+5.0%). The `mix` module time varied by up to 4.6% between runs, so any
+change in the accumulator is below a resolution of about 2 s per event. Of the pileup
+pi0, 74.5% carry the exact pi0 mass, 13.6% a partial sum and 12.0% no momentum. On
+pileup, `reconstructableFinalState` falls from 40784 to 33591 members in one event, with
+`stableDecayProducts` unchanged at 40804.
 
 ## 8. Not measured
 
