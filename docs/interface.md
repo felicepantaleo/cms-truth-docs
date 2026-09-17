@@ -419,6 +419,44 @@ Every enum has a name, so a dump, a plot label and a log line spell it the same 
 `truth::levelName`, and `truth::levelNamesOf(particleData)` for the levels one particle
 belongs to, signal last.
 
+A SIM track id and a SIM vertex index are local to their sub-event, so a bare one
+attributes the hits of a pile-up track to a signal particle. One function builds the key
+that keeps them apart:
+
+```cpp
+truth::simObjectKey(packedEventId, localId);   // (EncodedEventId, local id) -> map key
+```
+
+### The interactions overlaid in the event
+
+```cpp
+struct Interaction {
+  uint64_t eventId;        // the packed EncodedEventId of this interaction
+  uint32_t vertexId;       // the vertex that stands for the interaction point
+  bool     isPlaceholder;  // the vertex carries no usable position
+
+  bool isSignal() const;
+  int  bunchCrossing() const;
+  int  eventIndex() const;
+};
+
+std::vector<Interaction>  truth::interactions(Graph const& graph);
+std::optional<Interaction> truth::signalInteraction(Graph const& graph);
+```
+
+`interactions()` returns the signal first, then the pile-up ordered by bunch crossing and
+by index inside the crossing. Ask `isSignal()` rather than taking the first element on
+faith: a sub-graph can hold pile-up only, and then nothing in the list is the signal.
+
+Where the vertex comes from decides how much it is worth. When a selection preset ran, the
+graph holds one `VertexRole::Interaction` node per interaction and that node IS the
+interaction point. Measured on a small pile-up sample with the `top` preset, one event held
+four of them, one per sub-event, with `eid` 0 to 3. Without a preset every vertex is
+`Normal`, so `interactions()` elects the lowest-numbered usable production vertex of each
+sub-event instead. An elected vertex that neither merged with a `SimVertex` nor carries a
+position comes back with `isPlaceholder` set: its constituents still count there, but its
+position is not the interaction point.
+
 From a level to objects an association can use, in one call:
 
 ```cpp
@@ -442,6 +480,9 @@ particle.forEachParentId([&](uint32_t parent) { ... });
 ```
 
 or the CSR spans of `Graph` directly. They report the same ids in the same order.
+
+`Particle::ancestorCount()` returns `ancestors().size()` without building the vector, for
+code that only needs the depth.
 
 ## `truth::LogicalGraphHitIndex`
 
