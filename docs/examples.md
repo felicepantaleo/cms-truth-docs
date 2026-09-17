@@ -208,6 +208,61 @@ for (truth::Particle p : branch.members())          // every shower particle
       ++nConversions;                                // a gamma -> e+e- materialisation
 ```
 
+## One analysis per selection preset, in python and in C++
+
+`PhysicsTools/TruthInfo/test/presetExamples.py` and
+`PhysicsTools/TruthInfo/test/TruthGraphPresetExamples.cc` hold the same ten analyses, one
+per preset of `truthGraphSelections.py`, with the same function names. Each starts from
+what its preset seeds on and prints one line per object of interest. They are the shortest
+complete uses of the interface: the level helpers, `branchesAtLevel`, the provenance
+accessors, `forEachChildId`, and the vertex positions.
+
+| preset | what the example computes | from |
+|---|---|---|
+| `gun` | per gun particle: its reconstructable products and how many descendants reach the calorimeter | `signal`, `reconstructableFromSignal`, `caloBoundary` |
+| `resonance` | the two leptonic legs of the Z and their invariant mass against the generator mass | `signal`, children |
+| `vbf` | m(jj) and the rapidity gap of the two tagging quarks | `signal`, `partonJets` |
+| `ggf` | the reconstructable products of the Higgs and the visible energy fraction | `signal`, `reconstructableFromSignal` |
+| `vh` | the boson produced with the Higgs and its decay mode | production siblings |
+| `top` | b and W of each top, the W mode, the event class | `signal`, `forEachChildId` |
+| `singletop` | the production partner of the top | production siblings |
+| `diboson` | m(VV) and the mode of each boson | `signal` |
+| `heavyflavor` | flight length of each b hadron and the charm hadrons below it | `branchesAtLevel(BHadrons)`, vertex positions |
+| `full` | per-interaction census, and the reconstructable final state with signal and pile-up apart | `summary()`, `isSignal` |
+
+The python side reads the JSON the dumper writes, or an EDM file through FWLite:
+
+```bash
+presetExamples.py --preset resonance truthlogicalgraph_run1_lumi1_event26.json
+presetExamples.py --preset all step3.root -n 2
+```
+
+The C++ side is a plugin driven by `presetExamples_cfg.py`. A production file holds the
+graph with no selection preset, so `--rebuild` builds it again from the GEN and SIM record
+in the file with the preset's selection; a gun takes its species from the fragment name:
+
+```bash
+cmsRun presetExamples_cfg.py step3.root --preset top --rebuild
+cmsRun presetExamples_cfg.py step3.root --preset gun --rebuild --fragment TenTau_E_15_500
+```
+
+Both sides give the same numbers on the same events, which is the check that the python
+reader and the C++ views agree. On the local samples (2026-09-17):
+
+```
+resonance 23 -> 11 -11: m(ll) 94.65 GeV, generator mass 94.66 GeV        (ZEE event 26)
+vbf: 1 Higgs, tagging partons 2 1: m(jj) 611.1 GeV, |delta eta| 7.23     (VBF event 17)
+top -6: b yes, W hadronic, 1262 descendants
+top  6: b yes, W leptonic, 402 descendants
+top event class: semileptonic                                             (TTbar event 38)
+heavyflavor: 531 pt 101.76 GeV, flight 2.806 cm, 1 charm hadron below     (TTbar event 38)
+gun 15 E 107.25 GeV: 2 reconstructable products, 105 descendants reach the calorimeter
+```
+
+`vh` printed nothing on the local samples: none of them is an associated-production
+sample, and the example reports only a Higgs that shares its production vertex with a W
+or a Z.
+
 ## Physics questions the interface answers
 
 The point of the navigation API is that physics questions map onto a couple of

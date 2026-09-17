@@ -252,6 +252,38 @@ The graph also offers graph-level extremities: `graph.roots()`, `graph.leaves()`
 `graph.sourceVertices()`, `graph.sinkVertices()`, plus `nParticles()` /
 `nVertices()` and `isConsistent()`.
 
+## Reading a graph from python
+
+`PhysicsTools/TruthInfo/python/graphTools.py` wraps the CSR arrays, the packed interaction
+id and the level bits, so a probe is a few lines instead of forty. It reads two sources
+with one interface: an EDM file through FWLite, and the JSON the dumper writes.
+
+```python
+from PhysicsTools.TruthInfo.graphTools import TruthGraphView, eventGraphs
+
+for graph in eventGraphs("step2.root"):            # one view per event
+    print(graph.summary())                         # one line per interaction
+    for i in graph.particlesOfLevel("bHadrons"):
+        print(graph.pdgId(i), graph.p4(i), graph.children(i), graph.levels(i))
+
+graph = TruthGraphView.fromJson("truthlogicalgraph_run1_lumi1_event7.json")
+```
+
+The view offers `children`, `parents`, `descendants`, `productionVertices`,
+`decayVertices`, `incomingParticles`, `outgoingParticles`, the level helpers
+`levels`, `isAtLevel` and `particlesOfLevel`, the provenance helpers `bunchCrossing`,
+`eventIndex`, `isSignal`, `isFromPileup`, `interactions` and `particlesOfInteraction`, and
+`verticesWithRole`. `hasMomentum` says whether a particle has one at all.
+
+`TruthLogicalGraphDumper` writes that JSON when `jsonFile` is set, next to the dot file and
+with the momenta at full precision, so an audit script reads numbers rather than parsing a
+picture. The dot file rounds to three decimals, which is enough to draw and not enough to
+compute an invariant mass.
+
+The level names and vertex roles the python side uses are held against the headers by
+`PhysicsTools/TruthInfo/test/graphTools_t.py`, so a level added in C++ and not there fails
+a test rather than silently reading as no level at all.
+
 ## The Branch subgraph view and selecting particles
 
 A `truth::Branch` is a non-owning view. It holds one or more root particles plus a

@@ -287,6 +287,13 @@ fixed truth definition and needed a disjoint truth reference that was never wire
 merge and duplicate plots with the truth level and the working point as axes; see the
 next section.
 
+**The graph summary**: `TruthGraphSummaryValidator` books `TruthInfo/Graph`, which says what
+the graph of the event holds rather than how well reco matched it: interactions per event,
+particles and vertices per interaction, signal and pile-up particles, particles with no
+momentum, vertices per role, and level members with signal and pile-up apart. These are the
+numbers that catch a build regression, for example a pile-up interaction that lost its
+artificial vertices, without dumping a graph by hand.
+
 **The plots macro**: `Validation/TruthInfo/scripts/makeTruthGraphValidationPlots.py` is a self-contained
 PyROOT macro. It follows `makeHGCalValidationPlots.py` but has no framework
 dependency. It reads the analyzer DQMIO output **or** a legacy harvested `DQM_V0001`

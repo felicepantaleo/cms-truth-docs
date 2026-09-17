@@ -397,6 +397,52 @@ Config const& config() const;
 
 Charge for `chargedOnly` comes from `HepPDT::ParticleID(pdgId).threeCharge()`.
 
+## Provenance, names and one-call entry points
+
+Every node knows which interaction it came from, and one test decides signal from pile-up.
+Do not compare `eventId` to 0 by hand: the packed id of the signal is 0 and so is the
+default value, which is how pile-up once ended up labelled as signal.
+
+```cpp
+particle.data().bunchCrossing();   // 0 for the in-time interaction
+particle.data().eventIndex();      // 0 for the signal
+particle.data().isSignal();        // bunch crossing 0 and index 0
+particle.data().isFromPileup();
+particle.data().hasMomentum();     // false when no momentum is known at all
+```
+
+`truth::Branch` keeps the same four and now reads them from its root particle, so the two
+cannot disagree. `VertexData` carries the same interaction accessors.
+
+Every enum has a name, so a dump, a plot label and a log line spell it the same way:
+`truth::vertexRoleName`, `truth::particleRoleName`, `truth::vertexReasonName`,
+`truth::levelName`, and `truth::levelNamesOf(particleData)` for the levels one particle
+belongs to, signal last.
+
+From a level to objects an association can use, in one call:
+
+```cpp
+for (truth::Branch const& b : truth::branchesAtLevel(graph, truth::Level::BHadrons)) {
+  ...                                       // one branch per level member
+}
+truth::branchesAtLevel(graph, truth::Level::HardProcess, truth::ClosureSpec::depth(0));
+```
+
+The members come from `levelAntichain`, which reads the graph rather than the stored flags,
+so a level whose rule the graph cannot satisfy yields no branch.
+
+## Navigation that allocates, and navigation that does not
+
+`Particle::children()`, `parents()`, `ancestors()` and `descendants()` build a vector on
+every call, and the last two walk the whole subgraph to do it. In a loop over particles use
+
+```cpp
+particle.forEachChildId([&](uint32_t child) { ... });
+particle.forEachParentId([&](uint32_t parent) { ... });
+```
+
+or the CSR spans of `Graph` directly. They report the same ids in the same order.
+
 ## `truth::LogicalGraphHitIndex`
 
 `truth::LogicalGraphHitIndex` is the per-logical-particle hit index. It indexes
