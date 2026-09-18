@@ -9,9 +9,13 @@ Unless a section says otherwise, the numbers come from the eight `enableTruth` R
 ## The relval library
 
 Workflow `34xxx.88` = base workflow + the `enableTruth` UpgradeWorkflow variant.
-The offset `.88` appends `--procModifiers enableTruth` to the GenSim,
-HARVESTGlobal and RecoGlobal steps. `runTruthRelvals.sh` regenerates the library.
-`makeTruthGallery.sh` builds the DOT gallery.
+The offset `.88` appends `--procModifiers enableTruth` to the GenSim, HARVESTGlobal and
+RecoGlobal steps, and `customiseTruthBranchValidation` to the last two. Since every Run4
+era carries `enableTruth`, the plain `.0` workflow already builds the graph, so `.88` is
+the workflow that adds the association maps and their performance plots. It is not in the
+short matrix nor in the limited set, so it runs when it is asked for.
+`runTruthRelvals.sh` regenerates the library. `makeTruthGallery.sh` builds the DOT
+gallery.
 
 | Folder | Sample | D120 | D122 | Natural seeds |
 |---|---|---|---|---|
@@ -208,12 +212,15 @@ Standalone drivers: `test/validateBranch{DQM,TrackingDQM}_cfg.py` (→ DQMIO),
 `test/harvestBranchDQM_cfg.py` (-> legacy `DQM_V0001`), all under
 `Validation/TruthInfo`. Both sequences live in
 `Validation/TruthInfo/python/truthGraphValidation_cff.py` and
-`truthGraphDQMHarvester_cff.py`. The release sequences take both behind `enableTruth`.
-The association producers go into `baseCommonPreValidation`. The DQM analyzers go into
-`baseCommonValidation` (`globalValidation_cff`). The matching harvesting attaches to
-`postValidation_common` (`postValidation_cff`). The Run4 eras apply `enableTruth`, so
-these modules run in the standard Phase-2 validation. The reco-side validators and
-their harvesters stay opt-in (see the antichain caveat below).
+`truthGraphDQMHarvester_cff.py`. The release sequences take both behind `enableTruth`:
+the graph summary and the two legacy-comparison validators go into `baseCommonValidation`
+(`globalValidation_cff`) and their harvesting into `postValidation_common`
+(`postValidation_cff`), so the Run4 eras run them in the standard Phase-2 validation.
+They book 98 monitor elements.
+The association producers and the reco-side performance plots are not in the default
+validation. They book 54242 monitor elements, 21.9 MiB of the harvested DQM file on ten
+ttbar D127 events, and `customiseTruthBranchValidation` adds them. See
+[Association layer](association-layer.md).
 
 ## The hit-exposure layer
 

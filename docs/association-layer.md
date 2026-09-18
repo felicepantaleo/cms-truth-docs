@@ -7,18 +7,32 @@ maps into DQM plots. Both are offered upstream in cms-sw/cmssw#51829 and are not
 
 ## What runs, and when
 
-The Run4 eras carry the `enableTruth` process modifier, so a standard Run4 validation
-workflow schedules the whole chain with no customise:
+Nothing in this chain runs in a standard workflow. The plots are large, 54242 monitor
+elements and 21.9 MiB of the harvested DQM file on ten ttbar D127 events, and only a study
+of the association reads them, so they are asked for:
 
-- the association producers run in the prevalidation Path, from
-  `truthGraphAssociatorsSequence`;
-- the DQM analyzers run in the validation EndPath, from
-  `truthBranchValidationSequence`;
-- the harvesters run in HARVESTING, from `truthBranchHarvestingSequence`.
+```bash
+cmsDriver.py ... --customise SimGeneral/TruthGraphAssociatorProducers/\
+    customiseTruthGraphAssociators.customiseTruthBranchValidation
+```
+
+One option covers a whole workflow. On the reconstruction step the customise schedules
+the association producers and the DQM analysers together, in that order; on the
+harvesting step it schedules the harvesters; on every other step it does nothing.
+
+Two smaller things do run under `enableTruth`, in every Run4 workflow: the graph summary,
+and the comparison of a branch with `CaloParticle`, `SimCluster` and `TrackingParticle`.
+Together they book 98 monitor elements, which is the regression net on the graph itself.
+See [Validation](validation.md).
+
+To read the maps in your own analysis rather than plot them, use
+`customiseTruthGraphAssociators`, which schedules the producers and keeps their products
+in the output file.
 
 The HLT twins of each module are kept in separate sequences
 (`truthGraphHltAssociatorsSequence`, `truthBranchHltValidationSequence`), because they
 read HLT collections an offline reconstruction does not produce.
+`customiseTruthHltValidation` schedules those.
 
 A job that wants the maps in its own output applies
 `SimGeneral/TruthGraphAssociatorProducers/customiseTruthGraphAssociators.customiseTruthGraphAssociators`,
