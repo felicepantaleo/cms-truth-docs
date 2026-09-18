@@ -400,6 +400,42 @@ The same module backs the standalone dumper and `makeTruthGallery.sh`. `python3
 truthGraphSelections.py <fragment>` prints the flags. Adding a Run4 sample therefore
 needs no config edit.
 
+##### Applying a preset to a whole job
+
+Setting `postProcessing` by hand covers the graph producer only. The preset decides which
+particle is the signal, so the targets producer has to seed with the same species, or the
+`_signal` efficiency denominator stops being the preset's signal object. One customise
+sets both:
+
+```python
+from PhysicsTools.TruthInfo.customiseTruthPreset import applyTruthPreset
+applyTruthPreset(process, preset="top")                        # the preset by name
+applyTruthPreset(process, fragment="TTbar_14TeV_TuneCP5_cfi")  # resolved from the fragment
+applyTruthPreset(process, preset="top", seedParentDepth=2)     # any field overridden
+```
+
+From `cmsDriver.py`, which is the case of running the graph over a GEN-SIM sample that
+already exists:
+
+```bash
+cmsDriver.py step3 ... \
+  --customise_commands "from PhysicsTools.TruthInfo.customiseTruthPreset import applyTruthPreset; applyTruthPreset(process, preset='top')"
+
+# or, as a plain customise that reads the environment
+TRUTH_GRAPH_PRESET=top cmsDriver.py step3 ... \
+  --customise PhysicsTools/TruthInfo/customiseTruthPreset.customiseTruthPreset
+TRUTH_GRAPH_FRAGMENT=TTbar_14TeV_TuneCP5_cfi cmsDriver.py step3 ... \
+  --customise PhysicsTools/TruthInfo/customiseTruthPreset.customiseTruthPreset
+```
+
+The job prints the preset it resolved, with its seeds, so a log says which view was built.
+Fields the preset does not own keep the value the chain gave them: a mixed job's
+`reconstructablePdgIds` and `dropHitlessSimSubgraphs` survive the customise. With neither
+the preset nor the fragment given, nothing changes and the whole graph is kept.
+
+The job cannot read the fragment name out of an existing file, so name it. A wrong guess
+would silently change what the graph contains.
+
 !!! note "Pile-up is an orthogonal axis, not a preset"
     The presets pick the **signal** of a *process*. Pile-up is an *overlay* that
     composes with any of them (ZMM+PU, TTbar+PU, …). It is therefore **not** an
