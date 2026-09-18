@@ -511,6 +511,7 @@ std::vector<Particle> particle.productionSiblings();  // what recoils against it
                                                  // the boson made with a Higgs
 std::vector<Particle> graph.signalParticles();   // what the preset named as the signal
 std::vector<Particle> truth::particlesAtLevel(graph, level);  // levelAntichain as views
+std::vector<Particle> truth::particlesAtLevels(graph, {levels}, truth::LevelMatch::Any);
 bool truth::isLepton(int32_t pdgId);             // charged leptons, not neutrinos
 bool truth::isWeakBoson(int32_t pdgId);          // W and Z; the Higgs is neither
 ```
@@ -520,6 +521,16 @@ its last copy, so a child lookup on the first copy finds another copy of the sam
 and not the decay. `signalParticles()` reads a stamped flag rather than recomputing, because
 `LevelFlag::Signal` is not a level row and does not come out of `levelAntichain` like the
 others; a graph built with no preset carries none.
+
+`particlesAtLevels` takes several levels at once. `LevelMatch::Any` is the union and
+`LevelMatch::All` the intersection, for "stable decay products that also reach the
+calorimeter". Measured on one ttbar event with small pile-up, 552 particles of 3431 carry
+two or more levels, so `All` is not a degenerate query.
+
+`Any` is the union of the per-level members and is deliberately NOT reduced to an antichain
+again. Levels nest: a hard-process b quark is an ancestor of the B hadron, which is an
+ancestor of the D hadron, and each is the member of its own level. Reducing the union would
+keep the topmost and drop the very members the caller asked for.
 
 `particlesAtLevel`, `isLepton` and `isWeakBoson` are free functions rather than methods:
 the first needs `Level` and `levelAntichain`, which live in `PhysicsTools/TruthInfo` and
