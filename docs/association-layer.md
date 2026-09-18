@@ -70,10 +70,18 @@ An adaptive point answers only with a particle a detector could have seen. The
 `assignableTargets` PSet of `truthBranchTargets` bars, each with its own flag:
 
 - a synthetic particle, that is a connector or a signal stand-in;
-- a particle produced at an artificial vertex;
 - a beam particle, which has no production vertex;
 - a parton;
 - an electroweak boson, and anything in `extraBarredPdgIds`.
+
+The vertex a particle was produced at is deliberately not a criterion. A selection preset
+attaches every real particle it keeps but whose production vertex it dropped to an
+artificial source vertex: a gun particle to the `InitialState` vertex, a stable spectator
+to the `UnderlyingEvent` vertex. Measured on one ttbar event with the `top` preset, 234
+stable spectators hang off that vertex, and on a gun every seed does. Those are particles
+a detector sees, so barring them would have made the adaptive points answer with
+something else, or with nothing, for most tracks of a preset job. The invented nodes are
+barred by their own role instead.
 
 The barred roots stay in `selectedRoots` and in the `Fixed` map, because the levels made
 of those particles need them as truth-side denominators, and the truth-driven direction

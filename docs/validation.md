@@ -339,6 +339,37 @@ events per sample.
 | `recopurity` | `num_recopurity/num_reco` | how much of the object belongs to the branch it matched, as a **mean** |
 | `pileuprate` | `num_pileup/num_reco` | is the matched branch an overlaid interaction |
 
+### Acceptance bands
+
+Every ratio numerator and denominator is booked again in a sub-folder per absolute
+pseudorapidity band, `etaLt15`, `eta15to30` and `eta30to45`, with the same monitor element
+names, so one harvester string covers the inclusive folder and every band. Mixing the
+bands hides the result: on TenTau the calorimetric efficiency of the tau reads 0.19
+inclusively, and splits into 0.02 in the barrel, where no trackster can exist, against
+0.48 in the endcap, with 61.5% of the taus entering the barrel.
+
+Each domain lists the bands it books, in `etaRegions`. A band a domain cannot reach only
+repeats the inclusive folder and costs the same monitor elements: the vertex domains book
+none, because a vertex has no pseudorapidity of its own and every entry would land in the
+first band. The harvester reads the same list, so no ratio is asked for in a folder that
+was never booked.
+
+### The vertex domains apply a constituent cut
+
+The reference vertex association gates on POSITION and disables its shared-track cut
+(`sharedTrackFraction = 2`, `absZ = 1.0` cm in
+`SimTracker/VertexAssociation/python/secondaryVertexAssociatorByPositionAndTracks_cfi.py`).
+This association has no position gate: it matches a truth vertex to a reco vertex through
+the tracks they share. A constituent-fraction cut therefore takes the place of the
+position window, `minTruthPurityForIndividual = minRecoPurityLoose = 0.5`, more than half
+the constituents on each side. With both at 0, as they were, any truth vertex sharing one
+track counted as reconstructed and the efficiency was 1 by construction.
+
+The denominator counts only the charged particles that own tracker hits. A charged
+particle that decays before it reaches the tracker leaves no track: a D+ from a B decays
+after about 300 um, and counting it made a one-track vertex look findable and put pt^2 in
+the purity denominator that no track can match.
+
 !!! warning "`fakerate` and `contaminated` are not the same question"
     The recoToSim score is normalised against the cell's **total** truth energy
     (`recoEnergy = fraction * cellTotalEnergy`). At PU200 a cell shared with overlaid
