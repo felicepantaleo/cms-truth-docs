@@ -429,20 +429,34 @@ truth::simObjectKey(packedEventId, localId);   // (EncodedEventId, local id) -> 
 
 ### The interactions overlaid in the event
 
-```cpp
-struct Interaction {
-  uint64_t eventId;        // the packed EncodedEventId of this interaction
-  uint32_t vertexId;       // the vertex that stands for the interaction point
-  bool     isPlaceholder;  // the vertex carries no usable position
+`Interaction` is a view over the graph, like `Particle` and `Vertex`:
 
-  bool isSignal() const;
-  int  bunchCrossing() const;
-  int  eventIndex() const;
+```cpp
+class Interaction {
+  uint64_t eventId() const;      // the packed EncodedEventId of this interaction
+  bool     isSignal() const;
+  int      bunchCrossing() const;
+  int      eventIndex() const;
+
+  uint32_t vertexId() const;     // the vertex that stands for the interaction point
+  Vertex   vertex() const;
+  math::XYZTLorentzVectorD const& position() const;   // where it happened
+  std::vector<Particle> outgoingParticles() const;    // what came out of it
+
+  bool     isPlaceholder() const;  // the vertex carries no usable position
 };
 
-std::vector<Interaction>  truth::interactions(Graph const& graph);
+std::vector<Interaction>   truth::interactions(Graph const& graph);
 std::optional<Interaction> truth::signalInteraction(Graph const& graph);
+
+std::vector<Vertex> Graph::interactionVertices() const;  // the fact, with no election
 ```
+
+The split matters. `Graph::interactionVertices()` reports what the graph carries, in id
+order, one vertex per interaction, and elects nothing. `truth::interactions()` adds the two
+things that are choices: it orders the result, and when no preset ran and the graph holds
+no interaction vertex it elects a stand-in production vertex and marks it
+`isPlaceholder()`. A guess does not belong in the data format, so it lives one layer up.
 
 `interactions()` returns the signal first, then the pile-up ordered by bunch crossing and
 by index inside the crossing. Ask `isSignal()` rather than taking the first element on
@@ -483,6 +497,34 @@ or the CSR spans of `Graph` directly. They report the same ids in the same order
 
 `Particle::ancestorCount()` returns `ancestors().size()` without building the vector, for
 code that only needs the depth.
+
+### Navigation the analyses kept rewriting
+
+These were written again in every worked example before they were part of the interface:
+
+```cpp
+Particle particle.lastCopy();                    // the copy whose children are the decay
+std::optional<Particle> particle.firstChildWithPdgId(int pdgId);   // downward twin of
+                                                 // firstAncestorWithPdgId, signed and exact
+std::vector<Particle> particle.productionSiblings();  // what recoils against it: the VBF
+                                                 // tagging quarks, the single-top partner,
+                                                 // the boson made with a Higgs
+std::vector<Particle> graph.signalParticles();   // what the preset named as the signal
+std::vector<Particle> truth::particlesAtLevel(graph, level);  // levelAntichain as views
+bool truth::isLepton(int32_t pdgId);             // charged leptons, not neutrinos
+bool truth::isWeakBoson(int32_t pdgId);          // W and Z; the Higgs is neither
+```
+
+`lastCopy()` matters wherever a particle radiates: a W or a Z carries its decay products on
+its last copy, so a child lookup on the first copy finds another copy of the same particle
+and not the decay. `signalParticles()` reads a stamped flag rather than recomputing, because
+`LevelFlag::Signal` is not a level row and does not come out of `levelAntichain` like the
+others; a graph built with no preset carries none.
+
+`particlesAtLevel`, `isLepton` and `isWeakBoson` are free functions rather than methods:
+the first needs `Level` and `levelAntichain`, which live in `PhysicsTools/TruthInfo` and
+cannot be reached from the data format, and the other two take a pdgId and have no object
+to hang on.
 
 ## `truth::LogicalGraphHitIndex`
 
