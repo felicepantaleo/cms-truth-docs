@@ -6,7 +6,7 @@ Every signature below is copied from the headers, with `[[nodiscard]]` removed t
 `SimDataFormats/TruthInfo/interface/` holds the data-model headers.
 `PhysicsTools/TruthInfo/interface/` holds the analysis-layer headers. For the
 design rationale see the [Data model](data-model.md). For narrative walk-throughs
-see [How to use the graph](usage.md) and [Worked examples](examples.md).
+see [How to use the graph](usage.md) and [Reading real events](examples.md).
 
 !!! note "Where each symbol lives"
     | Symbol | Header |
@@ -37,7 +37,7 @@ vertices and back:
 | vertex → outgoing particles | `vertexToOutgoingParticleOffsets` | `vertexToOutgoingParticles` |
 | vertex → incoming particles | `vertexToIncomingParticleOffsets` | `vertexToIncomingParticles` |
 
-The truth graph is **bipartite**. An edge always crosses realms: a particle points
+The truth graph is bipartite. An edge always crosses realms: a particle points
 only at vertices, and a vertex points only at particles. There is no direct
 particle→particle edge. "The children of a particle" means *the outgoing particles
 of its decay vertices*. The handle API hides this for you, because
@@ -53,7 +53,7 @@ for (uint32_t pid = 0; pid < graph.nParticles(); ++pid) {
 }
 ```
 
-`Particle` and `Vertex` are **lightweight non-owning handles**. Each one is a
+`Particle` and `Vertex` are lightweight non-owning handles. Each one is a
 `(Graph const*, uint32_t id)` pair. They are cheap to copy and to pass by value.
 They are only valid while the `Graph` they reference is alive. A
 default-constructed handle has `valid() == false`, because its `graph_` is null. A
@@ -213,7 +213,7 @@ handles are equal when they carry the same `Graph` and the same id.
 
 !!! note "PDG-id matching is signed"
     `pdgId()`, `hasAncestorPdgId()`, `firstAncestorWithPdgId()`, and the selector's
-    `pdgIds` list all compare the **signed** PDG id. To accept a particle and its
+    `pdgIds` list all compare the signed PDG id. To accept a particle and its
     antiparticle, list both (`{15, -15}`) or take `std::abs` yourself.
 
 ## `truth::Vertex`
@@ -285,9 +285,9 @@ the handle methods use.
 
 ## `truth::Branch`
 
-A `Branch` is a non-owning **view** of a coherent subgraph, recomputed on demand.
+A `Branch` is a non-owning view of a coherent subgraph, recomputed on demand.
 It holds one or more root particles plus a *closure* of their descendants. It
-stores no graph data and is **not an EDM product**. It is the dynamic successor to
+stores no graph data and is not an EDM product. It is the dynamic successor to
 the static `CaloParticle` and `TrackingParticle`.
 
 ### Construction and closures
@@ -366,15 +366,15 @@ Branch                   merged(Branch const& other) const;          // union of
 
 !!! warning "Single-root vs multi-root semantics"
     `rootPdgId()`, `genEvent()`, `bunchCrossing()`, `event()`, and the provenance
-    predicates read the **first** root (`roots_.front()`). For a multi-root branch
+    predicates read the first root (`roots_.front()`). For a multi-root branch
     they describe that first root only. `commonAncestor()` and `merged()` operate
-    over **all** roots of both branches.
+    over all roots of both branches.
 
 ## `truth::BranchSelector`
 
 `BranchSelector` is a configurable predicate over branches. It mirrors the cut
 surface of `TrackingParticleSelector` and `CaloParticleSelector`. It takes the
-branch kinematics from the **root** particle.
+branch kinematics from the root particle.
 
 ```cpp
 struct BranchSelector::Config {
@@ -540,7 +540,7 @@ to hang on.
 ## `truth::LogicalGraphHitIndex`
 
 `truth::LogicalGraphHitIndex` is the per-logical-particle hit index. It indexes
-hits by particle id and by detector **channel**. An enum keys the channels, so you
+hits by particle id and by detector channel. An enum keys the channels, so you
 can add detectors without new hardcoded members:
 
 ```cpp
@@ -548,8 +548,8 @@ enum class HitChannel : uint8_t { Tracker = 0, MTD = 1, Calo = 2, Muon = 3 };
 inline constexpr std::size_t kNumHitChannels = 4;
 ```
 
-Each particle has two hit sets per channel. The **direct** hits are the hits on its
-own `SimTrack`. The **subgraph** hits are its own hits plus the hits of every
+Each particle has two hit sets per channel. The direct hits are the hits on its
+own `SimTrack`. The subgraph hits are its own hits plus the hits of every
 logical descendant. The accessors take the channel first, then the particle id:
 
 ```cpp
@@ -577,7 +577,7 @@ ordering of `DetIdToRecHitMapProducer`, and `MTD`, in the barrel-then-endcap
 
 ### Two storage layouts
 
-The layout an index carries is a property of the **data**, not of the reading job.
+The layout an index carries is a property of the data, not of the reading job.
 `sharedSubgraphStore()` reports the layout. The accessors handle both layouts, so
 an index written either way reads back correctly.
 
@@ -601,23 +601,23 @@ shared layout existed carries this layout too, which is why the read path stays.
 
 !!! warning "Use `truth::SubgraphHitView`, not `subgraphHits()`, for an arbitrary particle"
     `subgraphHits()` returns a single span. A GEN-only particle owns several
-    ranges, so under the shared layout that span is **empty**. Hold a
+    ranges, so under the shared layout that span is empty. Hold a
     `truth::SubgraphHitView`
     (`PhysicsTools/TruthInfo/interface/SubgraphHitView.h`) if the particle you pass
     can be any node of the truth graph. Call its `subgraphHits`. It returns the
-    coalesced, detId-sorted span in **either** layout, and it caches the coalesced
+    coalesced, detId-sorted span in either layout, and it caches the coalesced
     form for the rest of the event. Hold one per event and per module. It is not
     thread safe. Every in-tree consumer already goes through it.
 
 !!! warning "A shared range is not coalesced"
-    In the shared layout a subgraph range is in **tree order**, not in DetId order.
+    In the shared layout a subgraph range is in tree order, not in DetId order.
     It repeats a DetId hit once per contributing descendant. Sum the entries that
     share a DetId yourself if you need per-cell energies. `BranchHitAssociator`
     does exactly this, once per candidate root at construction, so its own results
     are unchanged.
 
     `subgraphHits()` returns a single span. That is correct for every particle that
-    carries hits. A **GEN-only** particle sits above the SIM tree in a DAG and
+    carries hits. A GEN-only particle sits above the SIM tree in a DAG and
     spans several ranges, so `subgraphHits()` returns an empty span for it. Use
     `appendSubgraphHits()`, which is correct for every particle in both layouts, or
     iterate `subgraphRanges()`.
@@ -629,7 +629,7 @@ inverted-index build of `BranchHitAssociator`. Most consumers use the span
 accessors above.
 
 !!! note "Empty channels return empty spans"
-    `directHits` and `subgraphHits` return an **empty span**, not an error, on a
+    `directHits` and `subgraphHits` return an empty span, not an error, on a
     channel that was not filled. They also return an empty span for an
     out-of-range particle id. The `subdetectors` list selects which channels are
     filled. Gate on `hasChannel(channel)` if you need to distinguish "no hits" from

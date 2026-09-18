@@ -6,7 +6,7 @@ At the HL-LHC every interesting collision arrives with about 200 others in the s
 
 The truth producers read `g4SimHits` and `generatorSmeared`. Those collections hold the signal collision only, at bunch crossing 0. The pileup truth lives elsewhere, and it is mostly out of reach:
 
-- **Standard mixing:** pileup `SimTrack`s live in the **transient**
+- **Standard mixing:** pileup `SimTrack`s live in the transient
   `CrossingFrame<SimTrack>`. The digitizers consume that frame, and CMSSW never
   persists it; only `CrossingFramePlaybackInfoNew` survives. The only persisted
   pileup truth is the flat `mix:MergedTrackTruth` / `mix:MergedCaloTruth`.
@@ -25,26 +25,26 @@ Only the inputs never delivered the pileup.
 
 `TruthGraphMixedProducer` reads the `CrossingFrame<SimTrack/SimVertex>` through
 `MixCollection`, keyed by `(EncodedEventId, localId)`. Crossing frames are
-transient, so the producer must run **inside the DIGI step**. The
+transient, so the producer must run inside the DIGI step. The
 `addMixedTruthGraph` customise does this, and it enables the frames with
 `setCrossingFrameOn`. The output keeps the compact mixed graph.
 
 It validated the data model on real mixed pileup. Pileup is visible across the
 whole bunch-crossing window. The signal is isolated at `(bx=0, event=0)`. Every
-track has one production vertex, and there are no cycles. But **flattening the
-`MixCollection` fragments the graph**. The local ids must be regrouped per
+track has one production vertex, and there are no cycles. But flattening the
+`MixCollection` fragments the graph. The local ids must be regrouped per
 sub-event, and a small fraction do not re-resolve. This gives ~1017
 components/event. That weakness motivated Route B.
 
 ### Phase B: `TruthGraphAccumulator` (the production route, merged and default for Run4)
 
 This is a `DigiAccumulatorMixMod`, like `TrackingTruthAccumulator`. The framework
-feeds it one sub-event at a time with its **native** `SimTrack`/`SimVertex`/HepMC
-collections. The ids therefore stay in their original local context: **no
-flattening, no cross-pileup keying, no fragmentation**. It is identical for
+feeds it one sub-event at a time with its native `SimTrack`/`SimVertex`/HepMC
+collections. The ids therefore stay in their original local context: no
+flattening, no cross-pileup keying, no fragmentation. It is identical for
 standard mixing and premixing, and it is consistent with the digis by construction.
 
-It is **configurable**:
+It is configurable:
 
 | Parameter | Default | Meaning |
 |---|---|---|
@@ -100,7 +100,7 @@ signal-vs-pileup per-bunch-crossing breakdown used for these numbers.
 
 ## Signal vs pileup: how it is meant to separate
 
-The truth graph separates signal from pileup **by reachability**, not by a flag.
+The truth graph separates signal from pileup by reachability, not by a flag.
 Its own artificial `Interaction` vertex summarizes each interaction (see the
 [Interface reference](interface.md) and the [TenTau example](examples.md)). The
 **packed `EncodedEventId`** keys those vertices, one node per pp collision. The
@@ -121,8 +121,8 @@ logical graph then reported `signalParticles = 27611`, `pileupParticles = 20616`
 The split is clean, and it needs no graph changes.
 
 The figure below is a muon-seeded view of that mixed graph
-(`seedPdgIds = {13, -13}`, `dropHitlessSimSubgraphs = false`). The **blue** subgraph
-descends from the signal Interaction vertex (`eid 0`). The **red** subgraph descends
+(`seedPdgIds = {13, -13}`, `dropHitlessSimSubgraphs = false`). The blue subgraph
+descends from the signal Interaction vertex (`eid 0`). The red subgraph descends
 from the in-time pileup interaction (`eid 1`). Signal against pileup is only a
 question of which Interaction vertex you reach.
 
@@ -143,21 +143,21 @@ Two practical notes:
 ## Production flow: build at DIGI, consume at RECO
 
 In a split production (GEN-SIM, DIGI-RAW, RECO, Validation as separate jobs) the
-code builds the mixed truth **once, at the mixing/DIGI step**. At that step the
+code builds the mixed truth once, at the mixing/DIGI step. At that step the
 merged signal+pileup sim-hits are live. Every later step consumes the result.
 `mixedTruthGraphCustomize.customiseTruthDigi` does this:
 
 1. it registers the `TruthGraphAccumulator` (the merged raw `TruthGraph_mix`);
-2. it builds the logical graph and the per-particle per-cell **hit index** right
+2. it builds the logical graph and the per-particle per-cell hit index right
    after mixing (`buildCompactTruthAtDigi`), reading the accumulator's merged
    sim-hits. The default scope is the full detector (Calo + Tracker + Muon; the MTD
    channel is resolved at RECO). `customiseTruthReduced` drops the Tracker channel
    for cost-sensitive runs, and leaves calo + MTD + muon;
 3. it applies an event-content level.
 
-The code builds the hit index **unresolved** (`recHitMap = ""`, so `recHitIndex`
+The code builds the hit index unresolved (`recHitMap = ""`, so `recHitIndex`
 stays invalid). This is deliberate. The shared-energy association
-(`truth::BranchHitAssociator`) matches reco objects to branches **by `DetId`**, not
+(`truth::BranchHitAssociator`) matches reco objects to branches by `DetId`, not
 by `recHitIndex`. It also keys the per-cell total-sim-energy denominator on
 `DetId`. The same unresolved index therefore serves every later stage that exposes
 its reco objects as `(DetId, fraction)` (L1, HLT, offline RECO). The bulky merged
@@ -188,8 +188,8 @@ all-contributor per-cell total map.
 
 ### Default for Run4, not a special workflow
 
-The whole chain is wired under the **`enableTruth` modifier**. `enableTruth` is
-added to the **`Phase2C17I13M9` era**, the common, HGCal-geometry-agnostic Phase-2
+The whole chain is wired under the `enableTruth` modifier. `enableTruth` is
+added to the `Phase2C17I13M9` era, the common, HGCal-geometry-agnostic Phase-2
 base. Truth is therefore on by default for Run4, with no special workflow.
 `Phase2C20I13M9` (hfnose), `Phase2C22I13M9` (HGCal V18), `Phase2C26I13M9` (V19) and
 the `noMkFit` variants all inherit it, as does any future geometry era layered on

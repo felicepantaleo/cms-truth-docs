@@ -21,14 +21,14 @@ single heterogeneous, read-only graph directly from HepMC2/HepMC3 plus
   GEN↔SIM provenance, derived from `SimTrack::genpartIndex()` for primary G4 tracks.
 
 The raw graph stays close to the inputs on purpose. It is the substrate for the
-logical graph. The producer builds cross-domain `GenToSim` edges **only for
-primary SimTracks**, and it reads `genpartIndex()` as a HepMC barcode. See
+logical graph. The producer builds cross-domain `GenToSim` edges only for
+primary SimTracks, and it reads `genpartIndex()` as a HepMC barcode. See
 [Findings](findings.md) for why non-primary back-fill must not be used.
 
 ## Layer 2: `truth::Graph` (logical)
 
 `SimDataFormats/TruthInfo/interface/Graph.h`. `TruthLogicalGraphProducer` builds a
-user-facing **bipartite Particle ↔ Vertex** graph from the raw graph.
+user-facing bipartite Particle ↔ Vertex graph from the raw graph.
 
 - `Particle` and `Vertex` are lightweight handles `(graph*, id)`. The payload is in
   `ParticleData` / `VertexData`. It holds the provenance back-refs
@@ -41,9 +41,9 @@ user-facing **bipartite Particle ↔ Vertex** graph from the raw graph.
   `simNode`, which conflates a connector with a stand-in. `isSynthetic()`,
   `isAtLevel()` and `particleRole()` are the accessors. A `levelFlags` of zero is
   ambiguous, so a reader that needs certainty re-derives with `levelAntichain()`.
-- The producer **merges** GEN and SIM particles/vertices when they are robustly
-  associated. A merged particle takes its production vertex from its **immediate
-  GEN production vertex** (see [Findings](findings.md)). Intermediate GEN-only
+- The producer merges GEN and SIM particles/vertices when they are robustly
+  associated. A merged particle takes its production vertex from its immediate
+  GEN production vertex (see [Findings](findings.md)). Intermediate GEN-only
   copies can be collapsed.
 - **Vertex roles** (`VertexRole`): `Normal`, `Interaction`, `InitialState`,
   `UnderlyingEvent`, `BeamSideInput`. When a selection truncates the upstream history, one
@@ -127,7 +127,7 @@ user-facing **bipartite Particle ↔ Vertex** graph from the raw graph.
 | `roots()`, `leaves()`, `sourceVertices()`, `sinkVertices()` | graph extremities |
 
 !!! note "Technical details"
-    The traversals are **allocation-free**. The immediate-relative cores push into
+    The traversals are allocation-free. The immediate-relative cores push into
     a caller buffer. Every BFS/LCA reuses one buffer plus its own `dist`/`seen`
     array, instead of allocating per dequeued node. The multi-source LCA iterates
     only the visited set, with no dense `k×N` matrix. See
@@ -172,7 +172,7 @@ accessors read both.
 - **shared**, the default: `dfsOffsets` and `directHits` hold each hit exactly
   once, ordered so that a particle's descendants occupy the slots right after it.
   A subgraph is then a set of ranges over that single store and costs no extra hit
-  storage. The hits of a range are in **tree order, not DetId order**, and a DetId
+  storage. The hits of a range are in tree order, not DetId order, and a DetId
   repeats once per descendant that deposited in it.
 - **materialised**: `subgraphOffsets` and `subgraphHits` hold a second, coalesced,
   DetId-sorted copy of every descendant's hits under each ancestor, so a hit is
@@ -192,7 +192,7 @@ You reach the per-particle hits through the channel accessors:
 !!! warning "`subgraphHits()` returns an empty span for a GEN-only particle"
     In the shared layout every particle that carries hits owns exactly one range,
     so `subgraphHits()` is correct for it. A GEN-only particle owns several ranges,
-    because the GEN half is a DAG, and `subgraphHits()` returns an **empty span**
+    because the GEN half is a DAG, and `subgraphHits()` returns an empty span
     for it. Use `appendSubgraphHits()`, or iterate `subgraphRanges()`. In
     `PhysicsTools/TruthInfo`, `truth::SubgraphHitView` wraps this and caches the
     result per particle.
@@ -207,7 +207,7 @@ You reach the per-particle hits through the channel accessors:
 - **`energy` is the summed sim deposit of the entries a reader coalesces.** A
   particle can deposit in the same cell more than once, and several descendants of
   one ancestor can deposit in the same cell. In the materialised layout the builder
-  coalesces those deposits into a **single** `Hit` whose `energy` is their **sum**.
+  coalesces those deposits into a single `Hit` whose `energy` is their sum.
   In the shared layout the entries stay separate, in tree order, so a consumer that
   needs per-cell energies coalesces them itself. Either way the contributions
   accumulate, they never duplicate: if two leaves of the same mother both hit cell
@@ -215,15 +215,15 @@ You reach the per-particle hits through the channel accessors:
   `energy = e1 + e2`.
 
 !!! warning "Sim energy is per-particle; reco attribution is whole-cell, not fractional"
-    `energy` is the particle's (or subtree's) **own** sim energy in the cell. This
+    `energy` is the particle's (or subtree's) own sim energy in the cell. This
     side *is* fractional: each particle carries exactly what it deposited. The
-    **recHit** side is **binary**, not fractional. The coalesced `Hit` links the
+    recHit side is binary, not fractional. The coalesced `Hit` links the
     cell's recHit once. Summing `recHitEnergies[recHitIndex]` over a particle's hits
-    therefore credits the particle the **full** cell energy for every cell its
+    therefore credits the particle the full cell energy for every cell its
     subtree touches. Within one subtree that is exact, because the cell's energy
-    does belong to that ancestor. But a cell shared with a particle **outside** the
-    subtree counts in full for *both*. The index does **not** carry per-cell energy
-    fractions. This is deliberately **not** the `CaloParticle`/`SimCluster` fraction
+    does belong to that ancestor. But a cell shared with a particle outside the
+    subtree counts in full for *both*. The index does not carry per-cell energy
+    fractions. This is deliberately not the `CaloParticle`/`SimCluster` fraction
     model. Use the sim `energy` (per-particle) when you need energy sharing. Treat
     the recHit sum as "reco energy in cells this branch lit up", not "this branch's
     share of the reco energy".
@@ -244,7 +244,7 @@ You reach the per-particle hits through the channel accessors:
     - **Tracker**: tracker `PSimHit`s matched by `trackId()`; no recHit link.
     - **MTD**: filled from `MtdSimLayerCluster`, which `particleId()` already keys
       by the producing `SimTrack`, and restricted to the signal interaction by
-      `EncodedEventId`. The `recHitIndex` is the matched reco **`FTLCluster`**. The
+      `EncodedEventId`. The `recHitIndex` is the matched reco `FTLCluster`. The
       producer looks it up through `MtdSimLayerClusterToRecoClusterAssociation` and
       indexes it in the barrel-then-endcap `FTLCluster` concatenation. This
       `recHitIndex` is *channel-relative*: the MTD ordering is FTLClusters, not the
@@ -266,7 +266,7 @@ You reach the per-particle hits through the channel accessors:
 ## `truth::Branch`: the subgraph view
 
 `PhysicsTools/TruthInfo/interface/Branch.h`. This is a decay-branch / subgraph view
-of the logical graph. The code **recomputes it on demand** from a root, or a set of
+of the logical graph. The code recomputes it on demand from a root, or a set of
 roots, plus a closure spec. It needs no extra storage, so the logical graph stays
 compact.
 
@@ -290,11 +290,11 @@ energy of this τ branch", and "is this hit cluster from pileup".
 `PhysicsTools/TruthInfo/interface/BranchHitAssociator.h`. Given the hits of a reco
 object, it finds the best truth branches efficiently.
 
-- It works on **any reco object** that exposes a `truthHits()` method, through the
+- It works on any reco object that exposes a `truthHits()` method, through the
   C++20 concept `HasTruthHits`. A user opts an object in by defining that one
   method.
 - It builds an inverted `detId → candidate roots` index from the hit index. It then
-  runs a **sorted merge-join** of the reco hits against the DetId-sorted span of
+  runs a sorted merge-join of the reco hits against the DetId-sorted span of
   each candidate branch.
 - **Metrics:** `SharedEnergy` (the HGCal by-hits score:
   `score = (1/Σ(f·E)²) · Σ max(0, f_reco − f_branch)²·E²`) and `SharedHits`.

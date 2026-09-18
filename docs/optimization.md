@@ -13,7 +13,7 @@ Everything here is implemented. Ideas that are not yet done live in the [Roadmap
   Handles are 16-byte `(graph*, id)` views. They are never owning copies.
 - **`reserve()` discipline**, path-halving union-find, and the right
   `edm::global`/`edm::stream` concurrency choice per producer.
-- The **`Branch` view is non-owning and recomputed on demand**. There is no extra
+- The `Branch` view is non-owning and recomputed on demand. There is no extra
   stored product, so the truth graph stays compact.
 
 ## Allocation-free graph traversals
@@ -21,16 +21,16 @@ Everything here is implemented. Ideas that are not yet done live in the [Roadmap
 *Relevant to: the [navigation API](data-model.md#layer-2-truthgraph-logical).*
 
 The immediate-relative cores `appendParents` and `appendChildren` push neighbour
-ids into a **caller-provided buffer**. The degree is tiny. A caller that needs
+ids into a caller-provided buffer. The degree is tiny. A caller that needs
 uniqueness does a short linear dedup. Every BFS/LCA traversal reuses a single
 buffer plus its own `dist`/`seen` array. Those traversals are `ancestorsOf`,
 `descendantsOf`, `firstAncestorWithPdgIdOf`, `firstCommonAncestorOf` and
 `lowestCommonAncestor`. The earlier code instead allocated a `vector(nParticles)`
-dedup buffer **per dequeued node**. The change removed the original O(N²)-time,
+dedup buffer per dequeued node. The change removed the original O(N²)-time,
 O(N²)-allocation behaviour on ancestor, descendant and LCA queries. The returned
 sets and their order do not change.
 
-The multi-source LCA additionally **iterates only the visited set**. It reuses one
+The multi-source LCA additionally iterates only the visited set. It reuses one
 distance buffer with per-ancestor hit counts. It does not scan all `nParticles`,
 and it does not allocate a dense `k×N` distance matrix. On a ~260k-particle tree
 the two-input LCA query dropped from ~1 ms to a few microseconds (~138x). The
@@ -43,7 +43,7 @@ re-measure before quoting it.
 
 The hit-index builder keeps a flat `vector<Hit>` per particle, one per channel.
 It coalesces that vector lazily by sort-on-DetId plus sum. Two subgraph layouts
-exist and the builder writes the **shared** one by default: each hit is stored
+exist and the builder writes the shared one by default: each hit is stored
 exactly once in DFS order, and a subgraph is a set of ranges over that single
 store, so subgraph aggregation costs no hit storage at all. In the materialised
 fallback, subgraphs aggregate by appending the already-coalesced span of each
@@ -56,14 +56,14 @@ producer, because it handles the full calo and tracker hit volume. The gain in
 allocation and in cache behaviour is not measured.
 
 Hit sets, counts, recHit indices and recHit/tracker energies are bit-identical to
-the hash-based build. Summed **sim-hit energies** agree only to float
+the hash-based build. Summed sim-hit energies agree only to float
 **reassociation** (~1e-7 relative). The flat build sums in deterministic DetId
 order. The old `unordered_map` summed in hash-bucket order, which is not
 portable. The new value is therefore the more reproducible one. The cppunit
 tolerance (1e-6) covers the difference.
 
-The **DetId→RecHit map** (`hgcal::DetIdRecHitMap`, from
-`DetIdToRecHitMapProducer`) is a **sorted `vector<pair>` plus binary search**
+The DetId→RecHit map (`hgcal::DetIdRecHitMap`, from
+`DetIdToRecHitMapProducer`) is a sorted `vector<pair>` plus binary search
 (`add`/`finalize`/`find`). It is ~6× smaller than a hash map (8 B/entry vs ~48),
 and its lookups are cache-friendly. On a PU0 TTbar event it holds tens of
 thousands of entries. The PU200 saving is not measured.
@@ -75,7 +75,7 @@ thousands of entries. The PU200 saving is not measured.
 The inverted `detId → candidate roots` index and the per-cell energy map are flat,
 sorted CSR-style arrays (`cellRootsKeys_`/`Offsets_`/`cellRoots_`,
 `cellEnergyKeys_`/`Values_`). The code looks them up by binary search.
-`bestBranches` is a **sorted merge-join** of the reco hits against the
+`bestBranches` is a sorted merge-join of the reco hits against the
 DetId-sorted subgraph span of each candidate. That is the correct linear
 algorithm. It relies on the sorted-span invariant of the builder.
 

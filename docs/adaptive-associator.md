@@ -200,7 +200,7 @@ collection is added there rather than per job.
 The products are `ticl::TICLAssociationMap<ticl::mapWithSharedEnergyAndScore>`. Read
 them from a compiled `EDAnalyzer`, because bare FWLite/cppyy cannot instantiate
 this template reliably. Each entry gives the branch key (the root particle index in
-the `truth::Graph`), the shared energy, and the normalized score.
+the `truth::Graph`), the shared energy, and the normalised score.
 
 `TruthBranchAssociationDumper` is not part of the package. Read the maps from a
 compiled `EDAnalyzer`, or read the DQM output of `Validation/TruthInfo`, which books
@@ -209,21 +209,21 @@ the score, the purity and the efficiency per working point and per truth level.
 ## 7. What to expect: electron versus pion
 
 We ran both samples end to end on this branch (5 events each, D122, no PU). Every
-trackster gets a match in both samples. What differs is the **number of candidate
-branches**. Understand this difference before you interpret your own plots:
+trackster gets a match in both samples. What differs is the number of candidate
+branches. Understand this difference before you interpret your own plots:
 
 | Sample | Distinct candidate branches per event |
 |---|---|
 | single electron | 15, 24, 19, 15, 20 |
 | single pion | 2, 2, 2, 2, 17 |
 
-The gun fires one particle per endcap, so **2** is the floor: one branch per primary.
+The gun fires one particle per endcap, so 2 is the floor: one branch per primary.
 
-- The **electron** radiates bremsstrahlung in the tracker. Those photons cross the
+- The electron radiates bremsstrahlung in the tracker. Those photons cross the
   tracker-calorimeter boundary themselves, so each one becomes its own branch root.
   One electron therefore produces a whole family of candidate branches. This is why
   the electron tracksters have long ranked candidate lists.
-- The **pion** in events 1 to 4 crosses the boundary as a single particle and
+- The pion in events 1 to 4 crosses the boundary as a single particle and
   showers *inside* the calorimeter. The simulation creates its shower daughters past
   the boundary, so they are not roots. They are subgraph hits of the pion branch.
   This gives exactly 2 branches. Event 5 (17 branches) is the different case. That
@@ -232,7 +232,7 @@ The gun fires one particle per endcap, so **2** is the floor: one branch per pri
 
 Consequence for the adaptive level: for a clean single particle the adaptive match
 coincides with the best fixed-level match. There is nothing to climb to. The
-adaptive climb is useful in **merged** topologies. There several roots belong to one
+adaptive climb is useful in merged topologies. There several roots belong to one
 physical object, and the right label is their common parent. Examples are a pi0
 whose two photons are separate roots, an electron plus its brem photons, and an
 early pion interaction. Test the climb there, not on a clean pion.
@@ -257,7 +257,7 @@ deposit below the rechit threshold has no rechit to match. Single-particle showe
 leave a large tail of such cells. This is why the cell fractions are much lower than
 the energy fractions everywhere, including channels that work correctly. A channel
 is working when the matched sim ENERGY is high, about 80% or more. A channel whose
-energy fraction is near zero **while it holds real energy** is a genuine `DetId`
+energy fraction is near zero while it holds real energy is a genuine `DetId`
 mismatch.
 
 Choose a sample that puts energy where you want to test. An endcap particle

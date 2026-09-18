@@ -347,8 +347,8 @@ The special value `seedPdgIds = [0]` disables selection and keeps the full graph
 is a debugging escape hatch.
 
 !!! tip "Showing the seed's production co-products (e.g. VBF tagging jets)"
-    `seedParentDepth` only walks **up** the ancestry. The partons that *recoil
-    against* the seed at its production vertex are **siblings**, not ancestors. No
+    `seedParentDepth` only walks up the ancestry. The partons that *recoil
+    against* the seed at its production vertex are siblings, not ancestors. No
     parent depth reaches them. Seeding on the Higgs in VBF therefore leaves the
     event with nothing upstream. The two forward quarks that fused to make the
     Higgs share its production vertex, and they become the tagging jets.
@@ -364,7 +364,7 @@ is a debugging escape hatch.
 
 #### Per-process presets
 
-`enableTruth` attaches to **every** Run4 workflow (~140 generator fragments). The same
+`enableTruth` attaches to every Run4 workflow (~140 generator fragments). The same
 presets pick a focused view across the much larger production set. They were validated
 against all ~740 `genproductions_cards` fragment names. The right selection depends
 only on the physics. The selections collapse to these archetypes:
@@ -437,8 +437,8 @@ The job cannot read the fragment name out of an existing file, so name it. A wro
 would silently change what the graph contains.
 
 !!! note "Pile-up is an orthogonal axis, not a preset"
-    The presets pick the **signal** of a *process*. Pile-up is an *overlay* that
-    composes with any of them (ZMM+PU, TTbar+PU, …). It is therefore **not** an
+    The presets pick the signal of a *process*. Pile-up is an *overlay* that
+    composes with any of them (ZMM+PU, TTbar+PU, …). It is therefore not an
     eleventh preset. Two separate layers handle it:
 
     - **Build layer** (`TruthGraphAccumulator`): `pileupBunchCrossings` (default
@@ -477,9 +477,9 @@ if (select(branch)) { /* passes */ }
 
 ## Hit content and matching reco objects
 
-The hit index answers two questions per logical particle and per detector **channel**.
-It gives the SimHits that the particle produced **directly**. It also gives the SimHits
-that its whole **subgraph** produced, that is, the full shower or decay-branch
+The hit index answers two questions per logical particle and per detector channel.
+It gives the SimHits that the particle produced directly. It also gives the SimHits
+that its whole subgraph produced, that is, the full shower or decay-branch
 footprint. `truth::HitChannel` keys the channels (`Calo`, `Tracker`, `MTD`, `Muon`).
 Each channel has its own DetId space and metric. The accessors take the channel first,
 then the particle id:
@@ -600,7 +600,7 @@ associates TICL trackster collections to truth branches. It emits
 `ticl::TICLAssociationMap` products per configured collection: one reco-driven map per
 working point, `<key>RecoToTruth<WorkingPoint>`, and one truth-driven map,
 `<key>TruthToReco`, where `<key>` is the collection label with any instance joined by an
-underscore. Each entry carries the shared rechit energy and the normalized association
+underscore. Each entry carries the shared rechit energy and the normalised association
 score of `truth::BranchHitAssociator`. The branch key is the root particle index in the
 `truth::Graph`.
 

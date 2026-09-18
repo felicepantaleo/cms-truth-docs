@@ -48,7 +48,7 @@ collections. The graph and association rows come from a re-measurement on the cu
 build.
 
 Drop the legacy collections and keep the truth graph plus all four association working
-points. That saves **137.4 kB/event compressed, 17.8%** of the truth payload. That is
+points. That saves 137.4 kB/event compressed, 17.8% of the truth payload. That is
 with the full signal GEN half included, which the legacy collections do not carry at
 all. The shared hit index is what makes the truth graph a saving rather than a cost;
 the materialised index is larger, see section 1.2.
@@ -99,13 +99,13 @@ on the reference conditions before you quote any size claim from it again.
 
 Two things moved in opposite directions and the net is a saving.
 
-The truth graph now carries the **full signal GEN half**, contracted.
+The truth graph now carries the full signal GEN half, contracted.
 `truth::collapseGenShower` collapses away the parton shower and the intermediate
 copies of a resonance. A resonance that appears several times is therefore one node,
 whose children are its decay products. That half did not exist when this document was
 first written.
 
-The hit index now uses the **shared subgraph store**. It writes each hit once. The
+The hit index now uses the shared subgraph store. It writes each hit once. The
 order makes the subtree of a particle a contiguous run of slots. A subgraph is
 therefore a set of ranges of that one store, not a second materialised copy under
 every ancestor. A GEN-only particle sits above the SIM tree in a DAG. It therefore
@@ -181,15 +181,15 @@ three repetitions each.
 | without `TrackingTruth` and `CaloTruth` | 2430.0, 14.2 | 940 884.7 |
 | without all three | 2408.2, 6.2 | 930 964.4 |
 
-All three truth accumulators together cost **40.8 +- 3.9 ms/event**. That is **1.7% of
-the 2449 ms/event that `mix` costs**. The split of that time between graph and legacy
+All three truth accumulators together cost 40.8 +- 3.9 ms/event. That is 1.7% of
+the 2449 ms/event that `mix` costs. The split of that time between graph and legacy
 is NOT resolved at three repetitions. The two independent estimates of each disagree by
 more than their errors.
 
 The allocated-memory split is exact and additive (9920.3 + 29080.7 = 39001.0):
 
-- `TruthGraphAccumulator`: **9.9 MB/event**
-- `TrackingTruthAccumulator` + `CaloTruthAccumulator`: **29.1 MB/event**, a factor **2.9**
+- `TruthGraphAccumulator`: 9.9 MB/event
+- `TrackingTruthAccumulator` + `CaloTruthAccumulator`: 29.1 MB/event, a factor 2.9
   more.
 
 The downstream stages of the truth graph are ordinary EDProducers and are timed
@@ -213,7 +213,7 @@ framework TimeReport agrees to the microsecond.
 | `allSecondaryVertexToTruthBranchAssociators` | 0.091 | 140.3 |
 | total | 4.28 | 1964.9 |
 
-That is **0.38% of the 1119.7 ms/event** summed over all scheduled RECO modules. It is
+That is 0.38% of the 1119.7 ms/event summed over all scheduled RECO modules. It is
 with three working points per domain. No legacy truth producer runs in this RECO
 sequence. There is therefore no legacy counterpart to compare the associators against.
 
@@ -247,7 +247,7 @@ step writes them and both schemes consume them.
 
 `LogicalGraphHitIndex::subgraphHits` returns a single span. In the shared layout a
 particle that carries hits owns exactly one slot range, so its span is fine. A GEN-only
-particle owns several ranges, and the accessor then returns an **empty** span. Four
+particle owns several ranges, and the accessor then returns an empty span. Four
 validators used the size of that span as a smallest-footprint tie-break. A zero-size
 answer makes a GEN-only root win a comparison meant to pick the tightest branch. A
 simple switch of layout would therefore have read as a near-total loss of reproduction
@@ -262,8 +262,8 @@ per event and per module. It caches, so it is not thread safe.
 
 All seven consumers now go through it, and the arithmetic in each is unchanged. The
 check ran the calorimeter validator on 10 ttbar events, over a materialised index and
-over a shared index. It compared every monitor element: **50 compared, 50 non-empty, 0
-differing**. That rests on the accessor-level equivalence measured in section 1.1,
+over a shared index. It compared every monitor element: 50 compared, 50 non-empty, 0
+differing. That rests on the accessor-level equivalence measured in section 1.1,
 which covered every particle and every channel.
 
 ## 6. This chain is not bit-reproducible, and that is not a truth-graph property
@@ -286,7 +286,7 @@ uncompressed identical at 498985). It is not alone:
 The HLT tracking output changes between identical runs. That is the root of most of
 this. It is upstream of the truth graph and independent of it.
 
-The part that matters here is that the truth **content** is reproducible.
+The part that matters here is that the truth content is reproducible.
 `truth::Graph` and `truth::LogicalGraphHitIndex` hash identically across the same runs.
 The hash covers the logical particle and vertex records, all eight CSR arrays, and every
 hit and offset of all four channels. Of the persisted arrays of `TruthGraph`, these are
@@ -320,7 +320,7 @@ truth wiring, no selection preset. Compressed kB/event:
 | Legacy: TrackingParticle, 2x TrackingVertex, 4x SimCluster, CaloParticle | 56717 | x91 |
 | Graph: `TruthGraph`, `truth::Graph`, `truth::LogicalGraphHitIndex` | 8791 | x24 |
 
-At PU200 the truth graph is **15.5% of the legacy truth payload**, a factor 6.5. With
+At PU200 the truth graph is 15.5% of the legacy truth payload, a factor 6.5. With
 no pileup it is 82.2%, from the section 1 table. The saving grows with pileup for two reasons. The legacy objects
 re-embed their SimTrack copies and hit arrays per object and per collection, and pileup
 multiplies the objects. The topology of the truth graph stays CSR, and its hits stay
@@ -366,8 +366,8 @@ pileup, `reconstructableFinalState` falls from 40784 to 33591 members in one eve
 ## Summary
 
 On a no-pileup ttbar event, replace the frozen truth objects with the truth graph and
-its associators. That is a **17.8% reduction of the persisted truth payload** (772.2 to
-634.8 kB/event compressed). It is a **factor 2.9 less memory allocated during mixing**
+its associators. That is a 17.8% reduction of the persisted truth payload (772.2 to
+634.8 kB/event compressed). It is a factor 2.9 less memory allocated during mixing
 (29.1 to 9.9 MB/event). It is a RECO-side association cost of a few ms/event, well
 under 1% of the scheduled reconstruction. That is with the full signal GEN half
 included, which the legacy collections do not carry at all. The DIGI-time accumulation

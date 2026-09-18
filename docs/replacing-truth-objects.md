@@ -1,95 +1,90 @@
 # Replacing the legacy truth objects
 
-`TrackingParticle`, `CaloParticle`, and `SimCluster` are the current truth
-objects of CMS. They are useful, but they are **static and detector-specific**.
-Each one is a frozen, pre-grouped collection built for one purpose. Together they
-encode different, non-navigable views of the same event history. A
-`truth::Branch` is a **navigable, recomputed-on-demand** view of one unified
-graph. It reproduces what those objects deliver, and it removes their
-limitations.
+`TrackingParticle`, `CaloParticle` and `SimCluster` are the truth objects CMS uses today.
+Each is a collection built during digitisation, for one detector and one purpose, with its
+grouping and its thresholds fixed at that moment. Together they hold three views of the
+same event history, and none of the three can be walked or regrouped afterwards.
 
-## Why a Branch is a better primitive
+A `truth::Branch` is one view of the unified graph, computed when an analysis asks for it.
+This page shows that a branch reproduces what the legacy objects deliver, and measures how
+closely.
 
-| | Legacy `TrackingParticle` / `CaloParticle` / `SimCluster` | `truth::Branch` |
+## What a branch adds
+
+| | `TrackingParticle`, `CaloParticle`, `SimCluster` | `truth::Branch` |
 |---|---|---|
-| Construction | static, pre-grouped at digi/mixing time | derived on the fly from graph + closure |
-| Navigation | none (flat object) | parents/children/ancestors/LCA, decay branches |
-| Granularity | fixed | any closure (subtree, stable-leaves, depth-N, until-pdgId, predicate) |
-| Detectors | per-detector (calo vs tracker truth separate) | one graph, calo **and** tracker hit channels |
-| Provenance | limited | bunch crossing, signal/pileup, gen-event |
-| Reco matching | bespoke associators per object | one generic `BranchHitAssociator` (any object with `truthHits()`) |
-| Kinematics | stored | `p4`/visible/invisible computed from the branch |
+| Construction | grouped once, during digitisation | computed on demand from the graph and a closure |
+| Navigation | none, the object is flat | parents, children, ancestors, common ancestor, whole decay branches |
+| Granularity | fixed | any closure: subtree, stable leaves, depth N, until a species, until a level, or a predicate |
+| Detectors | one detector per object, calorimeter truth separate from tracker truth | one object, with a calorimeter and a tracker hit channel |
+| Provenance | limited | bunch crossing, signal or pileup, generator event |
+| Matching to reconstruction | one bespoke associator per object type | one `BranchHitAssociator` for any object that exposes `truthHits()` |
+| Kinematics | stored | computed from the branch, including the visible and invisible parts |
 
-We validated this claim: **for the purposes the legacy objects serve (hit content
-and reco↔truth association), a Branch reproduces them**. The reference is the set
-of existing associators. A Branch then offers strictly more: navigation,
-closures, unified calo and tracker, provenance, and tagging.
+## How the comparison is made
 
-## How the validation works
+Two DQM analysers in `Validation/TruthInfo` map each legacy object to its logical particle,
+through `obj.g4Tracks().front().trackId()` and the trackId to logical-particle map. They
+then compare the two descriptions of the same particle.
 
-Two DQM analyzers in `Validation/TruthInfo` map each legacy object to its logical
-particle. The mapping goes through `obj.g4Tracks().front().trackId()` into the
-trackId→logical-particle map. The two analyzers then compare:
+`BranchHGCalValidator` covers the calorimeter. It compares the `subgraphHits` of the branch
+with the `hits_and_fractions()` of the legacy object, and reports completeness, the
+fraction of the object's hits the branch covers, and purity, the fraction of the branch's
+hits that belong to the object. It also runs `BranchHitAssociator` and checks whether the
+tightest best-scoring branch is the mapped particle.
 
-- **Calo** (`BranchHGCalValidator`): it compares the `subgraphHits` of
-  the Branch against the `hits_and_fractions()` of the object. It reports
-  **completeness** (object hits covered by the Branch) and **purity** (Branch hits
-  that are the object's). It also runs the `BranchHitAssociator`. It then checks
-  that the tightest best-score branch is the mapped particle.
-- **Tracker** (`BranchTrackingValidator`): for each reco track it
-  compares the TrackingParticle from `ClusterTPAssociation` against the Branch
-  from the tracker hit channel. It checks that both point to the **same truth
-  particle**.
+`BranchTrackingValidator` covers the tracker. For each reconstructed track it compares the
+`TrackingParticle` from `ClusterTPAssociation` with the branch the tracker hit channel
+gives, and checks whether the two name the same truth particle.
 
-## Results
+## Calorimeter results
 
-### Calorimeter: `CaloParticle` and `SimCluster` (per event, ~5 events)
+Per event, over about five events.
 
-| Sample | Object | N | hit-compl. | energy-compl. | purity | best-branch-correct |
+| Sample | Object | Objects | Hit completeness | Energy completeness | Purity | Best branch correct |
 |---|---|---|---|---|---|---|
 | TTbar | CaloParticle | 526 | 1.00 | 1.00 | 0.73 | 0.85 |
 | TTbar | SimCluster | 1179 | 1.00 | 1.00 | 0.85 | 0.87 |
 | ZMM | CaloParticle | 278 | 1.00 | 1.00 | 0.71 | not measured |
 | ZMM | SimCluster | 609 | 1.00 | 1.00 | 0.85 | not measured |
 
-**Completeness is 1.0**: a Branch contains *all* of the legacy object's hits, and
-all of its energy. Purity is 0.71 to 0.85, because a Branch is deliberately
-**broader**. A Branch unifies a shower or decay that the legacy objects split
-into several `SimCluster`s or `CaloParticle`s. That breadth is deliberate: the
-Branch is the physically complete object. A tighter closure gives finer
-granularity.
+Completeness is 1.00 throughout: a branch holds every hit of the legacy object, and all of
+its energy. Purity is 0.71 to 0.85 because a branch is broader by construction. It keeps a
+shower or a decay together where the legacy objects split it into several `SimCluster`s or
+`CaloParticle`s. A tighter closure gives finer granularity when that is what the
+measurement wants.
 
-### Tracker: `TrackingParticle` (track→truth agreement)
+## Tracker results
 
-| Sample | reco tracks | both matched | Branch-TP agreement |
+| Sample | Reconstructed tracks | Matched on both sides | Same truth particle |
 |---|---|---|---|
-| ZMM | 210 | 210 | **99.5%** |
-| TTbar | 441 | 441 | **96.4%** |
-| SingleElectron | 6 | 6 | **100%** |
+| ZMM | 210 | 210 | 99.5% |
+| TTbar | 441 | 441 | 96.4% |
+| SingleElectron | 6 | 6 | 100% |
 
-Both sides match every reco track. Between 96% and 100% of the tracks point to
-the same truth particle. The few-percent misses in TTbar are the expected
-dense-jet cases (delta-rays, nuclear interactions, merged tracks). In those cases
-the PSimHit-detUnit truth and the cluster-DigiSimLink truth resolve to adjacent
-particles. The standard associators face the same ambiguity.
+Both sides match every reconstructed track, and 96% to 100% of the tracks point to the same
+truth particle. The remaining few percent in TTbar are the dense-jet cases: delta rays,
+nuclear interactions and merged tracks. There the `PSimHit`-based truth and the
+`DigiSimLink`-based truth resolve to neighbouring particles. The standard associators face
+the same ambiguity.
 
-## Creating new and better truth objects
+## Building the truth object you need
 
-A Branch is a *view*, so you build the truth object you need at use time:
+A branch is a view, so the truth object is defined at the point of use.
 
-- **A SimCluster-like object**: `Branch(root, StableLeaves)` plus `subgraphHits`.
-  You can root it at any particle, at any granularity.
-- **A CaloParticle-like object**: the subtree of a primary. `visibleP4()` and the
-  calo `subgraphHits` need no extra work.
-- **A TrackingParticle-like object**: the tracker `subgraphHits` of a particle.
-  `BranchSelector` reproduces the `TrackingParticleSelector` cuts
-  (pt/eta/charge/signal).
-- **Cross-detector objects** (impossible with the legacy split): one Branch
-  carries both its calo and tracker footprint. The track truth *and* the shower
-  truth of an electron are then one navigable object.
-- **Pileup-aware objects**: `isFromPileup()` / `bunchCrossing()` let a consumer
-  keep or drop pileup truth per bunch crossing (see [Pileup](pileup.md)).
+- **A `SimCluster`-like object**: `Branch(root, StableLeaves)` with `subgraphHits`, rooted
+  at any particle and at any granularity.
+- **A `CaloParticle`-like object**: the subtree of a primary particle. `visibleP4()` and the
+  calorimeter `subgraphHits` need nothing further.
+- **A `TrackingParticle`-like object**: the tracker `subgraphHits` of a particle.
+  `BranchSelector` reproduces the `TrackingParticleSelector` cuts on momentum,
+  pseudorapidity, charge and signal.
+- **A cross-detector object**, which the legacy split cannot express: one branch carries
+  both footprints, so the track truth and the shower truth of an electron are one
+  navigable object.
+- **A pileup-aware object**: `isFromPileup()` and `bunchCrossing()` let a consumer keep or
+  drop truth per bunch crossing. See [Pileup](pileup.md).
 
-The matching interface is uniform. One `BranchHitAssociator` associates any reco
-object that implements `truthHits()` to the best branch or branches. It replaces
-the bespoke per-object associators.
+The matching stays uniform. One `BranchHitAssociator` associates any reconstructed object
+that implements `truthHits()` to its best branch or branches, in place of the bespoke
+per-object associators.

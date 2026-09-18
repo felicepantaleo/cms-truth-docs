@@ -103,12 +103,12 @@ scale.
 | TenTau | 0 | 0 | 0 | 64 | 1 |
 | VBFHZZ4Nu | 0 | 0 | 0 | 51 | 30 |
 
-For context, compare the state **before** the fix (position-based vertex merge). The
+For context, compare the state before the fix (position-based vertex merge). The
 same logical graphs then had a mega-vertex of out-degree 666 to 936, and cycles in
 every event. See [Findings](findings.md).
 
-The **raw** graph is also clean everywhere: `multiProd=0`, `cycles=0`, one
-component/event. Its large numbers are **physical**, for example a SimVtx out-degree
+The raw graph is also clean everywhere: `multiProd=0`, `cycles=0`, one
+component/event. Its large numbers are physical, for example a SimVtx out-degree
 up to ~600 in TTbar and many multi-parent particles. Three effects produce them: the
 hard scatter (Z←q q̄ has 2 parents), PYTHIA string hadronization (status-71/72
 multi-endpoint mothers), and Geant4 shower vertices.
@@ -117,8 +117,8 @@ multi-endpoint mothers), and Geant4 shower vertices.
 
 The branch moved from `CMSSW_17_0_0_pre2` to `CMSSW_20_0_0_pre1` by rebase. A
 cross-release dataformat change (see [Findings](findings.md)) forced the comparison
-to be a **full relval re-run** on CMSSW_20. Result: **no change in truth-graph
-behavior**.
+to be a full relval re-run on CMSSW_20. Result: no change in truth-graph
+behaviour.
 
 - The rebuild from scratch is clean. All cppunit tests pass identically.
 - All 8 workflows PASSED every step (8/8/8/8/8).
@@ -145,7 +145,7 @@ process. All of them render cleanly. The old mega-vertex would have broken the
 layout.
 
 **Browse the rendered gallery.** The full CMSSW_20 set (SVG + DOT) is online and
-searchable at **[felice.web.cern.ch/truth](https://felice.web.cern.ch/truth/)**. That
+searchable at [felice.web.cern.ch/truth](https://felice.web.cern.ch/truth/). That
 site is an [Orbit](https://github.com/felicepantaleo/orbit) folder browser. Click a
 process, then a `*_signal_*` / `*_full_*` SVG for the inline zoomable view.
 
@@ -154,7 +154,7 @@ process, then a `*_signal_*` / `*_full_*` SVG for the inline zoomable view.
 A parallel DQM section compares the truth `Branch` graph to the legacy truth objects.
 The validators, their association-map producers and both sequences live in
 `Validation/TruthInfo`; `PhysicsTools/TruthInfo` holds no DQM module.
-It does **not** fork the release validators. It works in the same fashion as
+It does not fork the release validators. It works in the same fashion as
 `HGCalValidator` / `MultiTrackValidator`. TICL-style `AssociationMap` *producers* build
 the reco↔Branch links as standalone EDM products. DQM *analyzers* turn those links into
 plots. A `DQMGenericClient` harvester forms the efficiencies.
@@ -164,18 +164,18 @@ compares the Branch subgraph calo hits to each object's `hits_and_fractions`. It
 reproduction efficiency vs η/p_T/E, purity, hit/energy completeness, and energy
 response. It books three response references.
 
-`energy_response` is the **sim-energy containment** `E^{sim}_Branch / E_gen`. It folds
+`energy_response` is the sim-energy containment `E^{sim}_Branch / E_gen`. It folds
 in the active-material sampling fraction. It therefore sits well below 1 and varies by
 region.
 
 `raw_energy_response_sim` and `raw_energy_response_reco` instead normalise the Branch's
-energy **on the object's own cells** by the object's **fraction-weighted hit energy**,
+energy on the object's own cells by the object's fraction-weighted hit energy,
 not by the generator energy. They do so on the deposited (PCaloHit) and reconstructed
 (RecHit) scales.
 
-The deposited one is a **closure test**. A CaloParticle/SimCluster's per-cell fraction
+The deposited one is a closure test. A CaloParticle/SimCluster's per-cell fraction
 *is* its tracks' share of the deposit, that is, the Branch's own sim energy on that
-cell. The ratio is therefore **== 1 by construction**. Any deviation flags a
+cell. The ratio is therefore == 1 by construction. Any deviation flags a
 fraction↔deposit bug in PR validation. Restricting the numerator to the object footprint
 also keeps the ratio finite. Without that restriction, a tiny object whose `trackId`
 maps to a large shower would raise the un-thresholded sim ratio up to ~10⁵.
@@ -188,7 +188,7 @@ between overlapping showers.
 
 **Tracking**: a `TrackingParticle` carries *no hits of its own*, only its
 `SimTrack`s. The Branch↔TrackingParticle comparison therefore cannot be a direct hit
-overlap like the calorimeter one. The hit-bearing probe is the **reco track**.
+overlap like the calorimeter one. The hit-bearing probe is the reco track.
 `allTrackToTruthBranchAssociators` matches each `reco::Track` to a Branch by shared
 tracker elements. It uses `BranchHitAssociator` on the tracker channel with the
 shared-hit metric, because the tracker has no per-cell energy to share.
@@ -198,7 +198,7 @@ the loop to the
 `TrackingParticle` through the standard `ClusterTPAssociation` (`tpClusterProducer`).
 It books a "Branch reproduces the TP track→truth assignment" efficiency vs η/p_T. It
 also books the shared-hit completeness/multiplicity. Verified on TTbar (CMSSW_20,
-5 evt): **0.875** (246/281 TP-matched tracks), shared-hit multiplicity ≈ 16/track.
+5 evt): 0.875 (246/281 TP-matched tracks), shared-hit multiplicity ≈ 16/track.
 
 In Phase-2 D120 only the pixel `TrackerHitsPixel{Barrel,Endcap}*` simhits are
 populated. The TIB/TID/TOB/TEC branches are empty. The match is therefore
@@ -218,7 +218,7 @@ their harvesters stay opt-in (see the antichain caveat below).
 ## The hit-exposure layer
 
 The validators above compare the Branch graph to the *legacy truth objects*. The
-reco-to-truth associators close the other loop: they match **reco objects** directly
+reco-to-truth associators close the other loop: they match reco objects directly
 to the Branch graph through shared hits. Adding a new reco type takes one adapter and
 no DataFormats change.
 
@@ -296,9 +296,9 @@ artificial vertices, without dumping a graph by hand.
 
 **The plots macro**: `Validation/TruthInfo/scripts/makeTruthGraphValidationPlots.py` is a self-contained
 PyROOT macro. It follows `makeHGCalValidationPlots.py` but has no framework
-dependency. It reads the analyzer DQMIO output **or** a legacy harvested `DQM_V0001`
+dependency. It reads the analyzer DQMIO output or a legacy harvested `DQM_V0001`
 file. It locates the Branch-validator folders. It derives the efficiency, fake, merge
-and duplicate ratios with **binomial errors**. It overlays several samples in one set
+and duplicate ratios with binomial errors. It overlays several samples in one set
 of plots and writes PNGs plus an `index.html`:
 
 ```bash
@@ -306,7 +306,7 @@ makeTruthGraphValidationPlots.py tau.root:Tau zmm.root:ZMM ttbar.root:TTbar -o p
 ```
 
 The `FILE:LABEL` form sets the legend entry. Passing several samples also gives the
-per-event guided comparison (cf. [Worked examples](examples.md)).
+per-event guided comparison (cf. [Reading real events](examples.md)).
 
 **The library wrapper**: `Validation/TruthInfo/test/makeBranchValidationPlots.sh` automates the above over
 a `runTruthRelvals.sh` library. It locates each workflow's harvested legacy DQM file
@@ -371,29 +371,29 @@ after about 300 um, and counting it made a one-track vertex look findable and pu
 the purity denominator that no track can match.
 
 !!! warning "`fakerate` and `contaminated` are not the same question"
-    The recoToSim score is normalised against the cell's **total** truth energy
+    The recoToSim score is normalised against the cell's total truth energy
     (`recoEnergy = fraction * cellTotalEnergy`). At PU200 a cell shared with overlaid
     interactions therefore drives the score towards 1, even for a well matched object.
-    Measured on ttbar PU200, `ticlCandidate` / AdaptiveNominal: **73.8%** of tracksters
-    fail the 0.6 cut, while only **2.2%** have no candidate at all. Quote `fakerate`
+    Measured on ttbar PU200, `ticlCandidate` / AdaptiveNominal: 73.8% of tracksters
+    fail the 0.6 cut, while only 2.2% have no candidate at all. Quote `fakerate`
     for "reconstructed something that is not there". Quote `contaminated` for "shares
     its cells with other truth". `contaminated` stays in the package precisely because
     it is HGCalValidator's criterion, so it stays comparable to the reference.
 
-Each metric has **its own numerator**. The validator fills `num_assoc(recoToSim)` once
+Each metric has its own numerator. The validator fills `num_assoc(recoToSim)` once
 per matched object. `num_recopurity` holds the same objects weighted by the purity of
 the match. Merging the two turns the fake rate into one minus the mean purity. The
 package did merge them until 2026-08-01: the fake rate then read 0.83 on no-PU ttbar,
 where the fake rate is 0.003.
 
-The fake rate is **identical at all working points**. The purity meanwhile climbs
+The fake rate is identical at all working points. The purity meanwhile climbs
 from 0.28 (`Fixed`) to 0.97 (`AdaptiveNominal`) on no-PU ttbar. That is the control,
 not a coincidence. The adaptive climb changes *which* branch an object matches, not
 *whether* it matches one. The gain must therefore appear on the purity page. A fake
 rate that moves with the working point means the association gained or lost candidates.
 
 !!! note "At PU200 `nocandidate` saturates"
-    PU200 tracking `nocandidate` is 0.000 to 0.001, **lower** than with no pileup. The
+    PU200 tracking `nocandidate` is 0.000 to 0.001, lower than with no pileup. The
     truth graph is dense enough that nearly every reco object overlaps something.
     "Matched to nothing" therefore stops discriminating on its own. Read the pileup
     rate (0.93 to 0.95 adaptive) and the purity (0.10 to 0.73) beside it.
@@ -409,22 +409,22 @@ fake = matched to nothing
        OR (has a candidate at dominanceLevel AND leading share < minLeadingTruthShare)
 ```
 
-`minLeadingTruthShare` defaults to **0.5**. The validator books `leading_truth_share`
+`minLeadingTruthShare` defaults to 0.5. The validator books `leading_truth_share`
 and `dominance_ratio` as monitor elements in their own right. `leading_truth_share` is
 the leading contributor's shared energy over all contributors'. `dominance_ratio` is
 the leading contributor over the runner-up, capped at 20. The validator reads both from
-the **first** working point's map. That map is the only one carrying every candidate,
+the first working point's map. That map is the only one carrying every candidate,
 because an adaptive point inserts just the branch it climbed to. That makes the fake
-rate **identical at all working points** by construction. The validation scripts
+rate identical at all working points by construction. The validation scripts
 assert this as a control.
 
 #### The antichain requirement
 
-The validator computes dominance over one **level**, set by `dominanceLevel` (default
+The validator computes dominance over one level, set by `dominanceLevel` (default
 `caloBoundary`). This is not a detail. "Nothing dominates" is unfalsifiable off an
 antichain, because the leader and the runner-up can be the same particle at two depths.
 `selectedRoots` is every particle passing the selector. A tau, its daughter pion
-and that pion's descendants are therefore candidates at the same time, with **nested**
+and that pion's descendants are therefore candidates at the same time, with nested
 subgraphs carrying nearly identical shared energy.
 
 The control is no-PU TenTau. There, ten isolated taus must give one clear winner:
@@ -436,7 +436,7 @@ The control is no-PU TenTau. There, ten isolated taus must give one clear winner
 
 #### Objects the question does not reach
 
-An object that matched truth but has **no candidate at the dominance level** is not a
+An object that matched truth but has no candidate at the dominance level is not a
 fake. The question is undefined for it, not answered negatively. Counting it as a fake
 measures how much of the event that level covers, not how well the collection
 reconstructs. It has its own page, `nolevelcandidate`. Read that page beside the fake
@@ -446,14 +446,14 @@ Measurement established this, rather than assumption. Counting those objects as 
 gave 0.36 to 0.60 on no-PU across every sample and both domains. Three checks isolated
 the cause.
 
-It is **not** the threshold. Among objects where dominance is defined, the share is 1.0
+It is not the threshold. Among objects where dominance is defined, the share is 1.0
 for 45% of ttbar tracksters and below 0.5 for only 5.7%.
 
-It is **not** the level. A config-only probe moved the tracking level from
+It is not the level. A config-only probe moved the tracking level from
 `caloBoundary` to `stableDecayProducts`. The rate went from 0.540 to 0.489.
 Calorimetry stayed identical to four decimals, as the control.
 
-It is **not** nesting. Projecting each candidate onto the antichain member it descends
+It is not nesting. Projecting each candidate onto the antichain member it descends
 from changed nothing to four decimals. The associators insert roots that are already
 members or unrelated.
 
@@ -470,7 +470,7 @@ Measured on 200 events per sample, `ticlCandidate`:
 | VBF PU200 | 0.050 | 0.046 | 0.897 |
 
 !!! warning "At PU200 the fake rate is formed on a small subset"
-    `nolevelcandidate` is **0.87 to 0.93** at PU200. The fake rate therefore covers 7%
+    `nolevelcandidate` is 0.87 to 0.93 at PU200. The fake rate therefore covers 7%
     to 13% of the collection. `caloBoundary` holds about 113 objects per event at PU200
     against 99.7 with no pileup. That is only ~14 extra from 200 interactions, because
     the selector's 1 GeV floor removes nearly all soft pileup. The event meanwhile holds
@@ -516,7 +516,7 @@ decay vertices of the `bHadrons` and `cHadrons` antichains. The associator's
 Only the first criterion matches reco. The others cap the efficiency at a third and a
 tenth, whatever the reconstruction does. That cap is a property of the denominator.
 
-The levels name the **weakly decaying** hadron of each chain (2026-08-20). Before that,
+The levels name the weakly decaying hadron of each chain (2026-08-20). Before that,
 they kept the first hadron of the chain. For most chains the first hadron is an excited
 state, and it decays electromagnetically at its production point. The count was identical,
 but 35.3% of the denominator vertices sat below 100 microns from the beam axis, at the
@@ -560,7 +560,7 @@ instead.
 
 - `scram b` is clean, apart from external `vecgeom` warnings.
 - `scram b code-format` and `scram b code-checks` are clean for the package.
-- Unit tests (cppunit, `scram b runtests`): **640** assertions across 8 binaries:
+- Unit tests (cppunit, `scram b runtests`): 640 assertions across 8 binaries:
   `TruthLogicalGraphPostProcessor_t` (246), `LevelFlags_t` (122),
   `BranchHitAssociator_t` (103), `Branch_t` (47), `LogicalGraphHitIndexBuilder_t` (43),
   `GenGraphBuild_t` (40), `BranchSelector_t` (20), `AssignableTarget_t` (19), plus the

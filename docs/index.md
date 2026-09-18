@@ -22,7 +22,19 @@ Three properties follow, and they are the point of the design:
 
 ## Where to start
 
-If you want to understand the design, read [Data model](data-model.md). If you want to run it, read [How to use the graph](usage.md). If you want to see it on real events, read [Worked examples](examples.md).
+**To use it**, start with [Quickstart](quickstart.md). It produces three simulated events
+and reads the graph out of them in about half an hour, most of which is the simulation job
+running. The tutorials that follow it are meant to be read in order: choosing a truth
+definition, then python, then C++, then matching reconstruction to truth.
+
+**To understand it**, read [Data model](data-model.md) for the design and
+[Reading real events](examples.md), which follows three events node by node.
+
+**To copy from**, open [Worked analyses](worked-analyses.md): eleven complete analyses, one
+per physics topology, each written twice, in C++ and in python.
+
+Any page may use a term you have not met. The [Glossary](glossary.md) defines each one in
+the sense the code gives it.
 
 !!! warning "Status: under active development"
     The two packages `SimDataFormats/TruthInfo` and `PhysicsTools/TruthInfo` are in `CMSSW_20_1_X`. The work is Phase-2 only. The `enableTruth` process modifier gates the chain, and the Run4 eras apply it from `Phase2C17I13M9` onwards, so a standard Run4 workflow builds the truth graph during digitisation and stores it. Run2 and Run3 workflows are unaffected. One change is not gated: the `g4SimHits` `ReconnectDroppedAncestors` default, which is a detector-neutral fix of the simulated vertex connectivity and applies to every sample. See [Pileup](pileup.md) for the default wiring.
@@ -67,21 +79,40 @@ Three helpers work on top of the logical graph. They are ordinary classes, not e
 | New modifier | `Configuration/ProcessModifiers/enableTruth_cff` |
 | New sequence | `Validation/Configuration/truthPrevalidation_cff` |
 | Modified: default wiring | `Configuration/Eras` (`enableTruth` on `Phase2C17I13M9`, excluded by `Util_fastSimPhase2_cff`), `Digi_cff.py` (build after mixing), `digitizers_cfi.py` (the accumulator), `EventContent_cff.py` (the stored products) |
-| Modified: validation | `globalValidation_cff.py`, `postValidation_cff.py`, `upgradeWorkflowComponents.py` (the `.88` workflow variant) |
+| Modified: validation | `globalValidation_cff.py`, `postValidation_cff.py` |
 | Modified: ungated | `g4SimHits_cfi.py` and `SimTrackManager` (`ReconnectDroppedAncestors`) |
 
 ## All pages
 
+**Tutorials**, in order.
+
+- [Quickstart](quickstart.md): produce three events, confirm the graph is there, read it and draw it.
+- [Choose a truth definition](tutorial-truth-definitions.md): truth levels and selection presets, and what each one changes.
+- [Read a graph in python](tutorial-python.md): the python interface, on one real event.
+- [Write an analyser in C++](tutorial-cxx.md): a working CMSSW module in three files, then detector hits.
+- [Match reconstruction to truth](adaptive-associator.md): the association layer end to end on a single electron and a single pion.
+- [Worked analyses](worked-analyses.md): eleven complete analyses in a separate repository.
+
+**Understanding the graph.**
+
 - [Data model](data-model.md): the three layers, the branch view, the associator and the selector.
-- [How to use the graph](usage.md): how to enable the producers, and a tour of the navigation, selection and hit-matching API.
-- [Worked examples](examples.md): two real events followed step by step, a tau and a Z to two muons.
-- [Interface](interface.md): the precise signatures.
-- [Findings and changes](findings.md): what we found in the existing simulation record, what we changed, and why.
-- [Replacing truth objects](replacing-truth-objects.md): how a branch stands in for `TrackingParticle`, `CaloParticle` and `SimCluster`, with the measured agreement.
-- [Validation](validation.md): the relval workflows, the topology audits, the graph gallery and the reconstruction-side validators.
+- [Reading real events](examples.md): three events node by node, ten taus, a Z to two muons and a single electron.
 - [Pileup](pileup.md): how truth survives event mixing.
+- [Replacing truth objects](replacing-truth-objects.md): how a branch stands in for `TrackingParticle`, `CaloParticle` and `SimCluster`, with the measured agreement.
+
+**Reference.**
+
+- [Glossary](glossary.md): every term this site uses, in the sense the code gives it.
+- [How to use the graph](usage.md): how to enable the producers, and a tour of the navigation, selection and hit-matching API.
+- [Interface](interface.md): the precise signatures.
+- [Association layer](association-layer.md): the reconstruction-to-truth maps and the working points.
+- [Validation](validation.md): the relval workflows, the topology audits, the graph gallery and the reconstruction-side validators.
+
+**Measurements and history.**
+
+- [Findings and changes](findings.md): what we found in the existing simulation record, what we changed, and why.
 - [Implementation characteristics](optimization.md): the layout and performance choices that are already applied.
-- [Resource cost](resource-cost.md): the measured CPU and storage cost.
+- [Computing cost](resource-cost.md): the measured CPU and storage cost.
 - [Roadmap](roadmap.md): what comes next.
 
 ## Contact

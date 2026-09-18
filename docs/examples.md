@@ -1,11 +1,11 @@
-# Worked examples
+# Reading real events
 
 The fastest way to understand the truth graph is to look at one. This page walks through three real events and reads the picture out loud: what each node is, why the selection kept it, and which call in the API would return it.
 
 All three pictures are real renders from the graph gallery, not drawings. `makeTruthGallery.sh` produces them; see [Validation](validation.md).
 
 !!! note "How to read these graphs"
-    The truth graph is **bipartite**. Ellipses are `Particle`s and diamonds are
+    The truth graph is bipartite. Ellipses are `Particle`s and diamonds are
     `Vertex`es. An arrow always alternates realm: particle → its decay
     vertex → its children. Node colour encodes provenance. This is the dumper's
     legend:
@@ -36,15 +36,15 @@ It has ten independent decay branches. Each branch has its own neutrinos
 
 The image below shows the GEN-level decay structure of one event. It shows the ten
 taus and their immediate decay products, before the Geant4 shower. It has one
-deliberate feature: **all ten taus descend from a single artificial "signal"
-interaction vertex** (red, on the left). One `Interaction` source vertex
+deliberate feature: all ten taus descend from a single artificial "signal"
+interaction vertex (red, on the left). One `Interaction` source vertex
 summarizes each interaction. That vertex fans out through artificial connector
 particles to an `InitialState` vertex, and to an
 `UnderlyingEvent` vertex when there is one. The ten taus hang off the InitialState
 node of this event. That single interaction vertex lets you say *exactly* what is
 signal and what is not. The signal is, by definition, everything reachable from
-it. With pileup overlaid, **each extra interaction gets its own Interaction
-vertex**. Signal against pileup is then a plain reachability test rather than a
+it. With pileup overlaid, each extra interaction gets its own Interaction
+vertex. Signal against pileup is then a plain reachability test rather than a
 guess. (This TenTau gun has no underlying event, so only the InitialState branch
 appears. The full *detectable* truth graph has ~10<sup>4</sup> nodes once every
 hit-leaving shower secondary is attached. The GEN core is the didactic part, and
@@ -70,7 +70,7 @@ What to look at:
   ν<sub>e</sub>. These are leaves with no hits. They are exactly what
   `Branch::visibleP4()` excludes and what `invisibleEnergy()` measures.
 
-This is how the **Branch** selection produces the picture. The cut is
+This is how the Branch selection produces the picture. The cut is
 `seedPdgIds = {15, -15}`, `seedParentDepth = 0` and `keepStableSpectators = false`.
 It keeps each τ and its downstream subtree. With `attachSelectionSources = true`,
 the default, the selection summarizes the truncated upstream into the single
@@ -126,17 +126,17 @@ What to look at:
   also see the incoming partons that produced the Z: the blue status-21 `d` and
   anti-`d` quarks. These give the hard-scatter context.
 - **The signal interaction structure.** As in TenTau, the whole event descends from
-  a single artificial **Interaction** vertex (red). It fans out through an
-  **initial state** node, here the partons, and an **UnderlyingEvent** node, the
+  a single artificial `Interaction` vertex (red). It fans out through an
+  `InitialState` node, here the partons, and an `UnderlyingEvent` node, the
   spectators. These graph-internal nodes are not GEN or SIM. They therefore carry
-  their own **`Internal`** domain and inherit the **primary-vertex 4-position** of
-  the collision. Everything reachable from the Interaction vertex is, by
+  their own `Internal` domain and inherit the primary-vertex 4-position of
+  the collision. Everything reachable from the `Interaction` vertex is, by
   definition, this signal interaction.
 - **The two muon branches are long and thin.** Each muon is a merged GEN+SIM
   particle that Geant4 propagated (red, with trajectory checkpoints). Its subtree
   is essentially itself plus a few delta-ray and bremsstrahlung secondaries. Read
-  off the per-particle hit tallies. The muons carry tens of **tracker** subgraph
-  hits (`nSubgraphTrackerSimHits`) and only a small **calo** energy. That is the
+  off the per-particle hit tallies. The muons carry tens of tracker subgraph
+  hits (`nSubgraphTrackerSimHits`) and only a small calo energy. That is the
   standard MIP signature. It is why ZMM is a clean efficiency reference for the
   [tracker validators](validation.md#dqm-performance-plots-branch-vs-legacy-truth-objects).
 - **Bipartite layout in miniature.** The event is sparse, so you can trace the full
@@ -169,11 +169,11 @@ This is the configuration the track associators use.
 ## SingleElectron: an EM shower read off its vertex reasons
 
 `SingleElectron` (workflow `34002.88`) fires one 35 GeV electron into the detector.
-TenTau and ZMM exercise the GEN topology. This sample exercises the **SIM
-cascade** instead. A single electron radiates, the photons convert, and the
+TenTau and ZMM exercise the GEN topology. This sample exercises the SIM
+cascade instead. A single electron radiates, the photons convert, and the
 products re-radiate. The detectable truth graph is therefore a deep
-electromagnetic shower. Every SIM vertex now carries the **physical process that
-created it** (`VertexData::vertexReason()`, see
+electromagnetic shower. Every SIM vertex now carries the physical process that
+created it (`VertexData::vertexReason()`, see
 [Data model](data-model.md#layer-2-truthgraph-logical)). The shower is therefore
 self-describing.
 
@@ -192,7 +192,7 @@ What to look at (click to zoom):
   `reason: HadronInelastic` vertices are the rare photonuclear and electronuclear
   interactions. They seed the small hadronic component of the shower.
 - **Back-scattering.** Geant4 flags some secondaries as inward albedo across the
-  CALO→Tracker boundary. These secondaries carry a **back-scattered** badge. They
+  CALO→Tracker boundary. These secondaries carry a back-scattered badge. They
   are the one class of particle whose distance from the production region
   *decreases*. They were historically the source of apparent history-reversal (see
   [Findings](findings.md)).
@@ -266,7 +266,7 @@ or a Z.
 ## Physics questions the interface answers
 
 The point of the navigation API is that physics questions map onto a couple of
-method calls. Each question below uses **real** methods from
+method calls. Each question below uses real methods from
 [Graph.h / Branch.h](interface.md), with nothing invented. Assume `graph` is a
 `truth::Graph const&` and `hitIndex` a `truth::LogicalGraphHitIndex const&`.
 

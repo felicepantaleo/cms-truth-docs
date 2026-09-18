@@ -37,7 +37,7 @@ Sub-events therefore cannot collide. See [Pileup](pileup.md).)
 1. **M3: sparse, layout-agnostic association storage** in `TruthGraph`. Today
    `simTrackToGen`/`simTrackToVtx`/`simVtxToGen` are full-length over all nodes.
    Ranging them by a single base requires contiguous SimTrack/SimVertex nodes.
-   That condition holds for the signal producer. It does **not** hold for the
+   That condition holds for the signal producer. It does not hold for the
    per-sub-event layout of the accumulator. A naive range would silently corrupt
    mixed and pileup associations. The fix is a sparse sorted
    `vector<pair<nodeId,target>>` plus binary search, like the DetId-map rework.
@@ -66,24 +66,24 @@ Sub-events therefore cannot collide. See [Pileup](pileup.md).)
 
 ## Multi-surface boundary crossings (CMSSW-core follow-up PR)
 
-Each particle can carry trajectory **checkpoints**. A checkpoint is a position
+Each particle can carry trajectory checkpoints. A checkpoint is a position
 and momentum snapshot where Geant4 records a boundary crossing. The code stores
 it as `Checkpoint{checkpointId, position, momentum}` on `ParticleData`. Today
-there is exactly **one** crossing: the **Tracker → CALO** boundary. We want
+there is exactly one crossing: the Tracker → CALO boundary. We want
 several surfaces, for example ECAL → HCAL, the muon system entrance, and the
 HGCAL front face. Each surface carries its own 4-position and 4-momentum. A
 consumer can then sample a branch where it enters each subdetector.
 
 **How the code produces the single crossing today.** Geant4 detects the crossing
 in `SimG4Core/Application/src/SteppingAction.cc`. It compares the pre-step and
-post-step **physical volumes** against the names configured in
+post-step physical volumes against the names configured in
 `SimG4Core/Application/python/g4SimHits_cfi.py` (`SteppingAction.TrackerName = 'Tracker'`,
 `CaloName = 'CALO'`). That file already holds a `BTLName = 'BarrelTimingLayer'`,
 and `SaveCaloBoundaryInformation = True` under the Phase-2 modifier. On the
 transition Geant4 calls `TrackInformation::setCrossedBoundary(...)`
 (`SimG4Core/Notification/interface/TrackInformation.h`). The chain propagates
 that call through `TrackWithHistory` → `TmpSimTrack` → the persistent `SimTrack`
-(`SimDataFormats/Track/interface/SimTrack.h`). There it lands as a **single**
+(`SimDataFormats/Track/interface/SimTrack.h`). There it lands as a single
 `idAtBoundary_` / `positionAtBoundary_` / `momentumAtBoundary_` plus one
 `crossedBoundary_` bit.
 

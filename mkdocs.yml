@@ -23,19 +23,29 @@ theme:
 
 nav:
   - Home: index.md
-  - Data model: data-model.md
-  - How to use the graph: usage.md
-  - Interface reference: interface.md
-  - Worked examples: examples.md
-  - Findings & changes: findings.md
-  - Replacing truth objects: replacing-truth-objects.md
-  - Association layer: association-layer.md
-  - Validation: validation.md
-  - Pileup: pileup.md
-  - 'Tutorial: adaptive associator': adaptive-associator.md
-  - Implementation characteristics: optimization.md
-  - Computing cost: resource-cost.md
-  - Roadmap: roadmap.md
+  - Tutorials:
+      - 'Quickstart: your first truth graph': quickstart.md
+      - 'Choose a truth definition': tutorial-truth-definitions.md
+      - 'Read a graph in python': tutorial-python.md
+      - 'Write an analyser in C++': tutorial-cxx.md
+      - 'Match reconstruction to truth': adaptive-associator.md
+      - 'Worked analyses': worked-analyses.md
+  - Understanding the graph:
+      - Data model: data-model.md
+      - Reading real events: examples.md
+      - Pileup: pileup.md
+      - Replacing truth objects: replacing-truth-objects.md
+  - Reference:
+      - Glossary: glossary.md
+      - How to use the graph: usage.md
+      - Interface reference: interface.md
+      - Association layer: association-layer.md
+      - Validation: validation.md
+  - Measurements and history:
+      - Findings and changes: findings.md
+      - Implementation characteristics: optimization.md
+      - Computing cost: resource-cost.md
+      - Roadmap: roadmap.md
 
 markdown_extensions:
   - admonition
