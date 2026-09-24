@@ -50,14 +50,28 @@ It is configurable:
 |---|---|---|
 | `pileupBunchCrossings` | `{0}` | which bunch crossings to include for pileup (in-time only by default) |
 | `collapsePileupGen` | `true` | for pileup, collapse the GEN chain to the stable particles on a single gen vertex, keep the SIM |
-| `collapsedGenKeptPdgIds` | `{111}` | decaying species the collapsed GEN record keeps, each on its own decay vertex with its decay products below it. It must equal `reconstructablePdgIds` of the logical graph, so `reconstructableFinalState` stops at a pileup pi0 as it does at a signal pi0. The logical producer gives such a particle the summed momentum of its tracked decay products. The sum is exact when Geant4 tracked all of them, misses a product below the Geant4 primary cuts (p < 40 MeV or \|eta\| > 5.5) otherwise, and stays zero when none was tracked |
+| `collapsedGenKeptPdgIds` | `{111}` | decaying species the collapsed GEN record keeps, each on its own decay vertex with its decay products below it. It must equal `reconstructablePdgIds` of the logical graph, so `reconstructableFinalState` stops at a pileup pi0 as it does at a signal pi0. Such a particle takes its GEN momentum from the pileup record, and its decay vertex the GEN decay position |
 | `collapseSignalGen` | `false` | keep the signal's full graph (full signal GEN+SIM is the next step) |
 
 The accumulator also emits every sub-event's `SimTrack` and `SimVertex` collections as
 `mix:mergedSimTracks` and `mix:mergedSimVertices`, each object tagged with its
 sub-event `EncodedEventId`. `TruthLogicalGraphProducer` reads momenta and positions
 from them by `(event id, trackId)` and `(event id, index)`, and applies the HepMC
-payload of the signal only to signal nodes. Both are transient DIGI products. Before
+payload of the signal only to signal nodes. The GEN payload of every sub-event comes
+from `mix:genPayload`: one entry per node of the raw graph, the GEN four-momentum of a
+GenParticle and the (cm, ns) position of a GenVertex, read from that sub-event's own
+HepMC record while it is mixed. After mixing the event holds only the signal HepMC, so
+this is the only source of a pileup GEN momentum or position. The single GEN vertex of a
+collapsed pileup interaction sits where the beam particles of its record end. All three
+are transient DIGI products; the payload covers the GEN nodes only, as their node ids
+and values. On ttbar with 5 pileup interactions every pileup GEN particle has a momentum
+and every pileup GEN vertex a position, the production point of the final state of each
+of the 48 pileup interactions in 10 events is a TrackingParticle vertex to 1 um and 0.1
+ps, and the signal graph is unchanged, particle by particle and vertex by vertex. At
+PU200 the payload has no measurable cost: two runs of three events with and without it
+give 46.5 to 47.2 against 45.7 to 47.4 s per event in the mixing module, and a peak
+memory of 7.37 to 7.81 against 7.86 to 7.92 GB, a spread that identical runs also show.
+Before
 this (2026-09-14) the mixed logical graph read the signal `g4SimHits` collections by
 bare `trackId` and the signal HepMC by barcode, so every pileup particle carried a
 signal particle's momentum, or none: on ttbar at PU200 the stored pt of the particle
@@ -150,8 +164,8 @@ merged signal+pileup sim-hits are live. Every later step consumes the result.
 1. it registers the `TruthGraphAccumulator` (the merged raw `TruthGraph_mix`);
 2. it builds the logical graph and the per-particle per-cell hit index right
    after mixing (`buildCompactTruthAtDigi`), reading the accumulator's merged
-   sim-hits. The default scope is the full detector (Calo + Tracker + Muon; the MTD
-   channel is resolved at RECO). `customiseTruthReduced` drops the Tracker channel
+   sim-hits. The default scope is Calo + Tracker + Muon; the MTD channel is filled on
+   request, see [Data model](data-model.md). `customiseTruthReduced` drops the Tracker channel
    for cost-sensitive runs, and leaves calo + MTD + muon;
 3. it applies an event-content level.
 
@@ -161,9 +175,9 @@ stays invalid). This is deliberate. The shared-energy association
 by `recHitIndex`. It also keys the per-cell total-sim-energy denominator on
 `DetId`. The same unresolved index therefore serves every later stage that exposes
 its reco objects as `(DetId, fraction)` (L1, HLT, offline RECO). The bulky merged
-sim-hits never have to cross the DIGI→RECO boundary. MTD is left out of the DIGI
-index, because its channel needs the reco Mtd cluster associations, which are
-RECO-stage products.
+sim-hits never have to cross the DIGI to RECO boundary. MTD is not in the default
+DIGI index. Its channel reads only `mix:MergedMtdTruthLC` and the MTD topology, so
+adding `MTD` to `subdetectors` fills it at DIGI or in a later job.
 
 At RECO, `customiseTruthMixedReco.customise` drops the signal-only rebuild that
 `enableTruth` would otherwise schedule. The branch validators and association

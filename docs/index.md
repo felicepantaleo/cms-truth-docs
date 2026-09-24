@@ -91,6 +91,7 @@ Three helpers work on top of the logical graph. They are ordinary classes, not e
 - [Read a graph in python](tutorial-python.md): the python interface, on one real event.
 - [Write an analyser in C++](tutorial-cxx.md): a working CMSSW module in three files, then detector hits.
 - [Match reconstruction to truth](adaptive-associator.md): the association layer end to end on a single electron and a single pion.
+- [Port an existing associator](tutorial-port-associator.md): move a validation that reads TrackingParticles to the graph, with the MTD track validation as the measured example.
 - [Worked analyses](worked-analyses.md): eleven complete analyses in a separate repository.
 
 **Understanding the graph.**

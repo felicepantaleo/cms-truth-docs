@@ -570,10 +570,17 @@ Channel const&        channel(HitChannel channel) const;      // raw flat storag
 ```
 
 A `Hit` is `{ uint32_t detId; uint32_t recHitIndex; float energy; }`. It carries
-`bool hasRecHit() const` (⇔ `recHitIndex != Hit::kInvalidRecHitIndex`). Two
-channels set `recHitIndex`, each in its own index space: `Calo`, in the global
-ordering of `DetIdToRecHitMapProducer`, and `MTD`, in the barrel-then-endcap
-`FTLCluster` ordering. The tracker and muon channels leave it invalid.
+`bool hasRecHit() const`, true when `recHitIndex != Hit::kInvalidRecHitIndex`. On
+`Calo`, `recHitIndex` is the position in the global ordering of
+`DetIdToRecHitMapProducer`. On a cell-keyed channel it is the cell inside the module:
+the digi channel on the tracker, `category << 24 | row << 16 | col` on the MTD. The
+muon channel leaves it invalid.
+
+```cpp
+bool                   isCellKeyed(HitChannel channel) const;  // recHitIndex holds a cell
+std::span<const float> directHitTimes(HitChannel channel, uint32_t particleId) const;
+                       // ns, one per directHits entry; empty on a channel with no time
+```
 
 ### Two storage layouts
 

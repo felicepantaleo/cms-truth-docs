@@ -28,6 +28,11 @@ counting what a detector would see.
 | Tau | taus | how did each tau decay, in prongs and neutral pions, and how much energy is visible |
 | Full | any event | what does the whole event hold, interaction by interaction |
 
+The repository also holds `Mtd`, which is not a generator-level analysis. It is a port of
+the MTD track validation to the graph, and it needs a reconstruction job to run. The
+tutorial [Port an existing associator](tutorial-port-associator.md) explains it step by step
+and compares it with the original module.
+
 ## Run one
 
 The repository is a set of CMSSW packages, so it builds and tests with `scram`:

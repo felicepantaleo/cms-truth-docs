@@ -197,12 +197,13 @@ You reach the per-particle hits through the channel accessors:
     `PhysicsTools/TruthInfo`, `truth::SubgraphHitView` wraps this and caches the
     result per particle.
 
-- Each `Hit` is `{detId, recHitIndex, energy}`. Two channels set `recHitIndex`,
-  each in its own index space. For `Calo` it is the position in the global RecHit
+- Each `Hit` is `{detId, recHitIndex, energy}`. The meaning of `recHitIndex`
+  depends on the channel. For `Calo` it is the position in the global RecHit
   ordering from `DetIdToRecHitMapProducer`, HGCal collections first and then PF
-  collections; changing that order changes every index. For `MTD` it is the global
-  index in the barrel-then-endcap `FTLCluster` concatenation. For the tracker and
-  the muon channels it stays `Hit::kInvalidRecHitIndex`. `Hit::hasRecHit()` tests
+  collections; changing that order changes every index. On a cell-keyed channel,
+  `isCellKeyed(channel)`, it is the cell inside the module that `detId` names: the
+  digi channel for the tracker, and `category << 24 | row << 16 | col` for the MTD.
+  For the muon channel it stays `Hit::kInvalidRecHitIndex`. `Hit::hasRecHit()` tests
   validity.
 - **`energy` is the summed sim deposit of the entries a reader coalesces.** A
   particle can deposit in the same cell more than once, and several descendants of
@@ -242,13 +243,21 @@ You reach the per-particle hits through the channel accessors:
     - **Calo**: `PCaloHit`s (HGCAL EE/HE + ECAL barrel + HCAL) matched by
       `geantTrackId()`, with `recHitIndex` from the `DetIdRecHitMap`.
     - **Tracker**: tracker `PSimHit`s matched by `trackId()`; no recHit link.
-    - **MTD**: filled from `MtdSimLayerCluster`, which `particleId()` already keys
-      by the producing `SimTrack`, and restricted to the signal interaction by
-      `EncodedEventId`. The `recHitIndex` is the matched reco `FTLCluster`. The
-      producer looks it up through `MtdSimLayerClusterToRecoClusterAssociation` and
-      indexes it in the barrel-then-endcap `FTLCluster` concatenation. This
-      `recHitIndex` is *channel-relative*: the MTD ordering is FTLClusters, not the
-      HGCal recHit ordering.
+    - **MTD**: filled from `MtdSimLayerCluster`, keyed by `EncodedEventId` and the
+      producing `SimTrack`, for every interaction. The channel is cell keyed, like
+      the tracker. `detId` is the sensor module: a BTL sim hit names its crystal, so
+      the producer maps it to the module with the crystal layout of the MTD
+      topology. `recHitIndex` is `category << 24 | row << 16 | col`, where the
+      category is the `hitProdType` of the sim cluster: 0 direct, 1 BTL secondary not
+      saved, 2 BTL identified looper, 3 BTL back-scatter from the calorimeter, 4 ETL
+      hit from the rear face. Bits 0 to 23 are the `(row, col)` of an `FTLCluster`
+      pixel on that module, so a consumer masks the category before it compares
+      with a reco cluster. `directHitTimes(MTD, id)` gives the earliest time of each
+      hit in ns. BTL behaves like a calorimeter, where a cell is a crystal and its
+      energy matters, and ETL like a tracker, where a cell is a pixel; the storage is
+      the same and the consumer chooses the metric. The channel reads no reco
+      product, and the default DIGI index leaves it out: add `MTD` to
+      `subdetectors` to fill it.
     - **Muon**: the five `g4SimHits:Muon{DT,CSC,RPC,GEM,ME0}Hits` `PSimHit`
       collections matched by `trackId()`, like the tracker channel. There is no
       recHit link, because muon rechits are reconstructed segments. A
@@ -259,8 +268,8 @@ You reach the per-particle hits through the channel accessors:
     `{Calo, Tracker, MTD, Muon}`. A channel left off the list stays empty, and
     `hasChannel(...)` returns `false` for it. Each subdetector has its own config
     parameters for its input collections (`simHitCollections`,
-    `trackerSimHitCollections`, `muonSimHitCollections`, `mtdSimLayerClusters` plus
-    the FTLCluster inputs). You can therefore pick which subdetectors to read, and
+    `trackerSimHitCollections`, `muonSimHitCollections`, `mtdSimLayerClusters`). You
+    can therefore pick which subdetectors to read, and
     point each one at different collections.
 
 ## `truth::Branch`: the subgraph view

@@ -64,7 +64,17 @@ joined by an underscore:
   truth target is fixed a priori by the level, so no climb enters it.
 
 All are `ticl::TICLAssociationMap`, sorted best first. Equal scores are ranked by the
-tightest branch, so row [0] is the particle itself and not an ancestor of it.
+tightest branch, so row [0] is the particle itself and not an ancestor of it. A particle
+and an ancestor that own exactly the same cells tie on the reverse score too, for example
+a rho whose pi0 photons leave no hit. The follow-up branch
+`truth-association-tie-descendant` then puts the particle with the larger generation first.
+On PR 51829 alone the ancestor comes first in that case. On 100 ttbar events the
+rule changes the best branch of 1503 of 14277 matched tracks, 1399 of them across a
+generator decay (845 a rho to its charged pion), 30 across a Geant4 decay in flight and
+2 across a conversion. On tracksters it changes 861 of 5309, of which 595 are between two
+ancestors that no working point may assign, a beam proton and a b quark whose branches
+are so large that both reverse scores round to 1, and 14 are conversions, where the
+electron that reached HGCAL now comes before its photon.
 
 ## The working points
 

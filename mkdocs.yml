@@ -29,6 +29,7 @@ nav:
       - 'Read a graph in python': tutorial-python.md
       - 'Write an analyser in C++': tutorial-cxx.md
       - 'Match reconstruction to truth': adaptive-associator.md
+      - 'Port an existing associator': tutorial-port-associator.md
       - 'Worked analyses': worked-analyses.md
   - Understanding the graph:
       - Data model: data-model.md
