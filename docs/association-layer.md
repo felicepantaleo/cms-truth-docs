@@ -88,6 +88,15 @@ electron that reached HGCAL now comes before its photon.
 spreads past 0.6 and some other candidate does not, so the two agree on the large
 majority of well matched objects and separate on the badly matched tail.
 
+`Fixed` ranks by score only, and it keeps the roots no adaptive point may answer with
+(see below), because the truth-driven direction reads its pair scores from this map. So
+its row [0] is often not a particle: a trackster that merges energy from several particles
+is fully covered only by a common ancestor, a parton or a beam proton, and that ancestor
+has the best score. On 100 ttbar events without pileup, row [0] of `Fixed` is such a root
+for 3149 of 5309 `ticlTrackstersCLUE3DHigh` tracksters and for 78 of 14277 tracks. A
+consumer that needs a physical particle reads an adaptive map, which chooses among the
+assignable roots only.
+
 ## Which particles may be an answer
 
 An adaptive point answers only with a particle a detector could have seen. The
