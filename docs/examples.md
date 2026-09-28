@@ -89,9 +89,9 @@ want each seed in isolation rather than a signal-against-rest split.) In code ea
 
 ```cpp
 truth::Branch tauBranch(&graph, tau.id());          // Subtree closure
-auto products = tauBranch.finalState();             // the π/K/e/μ + ν, as the generator made them
-auto visP4    = tauBranch.visibleP4();              // sums finalState(), drops the ν's
-double eInvis = tauBranch.invisibleEnergy();        // carried by the τ neutrino(s)
+auto products = tauBranch.finalState();             // the pi/K/e/mu + nu, as the generator made them
+auto visP4    = tauBranch.visibleP4();              // sums finalState(), drops the nu's
+double eInvis = tauBranch.invisibleEnergy();        // carried by the tau neutrino(s)
 
 // prong count = charged decay products (1-prong vs 3-prong), charge as BranchSelector reads it
 int nProng = std::count_if(products.begin(), products.end(), [](truth::Particle const& p) {
