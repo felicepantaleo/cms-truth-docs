@@ -15,8 +15,8 @@ package are offered upstream in cms-sw/cmssw#51829, so for now one merge brings
 everything.
 
 ```bash
-cmsrel CMSSW_20_1_X_2026-09-13-2300      # scram list CMSSW_20_1_X shows what is on cvmfs today
-cd CMSSW_20_1_X_2026-09-13-2300/src
+cmsrel CMSSW_20_1_X_2026-09-28-1100      # scram list CMSSW_20_1_X shows what is on cvmfs today
+cd CMSSW_20_1_X_2026-09-28-1100/src
 cmsenv
 git cms-init
 git cms-merge-topic felicepantaleo:truth-adaptive-associator-v1

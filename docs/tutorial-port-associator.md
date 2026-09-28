@@ -35,7 +35,7 @@ hits on the track, the track time. That part is copied unchanged.
 |---|---|
 | 1 | The track map `generalTracksRecoToTruthFixed` of `AllTrackToTruthBranchAssociatorsProducer`. A row is sorted by score, and the score is 1 minus the purity, so a score of at most 0.25 is the 75% purity of the legacy associator. |
 | 2 | `ParticleData::bunchCrossing() == 0`. |
-| 3 | `Particle::threeCharge() != 0` and `ParticleData::momentum`. |
+| 3 | `Particle::charge() != 0` and `ParticleData::momentum`. |
 | 4 | The production vertex, `Graph::productionVertices(id)`. Its position is in cm and ns, so the conversion from seconds that the legacy module does with `simUnit_` is not necessary. |
 | 5 | `ParticleData::status == 1`. |
 | 6 | `LogicalGraphHitIndex::directHits(HitChannel::MTD, id)` and `directHitTimes(HitChannel::MTD, id)`: one hit per (sensor module, cell, category), with its energy and its earliest time. The category is the `hitProdType`: 0 direct, 1 secondary not saved, 2 looper, 3 back-scatter, 4 ETL rear face. |
@@ -139,8 +139,9 @@ track times are the same objects, and a difference can come only from the truth.
 ## The result
 
 Two samples, both ttbar at 14 TeV, Run4 D127, reconstructed with
-`CMSSW_20_1_X_2026-09-23-1100` and the follow-up branch `truth-association-tie-descendant`
-of PR 51829 merged on top (the same counts come out of `CMSSW_20_1_X_2026-09-13-2300`): 100 events without pileup, from the step2 file of workflow 37634.0, and 30
+`CMSSW_20_1_X_2026-09-23-1100` and the branch of PR 51829 merged on top, with the MTD
+channel, the tie rule and the pileup GEN payload (the same counts come out of
+`CMSSW_20_1_X_2026-09-13-2300`): 100 events without pileup, from the step2 file of workflow 37634.0, and 30
 events with 5 interactions in each bunch crossing, with the MinBias of workflow 37640.0 as
 pileup. The branch includes the pileup GEN payload, which gives a pileup particle its own
 production time; without it that time was 0 and the pileup time residual of the port was
@@ -186,14 +187,14 @@ make possible. Each remaining difference has a measured cause.
 
 ## What the as-released column showed
 
-The first version of this port ran on PR 51829 alone. It found MTD hits for 10% fewer BTL
+The first version of this port ran on PR 51829 before the tie rule. It found MTD hits for 10% fewer BTL
 particles, 3029 against 3377. A diagnostic run on the same events traced all 357 of those
 tracks to one cause. The track map assigned the track to the parent resonance of the pion
 or kaon, a rho, a K* or a Lambda_c, which is a generator particle with no SimTrack and so
 with no MTD hits. When the photons of the pi0 do not convert, the subgraph of the resonance
 holds exactly the tracker cells of the pion. The two candidates then tie on the score and
 on the reverse score, and the last rule of the sort took the lower particle id, the
-ancestor. The follow-up branch ranks the particle with the larger generation first on an
+ancestor. The associator now ranks the particle with the larger generation first on an
 exact tie.
 
 ## What the graph does not give yet

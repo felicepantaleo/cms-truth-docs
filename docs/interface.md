@@ -395,7 +395,8 @@ bool          operator()(Branch const& branch) const;   // true = passes
 Config const& config() const;
 ```
 
-Charge for `chargedOnly` comes from `HepPDT::ParticleID(pdgId).threeCharge()`.
+Charge for `chargedOnly` comes from `Particle::charge()`, the charge in units of e from HepPDT.
+It is fractional for a quark.
 
 ## Provenance, names and one-call entry points
 
@@ -406,8 +407,8 @@ default value, which is how pile-up once ended up labelled as signal.
 ```cpp
 particle.data().bunchCrossing();   // 0 for the in-time interaction
 particle.data().eventIndex();      // 0 for the signal
-particle.data().isSignal();        // bunch crossing 0 and index 0
-particle.data().isFromPileup();
+particle.isSignal();               // bunch crossing 0 and index 0
+particle.isFromPileup();           // also on truth::Vertex and on ParticleData
 particle.data().hasMomentum();     // false when no momentum is known at all
 ```
 
@@ -487,13 +488,14 @@ so a level whose rule the graph cannot satisfy yields no branch.
 
 `Particle::children()`, `parents()`, `ancestors()` and `descendants()` build a vector on
 every call, and the last two walk the whole subgraph to do it. In a loop over particles use
+the CSR spans of `Graph`, which allocate nothing and report the same ids in the same order:
 
 ```cpp
-particle.forEachChildId([&](uint32_t child) { ... });
-particle.forEachParentId([&](uint32_t parent) { ... });
+for (uint32_t vertex : graph.decayVertices(id))
+  for (uint32_t child : graph.outgoingParticles(vertex)) { ... }
+for (uint32_t vertex : graph.productionVertices(id))
+  for (uint32_t parent : graph.incomingParticles(vertex)) { ... }
 ```
-
-or the CSR spans of `Graph` directly. They report the same ids in the same order.
 
 `Particle::ancestorCount()` returns `ancestors().size()` without building the vector, for
 code that only needs the depth.

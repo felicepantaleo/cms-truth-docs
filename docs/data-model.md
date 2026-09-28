@@ -324,7 +324,7 @@ object, it finds the best truth branches efficiently.
 predicate over branches: pt/eta window, pdgId list, charge, signal-only,
 invert-eta. It follows the same pattern as `CaloParticleSelector` /
 `TrackingParticleSelector`. Charge comes from
-`HepPDT::ParticleID(pdgId).threeCharge()`.
+`Particle::charge()`, which is `HepPDT::ParticleID(pdgId).charge()`.
 
 ## Auxiliary plugins
 

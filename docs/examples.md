@@ -93,10 +93,9 @@ auto leaves   = tauBranch.stableLeaves();           // the π/K/e/μ + ν
 auto visP4    = tauBranch.visibleP4();              // sums leaves, drops the ν's
 double eInvis = tauBranch.invisibleEnergy();        // carried by the τ neutrino(s)
 
-// prong count = charged stable leaves (1-prong vs 3-prong); charge from the pdgId
-// (the convention BranchSelector uses: HepPDT::ParticleID(pdgId).threeCharge())
+// prong count = charged stable leaves (1-prong vs 3-prong), charge as BranchSelector reads it
 int nProng = std::count_if(leaves.begin(), leaves.end(), [](truth::Particle const& p) {
-  return HepPDT::ParticleID(p.pdgId()).threeCharge() != 0;
+  return p.charge() != 0.;
 });
 ```
 
@@ -215,7 +214,7 @@ for (truth::Particle p : branch.members())          // every shower particle
 per preset of `truthGraphSelections.py`, with the same function names. Each starts from
 what its preset seeds on and prints one line per object of interest. They are the shortest
 complete uses of the interface: the level helpers, `branchesAtLevel`, the provenance
-accessors, `forEachChildId`, and the vertex positions.
+accessors, the child spans of `Graph`, and the vertex positions.
 
 | preset | what the example computes | from |
 |---|---|---|
@@ -224,7 +223,7 @@ accessors, `forEachChildId`, and the vertex positions.
 | `vbf` | m(jj) and the rapidity gap of the two tagging quarks | `signal`, `partonJets` |
 | `ggf` | the reconstructable products of the Higgs and the visible energy fraction | `signal`, `reconstructableFromSignal` |
 | `vh` | the boson produced with the Higgs and its decay mode | production siblings |
-| `top` | b and W of each top, the W mode, the event class | `signal`, `forEachChildId` |
+| `top` | b and W of each top, the W mode, the event class | `signal`, children |
 | `singletop` | the production partner of the top | production siblings |
 | `diboson` | m(VV) and the mode of each boson | `signal` |
 | `heavyflavor` | flight length of each b hadron and the charm hadrons below it | `branchesAtLevel(BHadrons)`, vertex positions |
@@ -334,7 +333,7 @@ double eInvisible  = branch.invisibleEnergy();     // carried off by the tau neu
 
 // 1-prong vs 3-prong = number of charged stable leaves:
 int nProng = std::count_if(leaves.begin(), leaves.end(), [](truth::Particle const& p) {
-  return HepPDT::ParticleID(p.pdgId()).threeCharge() != 0;
+  return p.charge() != 0.;
 });
 ```
 
