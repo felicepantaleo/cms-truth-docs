@@ -75,7 +75,10 @@ A branch is a view, so the truth object is defined at the point of use.
 - **A `SimCluster`-like object**: `Branch(root, StableLeaves)` with `subgraphHits`, rooted
   at any particle and at any granularity.
 - **A `CaloParticle`-like object**: the subtree of a primary particle. `visibleP4()` and the
-  calorimeter `subgraphHits` need nothing further.
+  calorimeter `subgraphHits` need nothing further. The `caloBoundary` level is close to
+  the `CaloParticle` set but not equal to it: a photon that converts before the
+  calorimeter becomes its two electrons, and a pion that interacts in the tracker becomes
+  its secondaries.
 - **A `TrackingParticle`-like object**: the tracker `subgraphHits` of a particle.
   `BranchSelector` reproduces the `TrackingParticleSelector` cuts on momentum,
   pseudorapidity, charge and signal.

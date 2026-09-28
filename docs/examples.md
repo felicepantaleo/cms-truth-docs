@@ -89,12 +89,12 @@ want each seed in isolation rather than a signal-against-rest split.) In code ea
 
 ```cpp
 truth::Branch tauBranch(&graph, tau.id());          // Subtree closure
-auto leaves   = tauBranch.stableLeaves();           // the π/K/e/μ + ν
-auto visP4    = tauBranch.visibleP4();              // sums leaves, drops the ν's
+auto products = tauBranch.finalState();             // the π/K/e/μ + ν, as the generator made them
+auto visP4    = tauBranch.visibleP4();              // sums finalState(), drops the ν's
 double eInvis = tauBranch.invisibleEnergy();        // carried by the τ neutrino(s)
 
-// prong count = charged stable leaves (1-prong vs 3-prong), charge as BranchSelector reads it
-int nProng = std::count_if(leaves.begin(), leaves.end(), [](truth::Particle const& p) {
+// prong count = charged decay products (1-prong vs 3-prong), charge as BranchSelector reads it
+int nProng = std::count_if(products.begin(), products.end(), [](truth::Particle const& p) {
   return p.charge() != 0.;
 });
 ```
@@ -327,12 +327,12 @@ controls how far down you go:
 truth::Particle tau = graph.particle(tauId);
 
 truth::Branch branch(&graph, tau.id());          // full Subtree closure
-auto leaves        = branch.stableLeaves();        // the pi/K/e/mu + neutrinos
-auto visP4         = branch.visibleP4();           // sum of leaves, neutrinos removed
+auto products      = branch.finalState();          // the pi/K/e/mu + neutrinos
+auto visP4         = branch.visibleP4();           // sum of finalState(), neutrinos removed
 double eInvisible  = branch.invisibleEnergy();     // carried off by the tau neutrino(s)
 
-// 1-prong vs 3-prong = number of charged stable leaves:
-int nProng = std::count_if(leaves.begin(), leaves.end(), [](truth::Particle const& p) {
+// 1-prong vs 3-prong = number of charged decay products:
+int nProng = std::count_if(products.begin(), products.end(), [](truth::Particle const& p) {
   return p.charge() != 0.;
 });
 ```

@@ -302,8 +302,8 @@ truth::Branch shallow(&graph, tau.id(), truth::ClosureSpec::depth(2));
 truth::Branch untilHadrons(&graph, tau.id(),
                            truth::ClosureSpec::untilPdgId({211, -211, 111}));
 
-auto leafParticles = full.stableLeaves();
-auto visP4         = full.visibleP4();        // sums stable leaves, excludes neutrinos
+auto products      = full.finalState();       // what the generator handed to Geant4
+auto visP4         = full.visibleP4();        // sums finalState(), excludes neutrinos
 double eInvisible  = full.invisibleEnergy();  // p4().energy() - visibleP4().energy()
 int32_t rootPdg    = full.rootPdgId();
 bool fromB         = full.hasHeavyFlavor(5);  // any member is a b-flavored hadron
@@ -379,7 +379,8 @@ only on the physics. The selections collapse to these archetypes:
 | `top` | `TTbar*`, **ttX** (`ttH`/`ttW`/`ttZ`/`ttbb`/four-top/`ttDM`), `Tprime*` | seed the top(s) **+ keepProductionSiblings** |
 | `singletop` | `ST_t*`/`ST_tW`/`ST_s-channel` | seed top **+ keepProductionSiblings** (production partner) |
 | `diboson` | **`WW*`/`WZ*`/`ZZ*`/`VBS*`/same-sign WW** | seed the bosons `{23,24,−24}` **+ keepProductionSiblings** |
-| `heavyflavor` | `Bs*`/`Bu*`/`Jpsi*`/`Upsilon*` | seed by heavy-flavor content (`seedHadronFlavors=[5]`, beauty) |
+| `heavyflavor` | `Bs*`/`Bu*`/`B0*`/`Lb*`/`Upsilon*`/`Chib*`/`EtaB*` | seed by heavy-flavor content, beauty (`seedHadronFlavors=[5]`); a B decay to charmonium is beauty |
+| `heavyflavor` | `Jpsi*`/`Psi2S*`/`Chic*` | charm (`seedHadronFlavors=[4]`) |
 | `full` | QCD / MinBias / NuGun / **SUSY / LLP / DM / EFT / BSM** / unknown | keep the whole graph |
 
 The exotic/BSM set (SUSY, long-lived, dark-matter, EFT, generic BSM resonances) has no

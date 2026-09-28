@@ -323,14 +323,22 @@ ClosureSpec const&    closure() const;
 
 std::vector<uint32_t> memberIds() const;
 std::vector<Particle> members() const;
-std::vector<Particle> stableLeaves() const;
+std::vector<Particle> stableLeaves() const;    // childless members, Geant4 secondaries included
+std::vector<Particle> finalState() const;      // what the branch hands to Geant4
 
-math::XYZTLorentzVectorD  p4() const;          // sum over stable leaves
+math::XYZTLorentzVectorD  p4() const;          // sum over finalState()
 math::XYZTLorentzVectorD  visibleP4() const;   // excludes neutrinos (|pdg| 12/14/16)
 double                    energy() const;          // p4().energy()
 double                    visibleEnergy() const;   // visibleP4().energy()
 double                    invisibleEnergy() const; // energy() - visibleEnergy()
 ```
+
+A branch that continues into Geant4 holds the bremsstrahlung, delta-ray and hadronic
+secondaries of its tracked particles. `stableLeaves()` returns those last secondaries.
+`finalState()` stops where the generator hands a particle to Geant4: a tracked member
+counts with its own momentum and none of its Geant4 descendants, and a member Geant4
+never tracked counts through its members below it. The kinematics sum `finalState()`,
+so the visible momentum of a tau is the sum of its decay products.
 
 ### Tagging and origin
 

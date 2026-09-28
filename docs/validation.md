@@ -503,9 +503,11 @@ The selector therefore reports WHICH plotted-axis cut a branch fails (pt or eta)
 instead of one accept-or-reject. The associator publishes that mask beside each level
 denominator as `truthToRecoTargets<Level>Eligibility`. The validator fills a variable
 only for objects that fail nothing except the cut on that variable itself. An object
-that fails both cuts enters no plot. Levels whose roots Geant4 never tracked stay
-untouched, because the kinematic cuts never apply to them. `partonJets`, `bHadrons` and
-`hardProcess` measure identically with the selector open.
+that fails both cuts enters no plot. The kinematic cuts do not apply to a root whose
+momentum no detector measures: a parton, a top quark or a boson that Geant4 never
+tracked. `partonJets` therefore measures identically with the selector open. A hadron, a
+lepton, a photon and every generator final-state particle keep the cuts, so a b hadron,
+a tau, a pi0 and a particle beyond the detector acceptance are cut like a tracked one.
 
 ### The secondary-vertex denominator is the heavy-flavour decay vertices (2026-08-04)
 
