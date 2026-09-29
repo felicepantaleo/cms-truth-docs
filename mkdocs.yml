@@ -25,6 +25,7 @@ nav:
   - Home: index.md
   - Tutorials:
       - 'Quickstart: your first truth graph': quickstart.md
+      - 'Getting started: recipes and FAQ': getting-started.md
       - 'Choose a truth definition': tutorial-truth-definitions.md
       - 'Read a graph in python': tutorial-python.md
       - 'Write an analyser in C++': tutorial-cxx.md
