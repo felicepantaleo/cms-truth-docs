@@ -26,7 +26,7 @@ Browse them at
 Each sample folder holds:
 
 - `step3.root`: GEN-SIM-RECO with the truth graph, the hit index and the truth association maps.
-- `step3_inMINIAODSIM.root` and the harvested DQM file.
+- `step3_inMINIAODSIM.root`, the DQMIO file `step3_inDQM.root` and the harvested DQM file.
 - `configs/`: the four cmsRun configurations and the script that ran them.
 - `graphs/`: two events drawn as DOT and PDF, and the logical graph as JSON.
 - `validation/`: the truth validation gallery.
@@ -303,6 +303,145 @@ For efficiency against truth levels (`caloBoundary`, `stableDecayProducts`, ...)
 for the reco-driven view with duplicates, see the tracking analyzers in
 [taustudies](https://gitlab.cern.ch/cms-tau-pog/taustudies).
 
+## MTD: reproduce MtdTracksValidation
+
+The [MTD example](https://github.com/felicepantaleo/TruthGraphAnalysis/tree/main/Mtd) is
+a port of `MtdTracksValidation` to the graph. It fills the monitor elements of the legacy
+module under the same names, in the folder `MTD/TracksGraph`.
+[Port an existing associator](tutorial-port-associator.md) explains each step of the
+port. To run it on a finished `step3.root`, without the reconstruction:
+
+```bash
+wget $T/ttbar/step3.root $T/ttbar/step3_inDQM.root
+cmsRun TruthGraphAnalysis/Mtd/test/mtdGraphOnStep3_cfg.py -i step3.root -o mtdGraph_inDQM.root
+cmsDriver.py step4 -s HARVESTING:@phase2Validation -n -1 --conditions auto:phase2_realistic_T35 \
+    --geometry ExtendedRun4D122 --era Phase2C26I13M9 --mc --scenario pp --filetype DQM \
+    --filein file:mtdGraph_inDQM.root,file:step3_inDQM.root
+python3 TruthGraphAnalysis/Mtd/test/compareMtdPort.py DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO.root
+```
+
+The job builds the MTD channel of the hit index from the MTD sim clusters in the file,
+associates the tracks with a candidate floor of 0 GeV, and runs the port. The harvesting
+takes the legacy folder `MTD/Tracks` from `step3_inDQM.root` of the sample. The ttbar
+sample, 1000 events:
+
+```
+BTL                                        legacy    graph  graph/legacy
+tracks matched to truth                     42155    42382         1.005
+  particle with direct hits                 30167    30097         0.998
+    first direct cluster on the track       26735    26739         1.000
+    another cluster on the track             1325     1258         0.949
+    no cluster on the track                  2107     2100         0.997
+  particle with other hits only              6105     6192         1.014
+  particle without MTD hits                  5883     6093         1.036
+
+ETL                                        legacy    graph  graph/legacy
+tracks matched to truth                     28026    28060         1.001
+  particle with MTD hits                    19690    19610         0.996
+    correct cluster                         14859    14888         1.002
+    wrong cluster                            1792     1702         0.950
+    no cluster                               3039     3020         0.994
+  particle without MTD hits                  8336     8450         1.014
+
+time residual, correct cluster      legacy mean     rms   graph mean     rms  [ps]
+  BTL                                     -11.1    32.5        -11.0    32.5
+  ETL                                      -7.9    34.8         -7.9    34.8
+```
+
+The MTD hits of a particle come from `directHits(truth::HitChannel::MTD, particle)` of the
+hit index, with the module, the cell, the energy and the time of each hit. This is the
+starting point for any other MTD question: a time resolution per particle type, the
+clusters of a pileup particle, or the hits that a secondary leaves.
+
+## e/gamma: associate GSF tracks
+
+The release does not associate GSF tracks. The associator can run in your own analyzer
+on any collection of tracks: a `reco::GsfTrack` is a `reco::Track`, so the hit adapter
+takes it as it is. The [Egamma
+example](https://github.com/felicepantaleo/TruthGraphAnalysis/tree/main/Egamma) does
+this for `electronGsfTracks`:
+
+```cpp
+// once per event: the candidates of the file, on the tracker channel, counting hits
+const truth::BranchHitAssociator associator(hitIndex,
+                                            std::vector<uint32_t>(selected.begin(), selected.end()),
+                                            truth::BranchHitAssociator::Metric::SharedHits,
+                                            truth::HitChannel::Tracker,
+                                            /*emptyRootsMeansAll=*/false);
+// per GSF track: every candidate that shares a hit, best score first
+const auto hits = truth::recoHits(gsfTrack);
+for (auto const& match : associator.bestBranches(std::span<const truth::RecoHit>(hits))) {
+  if (!assignable[match.rootParticleId])
+    continue;  // a parton, a boson or a beam particle
+  const double purity = 1. - match.score;
+  const truth::Particle electron = truth::Particle(&graph, match.rootParticleId).lastCopy();
+  break;
+}
+```
+
+`lastCopy()` is necessary. The generator writes an electron again after it radiates a
+photon, and the two copies own the same hits. On a tie the associator puts the particle
+with the lower index first, which is the earlier copy. On the zee sample the analyzer
+finds 863 of the 1552 Z electrons without `lastCopy()`, and 1391 with it.
+
+```bash
+cmsRun TruthGraphAnalysis/Egamma/test/gsfTrackTruth_cfg.py -i $T/zee/step3.root
+```
+
+```
+GSF tracks 1655: 1652 with a particle owning 75% of the hits, 1496 of them an electron, 1484 an electron from the Z
+Z electrons 1552: found by hits 1391, by delta R 1391, by both 1391
+```
+
+The Z electrons have pT > 5 GeV and abs(eta) < 3. The hit match and a delta R < 0.05
+match find the same 1391 electrons. The mean of pT(GSF) / pT(truth) is 0.949. The same
+code takes any other track collection, for example `hltEgammaGsfTracksUnseeded`. This page
+does not test that.
+
+## Particle flow: check PF candidates
+
+The [ParticleFlow
+example](https://github.com/felicepantaleo/TruthGraphAnalysis/tree/main/ParticleFlow)
+compares the type of each PF candidate with the true particle. A charged candidate takes
+the particle of its track, from the track map. A neutral candidate takes the particle of
+its most energetic ECAL or HCAL cluster, from the PF cluster maps
+`truthBranchPFClusterEcalAssociators` and `truthBranchPFClusterHcalAssociators`.
+
+```cpp
+// charged: row [0] of the track map for the track of the candidate
+auto const track = candidate.trackRef();
+auto const& best = trackMap[track.key()].front();
+// neutral: the most energetic ECAL or HCAL cluster in the candidate blocks
+for (auto const& [block, index] : candidate.elementsInBlocks()) {
+  auto const cluster = block->elements()[index].clusterRef();
+  ...
+}
+```
+
+```bash
+cmsRun TruthGraphAnalysis/ParticleFlow/test/pfCandidateTruth_cfg.py -i $T/ttbar/step3.root --minEnergy 5
+```
+
+```
+PF type vs truth class (rows: PF type)
+               e        mu     gamma       h+-        h0    merged  no match
+     h      1216       100        34     47583        45        91       141
+     e       555         3         4       716         0         6        20
+    mu         3       571         0       121         0         1         0
+ gamma        90         0       572       165       295      2591       204
+    h0         3         0         2       294       361       365       222
+neutral candidates without an ECAL or HCAL cluster (HGCAL or HF): 105987
+mean E response: charged 0.977653, neutral 0.527128
+```
+
+This is the ttbar sample, 1000 events, candidates above 5 GeV. A match counts when the
+particle owns at least 75% of the object. The class `merged` is a particle that the
+generator decayed, for example a pi0, an eta or a B meson. It is the best match when
+the cluster merges several of its decay products. Most PF photons above 5 GeV are of this
+kind: the photons of one pi0 in one cluster. The endcap neutral candidates come from
+HGCAL through TICL and have no ECAL or HCAL cluster. For them, use the TICL candidate
+maps, `truthBranchTracksterAssociators:ticlCandidate...`.
+
 ## Where are the validation plots?
 
 Each sample folder has a `validation/` gallery, made by
@@ -333,6 +472,11 @@ python.
 You read an entry of `Fixed` after row [0]. A W carries the hits of all its descendants,
 so it shares every hit with the track. Take row [0] of `Fixed`, or use an `Adaptive`
 map.
+
+**My match is an earlier copy of the particle, with no SIM part.**
+The generator writes a particle again after it radiates, and the copies own the same
+hits. The maps of the release put the later copy first on a tie. The associator that you
+run yourself does not. Take `lastCopy()` of the match, as in the e/gamma recipe.
 
 **Many of my pileup tracks have no match.**
 The shipped candidate set requires pT > 1 GeV and abs(eta) < 4 for stable particles.
