@@ -337,7 +337,8 @@ A branch that continues into Geant4 holds the bremsstrahlung, delta-ray and hadr
 secondaries of its tracked particles. `stableLeaves()` returns those last secondaries.
 `finalState()` stops where the generator hands a particle to Geant4: a tracked member
 counts with its own momentum and none of its Geant4 descendants, and a member Geant4
-never tracked counts through its members below it. The kinematics sum `finalState()`,
+never tracked counts through its members below it. A tracked member that the generator
+decayed, a tau say, counts through its GEN decay products. The kinematics sum `finalState()`,
 so the visible momentum of a tau is the sum of its decay products.
 
 ### Tagging and origin
