@@ -139,9 +139,34 @@ dot -Tpdf truthlogicalgraph_run1_lumi1_event<N>.dot -o event.pdf
 ```
 
 The `truthlogicalgraph` file is the graph you analyse. The `truthgraph` file is the raw
-graph. For an interactive view, open the DOT file in
-[the truth graph viewer](https://cmssw-truth-graph-viz.web.cern.ch/app/), or open the
-sample folder in orbit, which draws DOT files up to 3 MB.
+graph. Orbit draws DOT files up to 3 MB in the sample folder.
+
+### Look at an event on a laptop, with no CMSSW
+
+The [truth graph viewer](https://github.com/felicepantaleo/CMSSWTruthViz) draws the graph
+interactively and the rechits of each particle in 3D. The orbit folder `viewer/` has 14
+tutorial events, two per sample, ready for it. You need Python 3.9 or newer:
+
+```bash
+git clone https://github.com/felicepantaleo/CMSSWTruthViz.git
+cd CMSSWTruthViz
+curl -O https://felice.web.cern.ch/orbit/TruthGraphTutorial/viewer/TruthGraphTutorialViewer.tar.gz
+tar xzf TruthGraphTutorialViewer.tar.gz
+TRUTHVIZ_CATALOG=$PWD/TruthGraphTutorialViewer/catalog.json TRUTHVIZ_SKIP_CMSSW_INSTALL=1 ./run.sh
+```
+
+Open the URL that the server prints, normally `http://localhost:8009/app/`, select
+`Sample catalogue` and pick an event. Click a particle and select `Direct hits` or
+`Subgraph hits` to draw its rechits. `TRUTHVIZ_SKIP_CMSSW_INSTALL=1` stops `run.sh` from
+installing a CMSSW release when it finds `/cvmfs`, for example on lxplus.
+
+To show the rechits, the viewer needs the sim-hit DetIds of each particle in the DOT file.
+The dumper writes them only with `process.truthLogicalGraphDumper.dumpSimHits = True`, so the
+DOT files in `graphs/` and the ones from the command above do not have them. The viewer
+sets this parameter itself when it processes a `step3.root`: select `CMSSW ROOT` in the
+page, start `run.sh` in the area of [Set up an area](#set-up-an-area) (after `cmsenv`, or
+with `TRUTHVIZ_CMSSW_SRC=$CMSSW_BASE/src`) and give the dumper arguments
+`--geometry ExtendedRun4D122`.
 
 ## What are the decay products of a tau?
 
