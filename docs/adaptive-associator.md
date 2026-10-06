@@ -166,6 +166,15 @@ particles their numerator: measured on 20 ttbar events at PU200, `partonJets` fa
 from 91 of 92 to 0 of 92. A truth object that is not a candidate root can never be
 matched at all.
 
+The synthetic nodes are the exception: `TruthBranchTargetsProducer` does not make
+them candidate roots, unless a truth level holds them. A connector has no observable
+momentum, so the branch selector does not cut it, and its subgraph holds a whole
+interaction. With a truth preset, it would be the only `Fixed` match of every reco
+object made of soft particles of that interaction, and the `Fixed` no-candidate and
+fake rates would read lower than the adaptive ones. Measured on 50 PU200 TenTau events
+with the TenTau preset: the `Fixed` no-candidate rate of the final tracksters is 0.0016
+with the connectors and 0.0326 without them, equal to the adaptive working points.
+
 So for a clean single electron the adaptive level is the electron itself, and for a
 charged pion it is the pion. The climb becomes useful for a converted photon or a
 decaying particle. There the adaptive level is the merged parent, not the
