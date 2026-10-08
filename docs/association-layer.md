@@ -45,6 +45,7 @@ which schedules both flavours and adds the keep statements.
 | `TruthBranchTargetsProducer` | `truthBranchTargets` | The truth-side targets, once per event: `selectedRoots`, `assignableRoots`, the signal-seed denominators and one truth-to-reco denominator per level |
 | `AllTrackToTruthBranchAssociatorsProducer` | `allTrackToTruthBranchAssociators` | Tracks, by shared tracker elements |
 | `TruthBranchTracksterAssociatorsProducer` | `truthBranchTracksterAssociators` | TICL tracksters, by shared calorimeter cells |
+| `TruthBranchCandidateAssociatorsProducer` | `truthBranchCandidateAssociators` | TICL candidates, by the shared calorimeter cells of all their tracksters |
 | `AllVertexToTruthBranchAssociatorsProducer` | `allVertexToTruthBranchAssociators` | Primary vertices, through the track maps |
 | `AllSecondaryVertexToTruthBranchAssociatorsProducer` | `allSecondaryVertexToTruthBranchAssociators` | Secondary vertices, through the track maps, against heavy-flavour decay vertices |
 
@@ -126,4 +127,6 @@ rather than being assigned a particle no detector could see.
 `Validation/TruthInfo` holds one templated `TruthBranchRecoValidator` over tracks,
 vertices, secondary vertices and tracksters, with `DQMGenericClient` harvesting. The
 reco-driven metrics are booked per working point, the truth-driven ones per truth level.
+`TruthBranchCandidateValidator` validates the TICL candidates on two channels, the
+calorimeter match of their tracksters and the particle of their track.
 See [Validation](validation.md) for the metric definitions and the measured numbers.

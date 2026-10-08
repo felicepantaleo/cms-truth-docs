@@ -565,6 +565,107 @@ clusters would make the outcome reachable again. This diverges deliberately from
 HGCalValidator, which books the plot. The split rate carries the calorimetric pathology
 instead.
 
+## TICL candidates on two channels (2026-10-08)
+
+`TruthBranchCandidateValidator` validates `ticlCandidate` against the truth graph. It runs
+next to `TICLCandidateValidator`, which stays. `customiseTruthBranchValidation` schedules it
+together with `truthBranchCandidateAssociators`, and the harvesting step forms its ratios.
+
+A candidate is two channels, so it has two identities:
+
+- The **calorimeter identity** is the branch that an adaptive working point chose for the
+  layer clusters of all the candidate tracksters. `truthBranchCandidateAssociators` matches
+  the candidate like one trackster made of those layer clusters, with the HGCAL denominator
+  and the rechit weights of the trackster associator. The calorimeter part is the whole of
+  each trackster, whatever share of its energy the candidate takes.
+- The **track identity** is the first row of the Fixed track map, the best detector
+  particle of the track, when it owns at least 75% of the track hits.
+
+### Truth-driven folders
+
+The denominators are the members of `reconstructableFromSignal` and `caloBoundary`, per
+working point (AdaptiveTight, AdaptiveNominal), per class (photon, electron, muon, charged
+hadron, neutral hadron) and in the `eta15to30` band. A pi0 member is a photon. A candidate
+**projects on a member** when one of its identities is the member or one of its
+descendants. The ladder is:
+
+| Step | Numerator | Condition |
+|---|---|---|
+| reconstructed | `num_assoc(simToReco)` | at least one candidate projects on the member |
+| right track | `num_assoc_track` | the representative has a track of the member (charged member) or no track (neutral member) |
+| right class | `num_assoc_pid` | and the class of the representative is the class of the member |
+| right energy | `num_assoc_energy` | and the representative energy over the member energy is in [0.7, 1.3] |
+| split | `num_split` | two or more candidates project on the member |
+| merged | `num_merged` | no candidate projects on the member, and an identity of a candidate is an ancestor of it |
+
+The representative of a charged member is a candidate with a track of the member when one
+exists. Otherwise it is the candidate that shares most of the member HGCAL energy. The rule
+is necessary: in TICLv6 a jet-member track becomes a track-only charged candidate and its
+trackster becomes a neutral residual. On the sample below, with the calorimeter identity
+alone, the right-track step for TICLv6 charged hadrons read 0.439 with the largest shared
+energy as the representative, and 0.899 with the rule. Each folder also books the energy,
+raw energy and summed energy residuals of the representative, the pt, eta and phi
+residuals, the number of candidates per member and a class matrix.
+
+The two channels are necessary too. With the calorimeter identity alone, a candidate whose
+track is linked to the shower of another particle never reaches the particle of its track.
+Adding the track identity moved the right-track step for charged hadrons from 0.899 to
+0.949 in TICLv6 and from 0.384 to 0.566 in TICLv5.
+
+### Reco-driven folders
+
+One folder per (class, working point). The fake, no-candidate, no-level-candidate, pileup
+and purity rates have the definitions of the other domains, on the calorimeter identity,
+or on the track identity for a candidate without a trackster. The candidate pages add:
+
+| Page | Formula | Question |
+|---|---|---|
+| `trackfakerate` | `1 - num_trackmatched/num_charged` | does the candidate track have a particle |
+| `trackmismatch` | `1 - num_trackconsistent/num_trackcalo` | are the track and the calorimeter part one object |
+| `pidpurity` | `num_pidcorrect/num_levelassoc` | is the candidate class the class of its caloBoundary member |
+| `mergedrate` | `num_mergedcandidate/num_assoc(recoToSim)` | is the identity an ancestor of several caloBoundary members |
+
+At PU200 the levels hold signal members only, so `nolevelcandidate` is 0.92 and the
+pileup rate 0.95: read the reco-driven rates with those two beside them.
+
+### Measured
+
+TenTau PU200 D127, c1 chain 4, 50 events, one DIGI file reconstructed with TICLv6 and with
+TICLv5, AdaptiveNominal, members with 1.5 < |eta| < 3.0, reconstructableFromSignal (410
+members):
+
+| Class | members | v6 reco / track / class / energy | v5 reco / track / class / energy |
+|---|---|---|---|
+| all | 410 | 0.961 / 0.920 / 0.783 / 0.615 | 0.910 / 0.666 / 0.461 / 0.246 |
+| charged hadron | 198 | 0.985 / 0.949 / 0.934 / 0.914 | 0.909 / 0.566 / 0.515 / 0.237 |
+| photon (pi0 included) | 130 | 0.900 / 0.838 / 0.638 / 0.177 | 0.946 / 0.862 / 0.446 / 0.215 |
+| muon | 44 | 1.000 / 1.000 / 0.795 / 0.795 | 0.727 / 0.682 / 0.386 / 0.386 |
+| electron | 35 | 1.000 / 0.943 / 0.486 / 0.371 | 1.000 / 0.457 / 0.286 / 0.229 |
+
+The energy step of the photon class is low by definition at this level: a resolved pi0 is
+two photon candidates, and the representative carries about half of the pi0 energy. At
+caloBoundary the photons of a pi0 are members, and 0.543 of the photons are merged (one
+candidate for the two photons of a pi0). The class matrix gives the electron result: 0.46
+of the reconstructed tau-decay electrons have the charged-hadron class in TICLv6.
+
+Checks on the same runs:
+
+- Positive control: in TICLv5 each candidate has one trackster, and the calorimeter score
+  distribution of the candidate association equals the trackster association of
+  `ticlCandidate` bin by bin, 94389 entries, at both adaptive points.
+- Invariants: `num_reco`, `num_assoc(recoToSim)`, `num_dominated` and `num_levelcandidate`
+  are equal at the two adaptive points, and so are the truth denominators.
+- The reconstruction is unchanged: 30 of 31 products of the replay are byte-identical. The
+  TICLCandidates differ only in the ProductID inside their Ptrs, because the four new
+  association products shift the product index of the trackster collection; every field
+  of every candidate is equal.
+- Workflow 37634.207 (TTbar, no pileup, 10 events) with the customise on step3 and on the
+  harvesting step books and harvests the 42 candidate folders. reconstructableFromSignal is
+  empty there, since that sample has no selection preset.
+
+Cost, TimeReport of the same PU200 job (8 threads, 4 streams): the candidate associator
+0.224 s/event, the validator 0.012 s/event; the trackster associator takes 0.488 s/event.
+
 ## Build & checks
 
 - `scram b` is clean, apart from external `vecgeom` warnings.
@@ -574,3 +675,5 @@ instead.
   `BranchHitAssociator_t` (103), `Branch_t` (47), `LogicalGraphHitIndexBuilder_t` (43),
   `GenGraphBuild_t` (40), `BranchSelector_t` (20), `AssignableTarget_t` (19), plus the
   `truthGraphSelections_t` and `testTruthHistoryGuard` tests.
+- `Validation/TruthInfo`: `testCandidateTruthMatching` (catch2, 59 assertions) checks the
+  level projection, the ancestor test, the classes and the ladder.
