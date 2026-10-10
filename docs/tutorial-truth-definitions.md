@@ -61,9 +61,10 @@ Read that as a set of answers to different questions.
 | `tauVisibleHadronic`, `tauVisibleLeptonic` | which taus decayed to hadrons and which to a lepton |
 
 Six levels printed nothing, and the reason matters. Four of them are defined relative to
-the signal or to the vertices that summarise it, so they stay empty until a selection
-preset names the signal: `signal`, `reconstructableFromSignal`, `stableLegsFromInitialState`
-and `underlyingEvent`. The two tau levels are empty only because this event has no tau.
+the signal or to the vertices that summarise it, so on a collision they stay empty until a
+selection preset names the signal: `signal`, `reconstructableFromSignal`,
+`stableLegsFromInitialState` and `underlyingEvent`. A particle gun needs no preset for
+`signal`: its shot particles are the signal. The two tau levels are empty only because this event has no tau.
 [Validation](validation.md) lists all twelve levels with their rules.
 
 ## Asking for one level, or several

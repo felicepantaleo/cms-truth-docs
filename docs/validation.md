@@ -49,7 +49,7 @@ Each particle carries the levels it belongs to, as bits on the graph itself (`Pa
 | level | what it holds |
 |---|---|
 | `hardProcess` | the **outgoing legs** of the hard scatter. ttbar gives b, b~ and the W decay products, **not** the two tops; H to two photons gives the photons; VBF gives the two tagging quarks plus the four neutrinos. Empty for a particle gun, correctly. |
-| `signal` | the **resonance**: 2 tops, 1 Z, 1 Higgs, 10 taus, W+ and W- for the diboson sample, 1 top for t-channel |
+| `signal` | the **resonance** a preset names: 2 tops, 1 Z, 1 Higgs, W+ and W- for the diboson sample, 1 top for t-channel. With no preset, the shot particles of a particle gun: 10 taus for TenTau. Empty for a collision with no preset |
 | `stableDecayProducts` | final-state generator particles, ~45% gamma and ~35% charged pions across every template |
 | `caloBoundary` | those reaching the calorimeter, plus secondaries made in material (ttbar 559 to 649, VBF 231 to 468) |
 | `stableLegsFromInitialState` | preset-dependent, so it varies from 4 (H125) to 2095 (ttbar) |
@@ -73,16 +73,23 @@ status 0. Code that infers "synthetic" from empty fields therefore cannot tell t
 apart. The stand-in's momentum is the sum of the hard-process legs. That momentum is an
 accounting quantity, never generator truth.
 
-A sample whose configuration names NO resonance has no `signal` level at all. An empty
-seed list, or the full-graph escape hatch `{0}`, means the question is not answerable.
-The code then leaves the `signal` and `signalNoSelection` folders unbooked, rather than
-booking them empty. The associators and the hit-based validators both take the seed list
-as `signalSeedPdgIds`. The two must carry the SAME value in the DQM configuration.
-Otherwise the folders vanish or read wrong.
+With no seed species, an empty seed list or the full-graph escape hatch `{0}`, the
+`signal` level is the shot particles of a particle gun: each GEN root of the signal
+interaction. A root with no production vertex is the dummy mother (pdgId 990) that the
+Pythia8 guns write, and its GEN daughters replace it. A collision has beam particles, with
+HepMC status 4, and with no preset it has no `signal` level at all.
 
-`signal` is the one level bit that nothing can recompute from the truth graph alone. The
-seed PDG ids that produced it therefore sit on the truth graph. The dumper audits every
-flagged particle against those ids.
+The validators book the `signal` and `signalNoSelection` folders only when the
+configuration names a signal: a seed list, or `bookGunSignal = True`. The `.88` workflow
+sets `bookGunSignal` on the reconstruction step of every gun sample, through
+`customiseTruthBranchValidationGun`. A folder is never booked empty. The associators and
+the hit-based validators both take the seed list as `signalSeedPdgIds`. The two must
+carry the SAME value in the DQM configuration. Otherwise the folders vanish or read wrong.
+
+With seed species, `signal` is the one level bit that nothing can recompute from the
+truth graph alone. The seed PDG ids that produced it therefore sit on the truth graph,
+and the dumper audits every flagged particle against those ids. With no seed species,
+the dumper recomputes the gun rule and requires the stored bits to equal it.
 
 [truth-graph-levels](https://felice.web.cern.ch/orbit/?path=%2Ftruth-graph-levels)
 publishes a dot and PDF of one event per template. Each node draws the levels as
@@ -430,7 +437,7 @@ assert this as a control.
 The validator computes dominance over one level, set by `dominanceLevel` (default
 `caloBoundary`). This is not a detail. "Nothing dominates" is unfalsifiable off an
 antichain, because the leader and the runner-up can be the same particle at two depths.
-`selectedRoots` is every particle passing the selector. A tau, its daughter pion
+`selectedRoots` is every particle passing the selector, its pt floor excepted. A tau, its daughter pion
 and that pion's descendants are therefore candidates at the same time, with nested
 subgraphs carrying nearly identical shared energy.
 
@@ -464,7 +471,9 @@ It is not nesting. Projecting each candidate onto the antichain member it descen
 from changed nothing to four decimals. The associators insert roots that are already
 members or unrelated.
 
-Measured on 200 events per sample, `ticlCandidate`:
+Measured on 200 events per sample, `ticlCandidate`, with the 1 GeV floor on the
+candidate set. Since 2026-10-10 the candidate set has no pt floor, so `nocandidate` at
+PU200 is smaller. These numbers are not measured again yet.
 
 | sample | `fakerate` | `nocandidate` | `nolevelcandidate` |
 |---|---|---|---|

@@ -317,9 +317,11 @@ The two definitions of "hits of a particle" are not the same. A TrackingParticle
 hits of one Geant4 track. A branch holds the hits of the particle and of its
 descendants. This page does not measure how much of the difference comes from this.
 
-The fake rate needs the right candidates. The maps in the file offer only stable
-particles with pT > 1 GeV and abs(eta) < 4 as candidates. At pileup most tracks come from
-softer particles, so these tracks have no candidate and count as fake: 0.811.
+The fake rate needs the right candidates. The rows "maps in the file" were measured when
+the maps offered only stable particles with pT > 1 GeV and abs(eta) < 4 as candidates. At
+pileup most tracks come from softer particles, so these tracks had no candidate and
+counted as fake: 0.811. Since 2026-10-10 the maps offer every particle with abs(eta) < 4,
+whatever its pt. The shipped maps are not measured again on this page yet.
 `--candidatePtMin 0.1` runs the association again in the job, with every particle above
 0.1 GeV and abs(eta) < 4.5 as a candidate. The fake rate at pileup is then 0.099. This
 costs about 3.6 s per PU200 event on one thread.
@@ -504,9 +506,9 @@ hits. The maps of the release put the later copy first on a tie. The associator 
 run yourself does not. Take `lastCopy()` of the match, as in the e/gamma recipe.
 
 **Many of my pileup tracks have no match.**
-The shipped candidate set requires pT > 1 GeV and abs(eta) < 4 for stable particles.
-Run the association again with a wider set, as `--candidatePtMin` does in the tracking
-recipe.
+The shipped candidate set takes every particle with abs(eta) < 4, whatever its pt. A
+track with no match is a fake, or comes from a particle outside that range. Run the
+association again with a wider set, as `--candidatePtMin` does in the tracking recipe.
 
 **Does the graph hold out-of-time pileup?**
 No. In the PU200 sample all 135289 particles of the first event are in bunch crossing 0.

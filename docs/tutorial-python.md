@@ -106,7 +106,7 @@ graph.levels(i)                              # the names of every level it is at
 graph.isAtLevel(i, "caloBoundary")
 graph.particlesOfLevel("bHadrons")
 graph.particlesAtLevels(["caloBoundary", "stableDecayProducts"], "all")
-graph.signalParticles()                      # what the preset named as the signal
+graph.signalParticles()                      # the preset's signal, or the shot particles of a gun
 graph.isSignal(i), graph.isFromPileup(i)
 graph.bunchCrossing(i), graph.eventIndex(i)
 ```

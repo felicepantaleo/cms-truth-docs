@@ -520,7 +520,7 @@ std::optional<Particle> particle.firstChildWithPdgId(int pdgId);   // downward t
 std::vector<Particle> particle.productionSiblings();  // what recoils against it: the VBF
                                                  // tagging quarks, the single-top partner,
                                                  // the boson made with a Higgs
-std::vector<Particle> graph.signalParticles();   // what the preset named as the signal
+std::vector<Particle> graph.signalParticles();   // the preset's signal, or the shot particles of a gun
 std::vector<Particle> truth::particlesAtLevel(graph, level);  // levelAntichain as views
 std::vector<Particle> truth::particlesAtLevels(graph, {levels}, truth::LevelMatch::Any);
 bool truth::isLepton(int32_t pdgId);             // charged leptons, not neutrinos

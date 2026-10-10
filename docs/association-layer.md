@@ -42,7 +42,7 @@ which schedules both flavours and adds the keep statements.
 
 | Module | cfi label | What it does |
 |---|---|---|
-| `TruthBranchTargetsProducer` | `truthBranchTargets` | The truth-side targets, once per event: `selectedRoots`, `assignableRoots`, the signal-seed denominators and one truth-to-reco denominator per level |
+| `TruthBranchTargetsProducer` | `truthBranchTargets` | The truth-side targets, once per event: `selectedRoots` (every cut of the selector except its pt floor), `denominatorRoots` (every cut, plus the level targets; the vertex associators count findable tracks over them), `assignableRoots`, the signal-seed denominators and one truth-to-reco denominator per level |
 | `AllTrackToTruthBranchAssociatorsProducer` | `allTrackToTruthBranchAssociators` | Tracks, by shared tracker elements |
 | `TruthBranchTracksterAssociatorsProducer` | `truthBranchTracksterAssociators` | TICL tracksters, by shared calorimeter cells |
 | `TruthBranchCandidateAssociatorsProducer` | `truthBranchCandidateAssociators` | TICL candidates, by the shared calorimeter cells of all their tracksters |

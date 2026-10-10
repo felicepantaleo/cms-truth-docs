@@ -79,7 +79,8 @@ behind a track was 0.58 of the track pt at the median, a quarter of them sat at
 |eta| above 4, and the association candidate cuts dropped the true particle for
 65% of the tracks. With the merged collections the median is 0.997 and the
 particle behind a track above 1.2 GeV is a candidate for 92% of the tracks; the
-rest fail the 1 GeV candidate cut on their own momentum.
+rest fail the 1 GeV candidate cut on their own momentum. Since 2026-10-10 the candidate
+set has no pt floor.
 
 The index producer also reads the tracker digi sim links, the inner ones and the outer
 ones, so the tracker truth is keyed by (module, cell): a tracker DetId names a module,
