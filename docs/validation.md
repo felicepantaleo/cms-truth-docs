@@ -386,9 +386,11 @@ after about 300 um, and counting it made a one-track vertex look findable and pu
 the purity denominator that no track can match.
 
 !!! warning "`fakerate` and `contaminated` are not the same question"
-    The recoToSim score is normalised against the cell's total truth energy
-    (`recoEnergy = fraction * cellTotalEnergy`). At PU200 a cell shared with overlaid
-    interactions therefore drives the score towards 1, even for a well matched object.
+    The recoToSim score is normalised to the object's own rechit energy
+    (`recoEnergy = fraction * rechitEnergy`). A branch owns only its share of the truth
+    energy of each cell (`branchEnergy = branchSimEnergy / cellSimEnergy * rechitEnergy`).
+    At PU200 a cell shared with overlaid interactions therefore drives the score towards
+    1, even for a well matched object.
     Measured on ttbar PU200, `ticlCandidate` / AdaptiveNominal: 73.8% of tracksters
     fail the 0.6 cut, while only 2.2% have no candidate at all. Quote `fakerate`
     for "reconstructed something that is not there". Quote `contaminated` for "shares

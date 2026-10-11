@@ -79,6 +79,13 @@ sorted CSR-style arrays (`cellRootsKeys_`/`Offsets_`/`cellRoots_`,
 DetId-sorted subgraph span of each candidate. That is the correct linear
 algorithm. It relies on the sorted-span invariant of the builder.
 
+The constructor orders the `(detId, root)` entries of every candidate by a stable
+radix sort on the detId, in two passes of 16 bits. One merge pass with
+`cellEnergyKeys_` then fills the index and the root energies. On TenTau PU200
+(D127, 3 events, 1 thread), the comparison sort of these entries and one binary
+search per subgraph hit took 230 to 317 ms of the 300 to 440 ms build of each
+calorimeter associator. The radix sort and the merge replace both.
+
 !!! note "All-particles default kept on purpose"
     With an empty candidate-root list the associator treats every particle as a
     root. A restriction of the roots would change the matching semantics, because

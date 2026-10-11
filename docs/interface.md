@@ -691,10 +691,11 @@ BranchMatch bestAdaptiveBranch(std::span<const RecoHit> recoHits,
                                float maxReverseScore = 1.f) const;
 ```
 
-`emptyRootsMeansAll` guards the restricted-root case. With the default, an empty
-`candidateRoots` means "every particle". Pass `false` when an empty list must
-instead mean "no candidates". A selection that legitimately returns nothing then
-does not silently widen to the whole event.
+`candidateRoots` is a set: the order of the list does not matter, and a repeated
+id counts once. `emptyRootsMeansAll` guards the restricted-root case. With the
+default, an empty `candidateRoots` means "every particle". Pass `false` when an
+empty list must instead mean "no candidates". A selection that legitimately
+returns nothing then does not silently widen to the whole event.
 
 `denominatorDetectors` is a bit per `DetId::det()` value. It names the detectors
 that the `sharedEnergyFraction` denominator covers. One hit channel spans several
