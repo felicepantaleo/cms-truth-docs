@@ -90,7 +90,7 @@ algorithm. It relies on the sorted-span invariant of the builder.
 
 *Relevant to: the [pileup mixing producers](pileup.md).*
 
-Both mixing producers (`TruthGraphAccumulator`, `TruthGraphMixedProducer`) build
+The mixing producer `TruthGraphAccumulator` builds
 the out-edge CSR with the proven counting-sort scatter `cursor = offsets;
 pos = cursor[src]++`. That scatter needs no permutation vector and no O(E log E)
 sort. It also does not rely on a non-stable sort matching the offsets. The

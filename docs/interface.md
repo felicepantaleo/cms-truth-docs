@@ -742,7 +742,10 @@ not have. The minimum is therefore the level that matches the object best.
 the global minimum. When the reco object shares no hits with any root,
 `rootParticleId` is `BranchMatch::kInvalidRoot`.
 
-The hit format is `truth::RecoHit { uint32_t detId; float energy; float fraction; }`.
+The hit format is `truth::RecoHit { uint32_t detId; float fraction; uint32_t cell; }`.
+A hit carries no energy: the `SharedEnergy` metric weights a cell by the associator's
+`CellEnergyTable` of rechit energies, or by the cell's total sim energy without one.
+`cell` is the channel inside a module on the tracker, where a DetId names a module.
 A reco object satisfies the `HasTruthHits` concept when it exposes a `truthHits()`
 member returning a range of `RecoHit`. Any such object works with the templated
 `bestBranches` overload directly. For objects that do not own their hits, use the

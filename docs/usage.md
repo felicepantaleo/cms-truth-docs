@@ -115,16 +115,13 @@ process.truthLogicalGraphHitIndexProducer = cms.EDProducer(
         cms.InputTag("g4SimHits", "EcalHitsEB", "SIM"),
         cms.InputTag("g4SimHits", "HcalHits", "SIM"),
     ),
-    doHGCalRelabelling = cms.bool(False),
     doHcalRelabelling = cms.bool(True),
 )
 ```
 
 !!! note "Sim-to-reco DetId conversion"
-    The two switches are independent, one per numbering scheme.
-    `doHGCalRelabelling` unpacks the old hexagon-indexed HGCAL simulation DetIds. It
-    is a no-op for the Run4 geometries, whose HGCAL simulation DetId is already the
-    reco DetId. The example above can therefore leave it off. `doHcalRelabelling`
+    The HGCAL simulation DetId of the Run4 geometries is already the reco DetId, so
+    HGCAL needs no conversion. `doHcalRelabelling`
     runs `HcalHitRelabeller` on the HCAL simulation DetIds, which are in packed test
     numbering. Without it, the HCAL entries of the index carry sim ids that match no
     `HBHERecHit`. ECAL barrel needs no conversion.
@@ -533,13 +530,13 @@ before using a channel.
 the hit index once per event. `bestBranches()` then answers any reco object. It
 merge-joins the object's hits against each candidate's subgraph span. It scores the
 candidates and sorts them best-first (`score` ascending). Two metrics exist:
-`SharedEnergy` (the HGCal by-hits score, comparing cell fractions) and `SharedHits`
+`SharedEnergy` (the HGCal by-hits score, each cell weighted by its rechit energy) and `SharedHits`
 (multiplicity: rechits on the reco side, cells on the branch side). A `truth::HitChannel` constructor argument (default
 `HitChannel::Calo`) selects which channel of the hit index the associator matches
 against. Pass `HitChannel::Tracker` for tracks.
 
 A reco object is matchable if it exposes its hits as a range of
-`truth::RecoHit{detId, energy, fraction}`. That is the `HasTruthHits` concept. Any
+`truth::RecoHit{detId, fraction, cell}`. That is the `HasTruthHits` concept. Any
 object that provides a `truthHits()` method works with no other changes. Some objects
 do not own their hits. For those, the free-function adapters in `RecoHitAdapters.h`
 build the hit range from the object plus the external collections it references:

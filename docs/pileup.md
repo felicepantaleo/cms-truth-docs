@@ -21,13 +21,11 @@ Only the inputs never delivered the pileup.
 
 ## Two routes
 
-### Phase A: `MixCollection` prototype
+### Phase A: `MixCollection` prototype (no longer in the code)
 
-`TruthGraphMixedProducer` reads the `CrossingFrame<SimTrack/SimVertex>` through
+The prototype read the `CrossingFrame<SimTrack/SimVertex>` through
 `MixCollection`, keyed by `(EncodedEventId, localId)`. Crossing frames are
-transient, so the producer must run inside the DIGI step. The
-`addMixedTruthGraph` customise does this, and it enables the frames with
-`setCrossingFrameOn`. The output keeps the compact mixed graph.
+transient, so it had to run inside the DIGI step.
 
 It validated the data model on real mixed pileup. Pileup is visible across the
 whole bunch-crossing window. The signal is isolated at `(bx=0, event=0)`. Every
@@ -160,15 +158,17 @@ Two practical notes:
 In a split production (GEN-SIM, DIGI-RAW, RECO, Validation as separate jobs) the
 code builds the mixed truth once, at the mixing/DIGI step. At that step the
 merged signal+pileup sim-hits are live. Every later step consumes the result.
-`mixedTruthGraphCustomize.customiseTruthDigi` does this:
+The `enableTruth` process modifier does this in every Run4 DIGI step:
 
-1. it registers the `TruthGraphAccumulator` (the merged raw `TruthGraph_mix`);
-2. it builds the logical graph and the per-particle per-cell hit index right
-   after mixing (`buildCompactTruthAtDigi`), reading the accumulator's merged
-   sim-hits. The default scope is Calo + Tracker + Muon; the MTD channel is filled on
-   request, see [Data model](data-model.md). `customiseTruthReduced` drops the Tracker channel
-   for cost-sensitive runs, and leaves calo + MTD + muon;
-3. it applies an event-content level.
+1. `SimGeneral/MixingModule/python/digitizers_cfi.py` registers the
+   `TruthGraphAccumulator` (the merged raw `TruthGraph_mix`);
+2. `truthGraphMixedDigiTask` (`PhysicsTools/TruthInfo/python/truthGraphMixedDigi_cff.py`,
+   added to `pdigiTask` in `Digi_cff`) builds the logical graph and the per-particle
+   per-cell hit index right after mixing, reading the accumulator's merged sim-hits.
+   The default scope is Calo + Tracker + Muon; the MTD channel is filled on request,
+   see [Data model](data-model.md). `mixedTruthGraphCustomize.customiseTruthReduced`
+   drops the Tracker channel for cost-sensitive runs, and leaves calo + MTD + muon;
+3. `EventContent_cff` keeps the three products in `FEVTDEBUGHLT` and `RECOSIM`.
 
 The code builds the hit index unresolved (`recHitMap = ""`, so `recHitIndex`
 stays invalid). This is deliberate. The shared-energy association
@@ -180,11 +180,11 @@ sim-hits never have to cross the DIGI to RECO boundary. MTD is not in the defaul
 DIGI index. Its channel reads only `mix:MergedMtdTruthLC` and the MTD topology, so
 adding `MTD` to `subdetectors` fills it at DIGI or in a later job.
 
-At RECO, `customiseTruthMixedReco.customise` drops the signal-only rebuild that
-`enableTruth` would otherwise schedule. The branch validators and association
-producers therefore resolve to the DIGI-built mixed products. It also repoints the
-`rawSrc` of the validators to `TruthGraph_mix`, and it persists the truth. RECO
-needs no rebuild and no sim-hits.
+At RECO nothing rebuilds the truth: `globalValidation_cff` does not import
+`truthPrevalidation_cff`, so the branch validators and the association producers read
+the DIGI-built products, and the validators read `rawSrc = mix` by default.
+`customiseTruthMixedReco.customise` keeps the truth in the RECO-tier output at a
+chosen verbosity level. RECO needs no rebuild and no sim-hits.
 
 ### Event content: `compact` vs `full`
 

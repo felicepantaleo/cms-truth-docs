@@ -237,7 +237,7 @@ to the Branch graph through shared hits. Adding a new reco type takes one adapte
 no DataFormats change.
 
 `PhysicsTools/TruthInfo/interface/RecoHitAdapters.h` provides free functions. They
-reduce any reco object to a range of `truth::RecoHit{detId, energy, fraction}`. That
+reduce any reco object to a range of `truth::RecoHit{detId, fraction, cell}`. That
 range is the `HasTruthHits` customization point, which `BranchHitAssociator` uses:
 
 - `truth::recoHits(reco::Track const&)`: the track's cells, unit weight. The tracker
@@ -282,9 +282,10 @@ associator producer reads the HGCAL rechits and the barrel PFRecHits the layer c
 were built from, and gives `BranchHitAssociator` a `truth::CellEnergyTable` of rechit
 energy per cell. The reco object then owns `fraction * rechit energy` of a cell, the
 branch owns its sim fraction of the same rechit energy, and a cell with a rechit but no
-simhit (noise) is paid for in full in the reco-side score. Without a table, in the unit
-tests and in the legacy-object validators, the weight is the cell's total sim energy
-from the hit index. The `Cleaned` instance of a PFRecHit producer holds the hits that
+simhit (noise) is paid for in full in the reco-side score. Without a table, as in the
+unit tests, the weight is the cell's total sim energy from the hit index. The
+legacy-object validators use the `SharedHits` metric, so they count shared cells and
+weight none. The `Cleaned` instance of a PFRecHit producer holds the hits that
 failed its quality tests; every truth configuration reads the plain instance.
 
 These are free functions, not data-format methods, on purpose. A trackster references
