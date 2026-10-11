@@ -349,7 +349,7 @@ events per sample.
 |---|---|---|
 | `fakerate` | `1 - num_dominated/num_reco` | does **one** truth branch own the object |
 | `nocandidate` | `1 - num_assoc(recoToSim)/num_reco` | does it correspond to **any** truth branch (a subset of `fakerate`) |
-| `nolevelcandidate` | `1 - num_levelcandidate/num_reco` | is the dominance question even **defined** for it |
+| `nolevelcandidate` | `1 - num_levelcandidate/num_reco` | is the dominance question even **defined** for it (first working-point folder only) |
 | `contaminated` | `1 - num_assoc_strict/num_reco` | does its best candidate pass the 0.6 recoToSim score (HGCalValidator's non-fake cut) |
 | `recopurity` | `num_recopurity/num_reco` | how much of the object belongs to the branch it matched, as a **mean** |
 | `pileuprate` | `num_pileup/num_reco` | is the matched branch an overlaid interaction |
@@ -431,7 +431,9 @@ the leading contributor over the runner-up, capped at 20. The validator reads bo
 the first working point's map. That map is the only one carrying every candidate,
 because an adaptive point inserts just the branch it climbed to. That makes the fake
 rate identical at all working points by construction. The validation scripts
-assert this as a control.
+assert this as a control. `leading_truth_share`, `dominance_ratio` and
+`num_levelcandidate` are the same in every working-point folder for the same reason, so
+the validator books them in the first working-point folder of each collection only.
 
 #### The antichain requirement
 
