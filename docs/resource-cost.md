@@ -40,16 +40,17 @@ when this document was first written. Two changes narrowed it. First, the truth 
 grew when its detector scope was corrected. The pruning and the hit index had been
 blind to the barrel, HCAL, the tracker and the muon chambers. The truth graph was
 therefore small because it was wrong. Second, the association layer grew from one
-working point to four plus the per-level denominators. The levels work added the level
-flags and the particle role. These cost 5 bytes per particle before compression.
+working point to four plus the per-level denominators. The code now has three working
+points, because `AdaptiveLoose` was removed after this measurement. The levels work
+added the level flags and the particle role. These cost 5 bytes per particle before compression.
 
 The legacy row is unchanged, because nothing in the graph work touches those
 collections. The graph and association rows come from a re-measurement on the current
 build.
 
-Drop the legacy collections and keep the truth graph plus all four association working
-points. That saves 137.4 kB/event compressed, 17.8% of the truth payload. That is
-with the full signal GEN half included, which the legacy collections do not carry at
+Drop the legacy collections and keep the truth graph plus the four association working
+points of this measurement. That saves 137.4 kB/event compressed, 17.8% of the truth
+payload. That is with the full signal GEN half included, which the legacy collections do not carry at
 all. The shared hit index is what makes the truth graph a saving rather than a cost;
 the materialised index is larger, see section 1.2.
 
