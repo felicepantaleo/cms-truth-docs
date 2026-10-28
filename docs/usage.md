@@ -133,6 +133,17 @@ process.truthLogicalGraphHitIndexProducer = cms.EDProducer(
     index. Never feed both `HGCalRecHit` and `particleFlowRecHitHGC` into the same
     map, because that double counts.
 
+!!! warning "Barrel and forward rechits in a RECO file"
+    The map reads the plain PFRecHit collections. Standard RECO output keeps only
+    their `Cleaned` instances, which hold the hits that failed the quality tests. Under
+    `enableTruth`, `FEVTDEBUGHLT` and `RECOSIM` also keep the plain `particleFlowRecHitECAL`,
+    `particleFlowRecHitHBHE`, `particleFlowRecHitHF` and `particleFlowRecHitHO`. A file
+    written without them resolves no barrel or forward cell: on 20 TTbar events, 0 of
+    230807 ECAL barrel hits and 0 of 17669 HCAL hits got a `recHitIndex`. The map
+    producer then names each missing collection once per job. Do not point the map at
+    the `Cleaned` instances. The association itself matches by `DetId` and does not need
+    the map.
+
 ## Consuming the products in an EDAnalyzer
 
 The three products are ordinary EDM products: `truth::Graph`,

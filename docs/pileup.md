@@ -168,7 +168,9 @@ The `enableTruth` process modifier does this in every Run4 DIGI step:
    The default scope is Calo + Tracker + Muon; the MTD channel is filled on request,
    see [Data model](data-model.md). `mixedTruthGraphCustomize.customiseTruthReduced`
    drops the Tracker channel for cost-sensitive runs, and leaves calo + MTD + muon;
-3. `EventContent_cff` keeps the three products in `FEVTDEBUGHLT` and `RECOSIM`.
+3. `EventContent_cff` keeps the three products in `FEVTDEBUGHLT` and `RECOSIM`. It also
+   keeps the plain barrel and forward PFRecHits (`particleFlowRecHitECAL`, `HBHE`, `HF`,
+   `HO`), so that `DetIdToRecHitMapProducer` can resolve those cells in a RECO file.
 
 The code builds the hit index unresolved (`recHitMap = ""`, so `recHitIndex`
 stays invalid). This is deliberate. The shared-energy association
@@ -192,7 +194,7 @@ chosen verbosity level. RECO needs no rebuild and no sim-hits.
 
 | Level | Keeps | Serves |
 |---|---|---|
-| `compact` (default) | logical graph + **unresolved** hit index + raw `TruthGraph_mix` | correct hits-and-fractions shared energy at any stage whose rechits share the cell-level `DetId` space (HLT, offline RECO) |
+| `compact` (default) | logical graph + **unresolved** hit index + raw `TruthGraph_mix` + plain barrel and forward PFRecHits | correct hits-and-fractions shared energy at any stage whose rechits share the cell-level `DetId` space (HLT, offline RECO) |
 | `full` | compact + the merged sim-hits of every in-scope channel | re-association at a **different granularity** (e.g. L1 trigger cells) or with a different metric, from the raw deposits |
 
 **Denominator invariant:** the fraction denominator is the sum of the index hit
@@ -212,7 +214,8 @@ C17:
 
 - `digitizers_cfi` registers the `TruthGraphAccumulator` in the mixing digitizers;
 - `Digi_cff` builds the logical graph + unresolved hit index right after mixing;
-- `EventContent` keeps the compact truth in FEVTDEBUGHLT and RECOSIM;
+- `EventContent` keeps the compact truth and the plain barrel and forward PFRecHits in
+  FEVTDEBUGHLT and RECOSIM;
 - `truthGraphValidation_cff` / `globalValidation_cff` consume the DIGI-built graph
   at RECO, with associators and validators that use `rawSrc=mix`. They deliberately
   do NOT import the signal-only build producers, which would attach at RECO and
