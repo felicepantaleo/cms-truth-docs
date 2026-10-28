@@ -2,8 +2,7 @@
 
 `SimGeneral/TruthGraphAssociatorProducers` turns the truth graph into association maps
 between reconstructed objects and truth branches. `Validation/TruthInfo` turns those
-maps into DQM plots. Both are offered upstream in cms-sw/cmssw#51829 and are not in
-`CMSSW_20_1_X` yet.
+maps into DQM plots. Both are in `CMSSW_20_1_X` from `CMSSW_20_1_X_2026-10-27-2300` (cms-sw/cmssw#51829).
 
 ## What runs, and when
 

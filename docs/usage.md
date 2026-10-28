@@ -583,8 +583,8 @@ library.
 ## Trackster-to-branch associations and the training dataset
 
 !!! warning "Partly on the development branch"
-    The association layer, `SimGeneral/TruthGraphAssociatorProducers`, is offered
-    upstream in cms-sw/cmssw#51829 and is not in `CMSSW_20_1_X` yet. The NanoAOD table
+    The association layer, `SimGeneral/TruthGraphAssociatorProducers`, is in
+    `CMSSW_20_1_X` from `CMSSW_20_1_X_2026-10-27-2300`. The NanoAOD table
     producers and the training customise live on the `ticl-v6-dev` development branch.
     They are `TracksterTruthBranchTableProducer`, `TracksterFeatureFlatTableProducer`,
     `BranchSimTracksterProducer`, `customiseTruthBranchTraining`, the `@HGCALTruth`

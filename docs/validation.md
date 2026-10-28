@@ -296,7 +296,7 @@ package dependency. A new reco type = one new adapter returning
 
 The first-generation `BranchRecoValidator` (two modules, `BranchTrackRecoValidator`
 and `BranchTracksterRecoValidator`, opt-in behind
-`truthGraphRecoSideValidationSequence`) is removed in PR 51829. It matched at one
+`truthGraphRecoSideValidationSequence`) is removed by cms-sw/cmssw#51829. It matched at one
 fixed truth definition and needed a disjoint truth reference that was never wired.
 `TruthBranchRecoValidator` in `Validation/TruthInfo` books the same efficiency, fake,
 merge and duplicate plots with the truth level and the working point as axes; see the
@@ -338,8 +338,8 @@ makeBranchValidationPlots.sh /path/library /path/branch_plots
 ## Reco-side metrics in `Validation/TruthInfo` (current generation, 2026-08-01)
 
 The sections above describe the first-generation validators. `Validation/TruthInfo` is
-the current-generation package. It is not in `CMSSW_20_1_X`: it is offered upstream in
-cms-sw/cmssw#51829, on top of the association layer. It holds one templated
+the current-generation package. It is in `CMSSW_20_1_X` from `CMSSW_20_1_X_2026-10-27-2300`
+(cms-sw/cmssw#51829), on top of the association layer. It holds one templated
 `TruthBranchRecoValidator` over tracks, vertices, secondary vertices and tracksters.
 `DQMGenericClient` string configuration harvests all of it. Six metrics live on the
 reco side and they answer four different questions. The numbers below come from 200

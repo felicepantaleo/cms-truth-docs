@@ -8,23 +8,20 @@ and draw its history as a picture.
 You need an account with access to `/cvmfs/cms.cern.ch` and a machine with about 20 GB of
 free disk.
 
-## Step 1: get a release and the branch
+## Step 1: get a release
 
-The two data-format packages are in `CMSSW_20_1_X`. The association layer and the DQM
-package are offered upstream in cms-sw/cmssw#51829, so for now one merge brings
-everything.
+The graph, the association layer and the DQM package are in `CMSSW_20_1_X` from
+`CMSSW_20_1_X_2026-10-27-2300`. You need no merge.
 
 ```bash
-cmsrel CMSSW_20_1_X_2026-09-28-1100      # scram list CMSSW_20_1_X shows what is on cvmfs today
-cd CMSSW_20_1_X_2026-09-28-1100/src
+cmsrel CMSSW_20_1_X_2026-10-27-2300      # scram list CMSSW_20_1_X shows what is on cvmfs today
+cd CMSSW_20_1_X_2026-10-27-2300/src
 cmsenv
-git cms-init
-git cms-merge-topic felicepantaleo:truth-adaptive-associator-v1
-scram b -j 8
 ```
 
 Integration builds age off cvmfs after about two weeks, so take a recent one rather than
-the release named here.
+the release named here. Do not take one older than `CMSSW_20_1_X_2026-10-27-2300`: it does not have the association
+layer.
 
 ## Step 2: produce three events
 

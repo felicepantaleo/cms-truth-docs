@@ -6,25 +6,18 @@ This tutorial runs the match on two samples where the answer is known: a single 
 
 All commands are single-thread and need CVMFS.
 
-## 1. Release and branch
+## 1. Release
 
 ```bash
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 # Pick a recent IB: scram list CMSSW_20_1_X shows what is on cvmfs today.
 # IBs age off cvmfs after a few weeks, so do not pin an old one.
-IB=CMSSW_20_1_X_2026-09-03-1100
+# The associator is in CMSSW_20_1_X from CMSSW_20_1_X_2026-10-27-2300.
+IB=CMSSW_20_1_X_2026-10-27-2300
 cmsrel $IB
 cd $IB/src
 cmsenv
-
-git cms-init
-# One merge brings everything: truth-adaptive-associator-v1 is stacked on the
-# "MC-truth graph by default for Run4" branch, so this single topic pulls in both
-# the default-on truth graph and the association layer.
-git cms-merge-topic felicepantaleo:truth-adaptive-associator-v1
-
-scram b -j 8
 ```
 
 Notes:
@@ -34,16 +27,13 @@ Notes:
   build. If your OS matches no build, first run inside the matching CMS
   container, for example `cmssw-el8` or `cmssw-el9`. Then follow the same
   commands.
-- The base truth-graph packages (`SimDataFormats/TruthInfo`,
-  `PhysicsTools/TruthInfo`) are already in the IB, including the truth levels.
-  The merge adds the association layer (`SimGeneral/TruthGraphAssociatorProducers`)
-  and the DQM validation package (`Validation/TruthInfo`).
-- Compile on one socket only.
-- The associators run in the release validation on their own, with no customise: the
-  Run4 eras carry `enableTruth`, which schedules them in the prevalidation Path and
-  the DQM analyzers in the validation EndPath. The customise used below,
+- The IB holds all four truth packages: `SimDataFormats/TruthInfo`,
+  `PhysicsTools/TruthInfo`, the association layer
+  (`SimGeneral/TruthGraphAssociatorProducers`) and the DQM package
+  (`Validation/TruthInfo`). You check out and compile nothing.
+- The associators do not run in a standard workflow. The customise used below,
   `SimGeneral/TruthGraphAssociatorProducers/python/customiseTruthGraphAssociators.py`,
-  is for a job that wants the maps kept in its own output.
+  schedules them. The runTheMatrix `.88` workflows apply it.
 
 ## 2. Single electron in HGCAL (no PU, D122)
 
@@ -217,7 +207,7 @@ the score, the purity and the efficiency per working point and per truth level.
 
 ## 7. What to expect: electron versus pion
 
-We ran both samples end to end on this branch (5 events each, D122, no PU). Every
+We ran both samples end to end with the association layer (5 events each, D122, no PU). Every
 trackster gets a match in both samples. What differs is the number of candidate
 branches. Understand this difference before you interpret your own plots:
 

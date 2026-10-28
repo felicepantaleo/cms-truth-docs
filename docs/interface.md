@@ -655,14 +655,13 @@ accessors above.
 
 ## `truth::BranchHitAssociator`
 
-!!! warning "Association layer: not in `CMSSW_20_1_X`"
+!!! note "Release"
     The signatures in this section, including `denominatorDetectors`,
     `sharedEnergyFraction`, `BranchMatch::kInvalidRoot`, `bestAdaptiveBranch` and
-    the `reco::CaloCluster` hit adapter, are those of the association layer offered
-    upstream in cms-sw/cmssw#51829. The release carries an earlier
+    the `reco::CaloCluster` hit adapter, are in `CMSSW_20_1_X` from
+    `CMSSW_20_1_X_2026-10-27-2300` (cms-sw/cmssw#51829). An older release carries an earlier
     `BranchHitAssociator` with a five-argument constructor, a four-field
-    `BranchMatch`, and adapters for tracks and tracksters only. Build against the
-    branch before using them.
+    `BranchMatch`, and adapters for tracks and tracksters only.
 
 `BranchHitAssociator` matches reco objects to truth branches by shared detector
 hits. You build it once per event over a set of candidate branch roots, where an

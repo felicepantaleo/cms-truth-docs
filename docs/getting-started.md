@@ -44,17 +44,15 @@ A remote file reads more slowly than a local one. For a full sample, copy it fir
 ## Set up an area
 
 ```bash
-cmsrel CMSSW_20_1_X_2026-09-28-1100      # scram list CMSSW_20_1_X shows what is on cvmfs today
-cd CMSSW_20_1_X_2026-09-28-1100/src
+cmsrel CMSSW_20_1_X_2026-10-27-2300      # scram list CMSSW_20_1_X shows what is on cvmfs today
+cd CMSSW_20_1_X_2026-10-27-2300/src
 cmsenv
-git cms-init
-git cms-merge-topic felicepantaleo:truth-adaptive-associator-v1
 git clone https://github.com/felicepantaleo/TruthGraphAnalysis.git TruthGraphAnalysis
 scram b -j 8
 ```
 
-Integration builds leave cvmfs after about two weeks. If this one is gone, take the most
-recent one. A newer release reads the tutorial files. An older release cannot read them.
+Integration builds leave cvmfs after about two weeks. If this one is gone, take a more
+recent one. Do not take one older than `CMSSW_20_1_X_2026-10-27-2300`: it does not have the association layer. A newer release reads the tutorial files. An older release cannot read them.
 
 The recipes below use scripts from
 [TruthGraphAnalysis](https://github.com/felicepantaleo/TruthGraphAnalysis), in the

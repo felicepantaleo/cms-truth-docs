@@ -29,7 +29,7 @@ Sub-events therefore cannot collide. See [Pileup](pileup.md).)
 - **Disjoint "interesting particles" reference for the reco-side validators.**
   Done. The truth levels are antichains by construction, and
   `TruthBranchRecoValidator` in `Validation/TruthInfo` takes the level as an axis.
-  The first-generation opt-in `BranchRecoValidator` is removed in PR 51829. See
+  The first-generation opt-in `BranchRecoValidator` is removed by cms-sw/cmssw#51829. See
   [Validation](validation.md#the-hit-exposure-layer).
 
 ## Storage / data layout (deliberate changes, not mechanical)
