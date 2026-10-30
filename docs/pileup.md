@@ -165,9 +165,9 @@ The `enableTruth` process modifier does this in every Run4 DIGI step:
 2. `truthGraphMixedDigiTask` (`PhysicsTools/TruthInfo/python/truthGraphMixedDigi_cff.py`,
    added to `pdigiTask` in `Digi_cff`) builds the logical graph and the per-particle
    per-cell hit index right after mixing, reading the accumulator's merged sim-hits.
-   The default scope is Calo + Tracker + Muon; the MTD channel is filled on request,
-   see [Data model](data-model.md). The hitless-subgraph pruning reads the MTD sim-hits
-   in every case, so a particle with only MTD hits stays in the graph.
+   The default scope is Calo + MTD + Muon + Tracker, see [Data model](data-model.md).
+   The MTD channel is filled from `mix:MergedMtdTruthLC`. The hitless-subgraph pruning
+   reads the MTD sim-hits, so a particle with only MTD hits stays in the graph.
    `mixedTruthGraphCustomize.customiseTruthReduced`
    drops the Tracker channel for cost-sensitive runs, and leaves calo + MTD + muon;
 3. `EventContent_cff` keeps the three products in `FEVTDEBUGHLT` and `RECOSIM`. It also

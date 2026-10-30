@@ -554,6 +554,19 @@ noise floor of two A runs (relative difference 1.3e-6). `stableLegsFromInitialSt
 `underlyingEvent` can also hold neutrinos when a preset builds them; the same rule
 applies there.
 
+### A denominator member can be required to have hits in the domain (2026-10-30)
+
+`requireHits` of `TruthBranchTrackValidator`, `TruthBranchTracksterValidator` and `TruthBranchPFClusterValidator` keeps in the truth-to-reco denominators only the members whose subgraph has hits in the hit-index channel of the domain: `Tracker` for tracks, `Calo` for tracksters and PF clusters. The default is `false`. The cut is in the validator and not in `TruthBranchTargetsProducer`, because one target list serves every domain and only the validator knows its channel.
+
+Measured on 10 no-PU ttbar events (34834.88, one shared `step2.root`). With the default, all histograms agree within the noise floor of two runs. With `requireHits = true`, every numerator is unchanged, because a member without hits in the channel has no match. The denominators change:
+
+| level | `num_simul`, calorimeter domains | `num_simul`, `generalTracks` |
+|---|---|---|
+| `caloBoundary` | 12526 to 11868 (-5.3%) | 12526 to 3222 (-74.3%) |
+| `stableDecayProducts` | 3687 to 3357 (-9.0%) | 3687 to 2457 (-33.4%) |
+| `reconstructableFinalState` | 2925 to 2698 (-7.8%) | 2925 to 2343 (-19.9%) |
+| `hardProcess` | 59 to 53 (-10.2%) | 59 to 53 (-10.2%) |
+
 ### The secondary-vertex denominator is the heavy-flavour decay vertices (2026-08-04)
 
 A secondary vertex is where a b or c hadron decayed. The denominator is therefore the

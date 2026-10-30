@@ -118,9 +118,7 @@ user-facing bipartite Particle ↔ Vertex graph from the raw graph.
   step in `TruthLogicalGraphPostProcessor`, before any collapsing or selection. The
   producer supplies the per-particle hit presence by reading the calo, tracker, MTD
   and muon sim-hit collections (`simHitCollections`, `trackerSimHitCollections`,
-  `mtdSimHitCollections`, `muonSimHitCollections`). The MTD hits are read also when
-  the hit index leaves the MTD channel out, so a later job can fill that channel. On a
-  TTbar event this removes the ~13k purely invisible SIM
+  `mtdSimHitCollections`, `muonSimHitCollections`). On a TTbar event this removes the ~13k purely invisible SIM
   particles and leaves every hit-bearing one untouched.
 
 ### Navigation API
@@ -267,8 +265,7 @@ You reach the per-particle hits through the channel accessors:
       hit in ns. BTL behaves like a calorimeter, where a cell is a crystal and its
       energy matters, and ETL like a tracker, where a cell is a pixel; the storage is
       the same and the consumer chooses the metric. The channel reads no reco
-      product, and the default DIGI index leaves it out: add `MTD` to
-      `subdetectors` to fill it.
+      product. The default DIGI index fills it.
     - **Muon**: the five `g4SimHits:Muon{DT,CSC,RPC,GEM,ME0}Hits` `PSimHit`
       collections matched by `trackId()`, like the tracker channel. There is no
       recHit link, because muon rechits are reconstructed segments. A
