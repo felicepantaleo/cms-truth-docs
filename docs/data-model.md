@@ -114,7 +114,12 @@ user-facing bipartite Particle ↔ Vertex graph from the raw graph.
   index by construction. GEN-only descendants of a removed SIM particle (e.g.
   neutrinos from a soft hadron that deposited nothing) go out with it. The GEN
   skeleton outside removed SIM subtrees stays, including invisible decays such as
-  Z→νν that never enter the simulation. The pruning is the first post-processing
+  Z→νν that never enter the simulation. The decay products of a GEN particle of a
+  `reconstructablePdgIds` species also stay, with or without hits. A pi0 therefore
+  keeps both photons, and the association decides whether the reconstruction
+  resolves or merges them. On 10 TTbar D122 events, 146 of the 1068 GEN pi0 lost one
+  or both photons to the pruning before this rule; now none does (+158 particles,
+  152 of them at |η| > 3). The pruning is the first post-processing
   step in `TruthLogicalGraphPostProcessor`, before any collapsing or selection. The
   producer supplies the per-particle hit presence by reading the calo, tracker, MTD
   and muon sim-hit collections (`simHitCollections`, `trackerSimHitCollections`,
