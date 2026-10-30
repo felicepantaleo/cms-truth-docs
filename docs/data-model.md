@@ -98,10 +98,11 @@ user-facing bipartite Particle ↔ Vertex graph from the raw graph.
   `TruthGraph::simTrackBackscattered`.
 - **The producer prunes hitless SIM subgraphs**
   (`postProcessing.dropHitlessSimSubgraphs`, default on). It removes every SIM
-  particle whose calorimeter + tracker sim-hit subgraph is empty, together with the
-  whole downstream subtree of that particle. The logical graph is therefore the
-  *detectable* truth. A particle that left no signature in any calorimeter
-  (HGCAL EE/HE, ECAL barrel, HCAL) and none in the tracker does not appear. The
+  particle whose calorimeter + tracker + MTD + muon sim-hit subgraph is empty,
+  together with the whole downstream subtree of that particle. The logical graph is
+  therefore the *detectable* truth. A particle that left no signature in any
+  calorimeter (HGCAL EE/HE, ECAL barrel, HCAL), the tracker, the MTD (BTL/ETL) or the
+  muon chambers does not appear. The
   "empty subgraph" test uses exactly the rule by which `LogicalGraphHitIndex`
   attributes hits. A particle has a hit only when a sim-hit carries its `SimTrack`
   trackId with positive energy. The kept graph is therefore consistent with the hit
@@ -110,8 +111,11 @@ user-facing bipartite Particle ↔ Vertex graph from the raw graph.
   skeleton outside removed SIM subtrees stays, including invisible decays such as
   Z→νν that never enter the simulation. The pruning is the first post-processing
   step in `TruthLogicalGraphPostProcessor`, before any collapsing or selection. The
-  producer supplies the per-particle hit presence by reading the calo/tracker
-  sim-hit collections. On a TTbar event this removes the ~13k purely invisible SIM
+  producer supplies the per-particle hit presence by reading the calo, tracker, MTD
+  and muon sim-hit collections (`simHitCollections`, `trackerSimHitCollections`,
+  `mtdSimHitCollections`, `muonSimHitCollections`). The MTD hits are read also when
+  the hit index leaves the MTD channel out, so a later job can fill that channel. On a
+  TTbar event this removes the ~13k purely invisible SIM
   particles and leaves every hit-bearing one untouched.
 
 ### Navigation API
