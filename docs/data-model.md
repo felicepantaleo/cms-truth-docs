@@ -119,7 +119,10 @@ user-facing bipartite Particle ↔ Vertex graph from the raw graph.
   keeps both photons, and the association decides whether the reconstruction
   resolves or merges them. On 10 TTbar D122 events, 146 of the 1068 GEN pi0 lost one
   or both photons to the pruning before this rule; now none does (+158 particles,
-  152 of them at |η| > 3). The pruning is the first post-processing
+  152 of them at |η| > 3). A status-2 GEN particle whose decay products the pruning
+  removed is removed too, up the chain, so no GEN leaf without hits remains (on the
+  same events, 7 K0 and K*0 at |η| > 3). A status-2 particle that keeps a product, such
+  as a tau with its GEN neutrino, stays. The pruning is the first post-processing
   step in `TruthLogicalGraphPostProcessor`, before any collapsing or selection. The
   producer supplies the per-particle hit presence by reading the calo, tracker, MTD
   and muon sim-hit collections (`simHitCollections`, `trackerSimHitCollections`,
