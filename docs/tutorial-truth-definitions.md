@@ -128,6 +128,10 @@ levels signal 2, stableLegsFromInitialState 93, reconstructableFromSignal 70,
        tauVisibleHadronic 1
 ```
 
+The `reconstructableFromSignal` count above was made before the walk split the colour
+strings that the signal shares with non-signal partons. With that rule the level is
+smaller; the example is not rerun yet. See [Findings](findings.md).
+
 Three things happened. The two top quarks now carry the `signal` level, so a question such
 as "what fraction of the top quark energy is visible" has a subject. Four artificial
 vertices appeared: the graph summarises everything the preset dropped into one interaction
