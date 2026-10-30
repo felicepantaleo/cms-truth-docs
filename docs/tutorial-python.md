@@ -108,6 +108,7 @@ graph.particlesOfLevel("bHadrons")
 graph.particlesAtLevels(["caloBoundary", "stableDecayProducts"], "all")
 graph.signalParticles()                      # the preset's signal, or the shot particles of a gun
 graph.isSignal(i), graph.isFromPileup(i)
+graph.isInTime(i)                            # bunch crossing 0: the signal and the in-time pileup
 graph.bunchCrossing(i), graph.eventIndex(i)
 ```
 

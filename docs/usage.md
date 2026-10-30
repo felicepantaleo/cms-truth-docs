@@ -402,7 +402,7 @@ graph = TruthGraphView.fromJson("truthlogicalgraph_run1_lumi1_event7.json")
 The view offers `children`, `parents`, `descendants`, `productionVertices`,
 `decayVertices`, `incomingParticles`, `outgoingParticles`, the level helpers
 `levels`, `isAtLevel` and `particlesOfLevel`, the provenance helpers `bunchCrossing`,
-`eventIndex`, `isSignal`, `isFromPileup`, `interactions` and `particlesOfInteraction`, and
+`eventIndex`, `isSignal`, `isFromPileup`, `isInTime`, `interactions` and `particlesOfInteraction`, and
 `verticesWithRole`. `hasMomentum` says whether a particle has one at all.
 
 `TruthLogicalGraphDumper` writes that JSON when `jsonFile` is set, next to the dot file and

@@ -362,7 +362,7 @@ These accessors give the source event of the root. They decode it from the
 int32_t  genEvent() const;
 int      bunchCrossing() const;
 int      event() const;
-bool     isInTime() const;     // bunchCrossing() == 0
+bool     isInTime() const;     // root().isInTime(): bunchCrossing() == 0
 bool     isFromPileup() const; // !isSignal(). In-time pileup has bunchCrossing() 0
                                // and a nonzero event(), and the default production
                                // keeps in-time pileup only, so a bunch-crossing test
