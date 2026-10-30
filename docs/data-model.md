@@ -15,6 +15,11 @@ single heterogeneous, read-only graph directly from HepMC2/HepMC3 plus
 - **Node kinds:** `GenEvent`, `GenVertex`, `GenParticle`, `SimVertex`, `SimTrack`.
 - **Edge kinds:** `Gen` (within GEN), `Sim` (within SIM), `GenToSim` (the realm
   boundary, `GenParticle → SimTrack`), `SimToGen` (reserved).
+- **GenEvent edges:** a `GenEvent` node points to every GEN vertex with no incoming
+  particle, and to every GEN vertex that those vertices do not reach along the edges.
+  The beams enter the first vertex of a collider record, so there the `GenEvent` node
+  points to every GEN vertex. `truth::genEventAttachedVertices` gives the list, and the
+  unmixed and the mixed graph builders both use it.
 - **Storage:** CSR out-edges (`offsets`, `edges`, `edgeKind`) + per-node payload
   (`pdgId`, `status`, `statusFlags`, packed `EncodedEventId`, `genEventOfNode`).
 - **Associations:** `simTrackToGen`, `simTrackToVtx`, `simVtxToGen`. These hold the
