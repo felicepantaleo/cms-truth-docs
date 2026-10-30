@@ -126,6 +126,16 @@ process.truthLogicalGraphHitIndexProducer = cms.EDProducer(
     numbering. Without it, the HCAL entries of the index carry sim ids that match no
     `HBHERecHit`. ECAL barrel needs no conversion.
 
+!!! note "HF energies are in GeV"
+    An HF sim hit carries a photoelectron count: `HCalSD` stores 1 GeV for each
+    photoelectron of the shower library and of the fibre hits. The index divides the
+    count by the `samplingFactor` of the HF digitizer (`hcalSimParameters.hf1` for the
+    long fibres, `hf2` for the short fibres, 0.37 for both in the Phase-2 eras), given
+    in `hfSamplingFactors`. An HF entry is then the energy in GeV that the digitizer
+    gives the hit. On TTbar without pileup the sum of the HF PFRecHit energies over the
+    sum of the HF index energies is 1.005 (2.71 before the conversion). The other
+    calorimeters keep the energy that Geant4 deposits in the active material.
+
 !!! note
     The concatenation order in `DetIdToRecHitMapProducer` fixes the global
     `recHitIndex`: all `HGCRecHitCollection` inputs first, then all

@@ -216,7 +216,9 @@ You reach the per-particle hits through the channel accessors:
   `energy = e1 + e2`.
 
 !!! warning "Sim energy is per-particle; reco attribution is whole-cell, not fractional"
-    `energy` is the particle's (or subtree's) own sim energy in the cell. This
+    `energy` is the particle's (or subtree's) own sim energy in the cell, in GeV. An
+    HF entry is the photoelectron count converted with the HF digitizer
+    `samplingFactor`, see [usage](usage.md). This
     side *is* fractional: each particle carries exactly what it deposited. The
     recHit side is binary, not fractional. The coalesced `Hit` links the
     cell's recHit once. Summing `recHitEnergies[recHitIndex]` over a particle's hits
