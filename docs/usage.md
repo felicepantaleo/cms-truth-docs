@@ -203,6 +203,58 @@ On one thread, the two producers take 7.5 ms and 0.6 ms per TTbar event. In the
 cmsDriver job above, the products take 11.6 kB (`TruthGraph`) and 50.2 kB
 (`truth::Graph`) per event on disk, compressed.
 
+### Run metadata
+
+On request, a job writes `truth::GraphMetadata` once per run, with the label
+`truthGraphMetadata`. It says how the graph of the run was built. The option is off by
+default. To turn it on:
+
+- in a GEN-only job, use `customiseTruthGenOnly.customiseTruthGenOnlyWithMetadata`
+  instead of `customiseTruthGenOnly`;
+- in a job that builds the graph at DIGI, add
+  `--customise PhysicsTools/TruthInfo/customiseTruthMetadata.customiseTruthMetadata`.
+
+`TruthGraphMetadataProducer` reads the parameter sets of the modules that ran, in this
+job and in the jobs before it, so the metadata cannot drift from the configuration.
+
+| Field | Content |
+|---|---|
+| `buildMode` | `GenOnly`, `GenSim`, or `GenSimMixed` (graph built during mixing) |
+| `pileupBunchCrossings` | the bunch crossings whose pile-up is in the graph (`GenSimMixed`) |
+| `cmsswVersion` | the release of the job that built the logical graph |
+| `generatorModule`, `generatorCmsswVersion`, `generatorConfig` | the type, the release and the tracked configuration of the generator module |
+| `generatorName`, `generatorVersion`, `generatorFragment` | the program, its version and the fragment name |
+| `presetName`, `signalSeedPdgIds`, `seedHadronFlavors`, `reconstructablePdgIds` | the selection |
+| `collapseIntermediateGenParticles`, `dropHitlessSimSubgraphs`, `pruningSimHitCollections` | the pruning |
+| `graphProducerConfig`, `rawGraphProducerConfig` | the tracked configuration of the graph producers |
+| `levelNames`, `levelFlags` | the name of each bit of `levelFlags` |
+| `hitIndexChannels`, `hitIndexInputs`, `hitIndexConfig` | the scope of the hit index |
+| `energySubdetectors`, `energyConventions` | the energy unit of the hit index in each subdetector |
+
+The generator program, its version and the fragment name are in no parameter set. The
+customise fills them only when the same job runs the generator: the version comes from
+`scram tool info` (for example `pythia8`, `317`), and the fragment from the cmsDriver
+annotation. In a DIGI job these three fields are empty. The other generator fields come
+from the GEN job in the process history.
+
+`applyTruthPreset` writes the preset name in `postProcessing.presetName` of every
+`TruthLogicalGraphProducer`, which includes the GEN-only one.
+
+When two input files hold different metadata for the same run, the framework keeps the
+first and logs an error. Monte Carlo files all have run 1, so do not merge files that were
+built with different settings.
+
+Read it in python:
+
+```python
+from DataFormats.FWLite import Runs, Handle
+metadata = Handle("truth::GraphMetadata")
+for run in Runs("gen.root"):
+    run.getByLabel("truthGraphMetadata", metadata)
+    m = metadata.product()
+    print(int(m.buildMode), m.generatorName, m.generatorVersion, m.presetName)
+```
+
 ## Consuming the products in an EDAnalyzer
 
 The three products are ordinary EDM products: `truth::Graph`,
