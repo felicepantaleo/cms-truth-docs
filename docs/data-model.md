@@ -89,6 +89,16 @@ user-facing bipartite Particle ↔ Vertex graph from the raw graph.
     `Unknown`. The producer stamps the byte on the complete GEN topology, before
     the post-processor rewrites the graph.
 
+    The species rules use `truth::isShowerObject`. A shower object is a parton
+    (gluon as 21 or 9), a diquark, a generator pseudoparticle (81 to 100), a Regge
+    exchange (110, 990, 9990), or a generator-internal state in the 99xxxxx
+    range: a Pythia diffractive state or a colour-octet onium state. The block
+    9900001 to 9900099 with a nonzero last digit holds physical BSM particles,
+    the left-right symmetric W_R, Z_R, N and H++. These are not shower objects,
+    so their decays are `Decay`. Measured on 4 Pythia8 W_R to e N events: the
+    W_R and N vertices, 8 in total, are `Decay`, and all other vertices keep
+    their reason.
+
     Measured on TTbar event 38, 129 GEN-only vertices: 106 `Decay`, 16
     `ShowerBranching`, 6 `Hadronization`, 1 `HardScatter`, none `Unknown`. With
     the intermediate copy chains kept the same event has 172 GEN vertices: 118
