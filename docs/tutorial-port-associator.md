@@ -145,7 +145,9 @@ channel, the tie rule and the pileup GEN payload (the same counts come out of
 events with 5 interactions in each bunch crossing, with the MinBias of workflow 37640.0 as
 pileup. The branch includes the pileup GEN payload, which gives a pileup particle its own
 production time; without it that time was 0 and the pileup time residual of the port was
-wider (BTL RMS 40.6 ps against 31.9 ps). Tracks with pt above 0.7 GeV; BTL is abs(eta) below 1.5. Both modules run in one
+wider (BTL RMS 40.6 ps against 31.9 ps). These two values were measured before a later fix
+of the pileup vertex time; with that fix the port gives 30.4 ps, as in the text below the
+table. Tracks with pt above 0.7 GeV; BTL is abs(eta) below 1.5. Both modules run in one
 job on each sample.
 
 | Category | No pileup: legacy | graph | 5 pileup: legacy | graph |
