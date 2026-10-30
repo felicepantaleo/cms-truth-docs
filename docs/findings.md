@@ -320,3 +320,12 @@ hadrons only if all its partons are signal" gives 0.73 and keeps 5 of 40 b hadro
 VBF H to bb the Higgs is a colour singlet: 0 of 22 strings are shared, and the level does
 not change. `reconstructableFinalState` seeds on every GEN root, so it has no shared
 string and does not change.
+
+The hadrons that follow a non-signal parton are underlying-event activity, so
+`underlyingEvent` takes them, and the stable legs below them, by the same rule as the
+legs off the UnderlyingEvent vertex. On the same 20 events `underlyingEvent` goes from
+7566 to 8875 members and from 205.7 to 232.4 TeV. No particle is in both
+`reconstructableFromSignal` and `underlyingEvent`, and no member of either level is an
+ancestor of a member of the other or of its own level. The visible and neutrino energy of
+the signal level plus the energy of `underlyingEvent` is 1.0043 times the energy of the
+generator-stable particles of the event (1.0077 before this change).
