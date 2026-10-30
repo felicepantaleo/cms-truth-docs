@@ -67,8 +67,9 @@ What to look at:
   τ → μ ν<sub>μ</sub> ν<sub>τ</sub> and a τ → e ν<sub>e</sub> ν<sub>τ</sub>.
 - **Neutrinos are the invisible leaves.** Every branch terminates in at least one
   **τ neutrino** (ν, pdgId ±16). The leptonic legs add a ν<sub>μ</sub> or a
-  ν<sub>e</sub>. These are leaves with no hits. They are exactly what
-  `Branch::visibleP4()` excludes and what `invisibleEnergy()` measures.
+  ν<sub>e</sub>. These are leaves with no hits. `Branch::visibleP4()` excludes them,
+  together with the other `truth::isInvisible` species, and `invisibleEnergy()` measures
+  them.
 
 This is how the Branch selection produces the picture. The cut is
 `seedPdgIds = {15, -15}`, `seedParentDepth = 0` and `keepStableSpectators = false`.

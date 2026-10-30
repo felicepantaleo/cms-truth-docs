@@ -55,7 +55,7 @@ namespace mystudy {
 
 Three interface calls carry the work. `truth::particlesAtLevels` answers "which particles
 is this measurement about". `Particle::lastCopy()` moves to the copy that carries the
-decay. `truth::isInvisible` keeps the neutrinos out of a visible energy.
+decay. `truth::isInvisible` keeps the neutrinos and the invisible BSM states out of a visible energy.
 
 This is the generator-level visible energy: the tau decay products, without the neutrinos.
 Resist the temptation to sum the leaves of the whole branch instead. The branch continues

@@ -70,10 +70,18 @@ efficiency denominator does not: no reco object can find a neutrino, so a neutri
 the denominator caps the efficiency below 1. `TruthBranchTargetsProducer` therefore drops
 every invisible member from `truthToRecoTargets<Level>`. `levelFlags` do not change.
 `truth::isInvisible` in `TruthLevels.h` holds the species: the neutrinos (12, 14, 16),
-the graviton (39), the PDG dark matter states (51, 52, 53), the lightest neutralino
-(1000022), the gravitino (1000039) and the Kaluza-Klein graviton (5100039). A member of
-such a species that the graph decays, for example a long-lived neutralino, stays in the
-denominator, because its decay products are visible.
+the graviton (39), the PDG dark matter states (51, 52, 53), the sneutrinos (1000012,
+1000014, 1000016), the lightest neutralino (1000022), the gravitino (1000039) and the
+Kaluza-Klein graviton (5100039). `truth::isInvisibleParticle` asks for an invisible
+species AND for an invisible species at every leaf below the particle. A copy chain of a
+neutrino is therefore invisible. A neutralino that decays to visible particles, for
+example a long-lived one, stays in the denominator. The list is closed: a hidden-valley
+dark hadron or another dark matter id is visible until it is added.
+
+The `signal` denominator (`signalSeeds`) drops an invisible seed by the same rule, so a
+neutrino gun has an empty `signal` folder. `signalNoSelection` has no cut at all and
+keeps the invisible seeds. The gap between the two folders is therefore what the
+selector removed plus the invisible seeds.
 
 All twelve templates contain the resonance. The truth graph therefore never has to
 invent one. A synthetic stand-in exists for a generator that omits the resonance.
@@ -553,6 +561,11 @@ numerator is unchanged. Outside these two levels, all histograms agree within th
 noise floor of two A runs (relative difference 1.3e-6). `stableLegsFromInitialState` and
 `underlyingEvent` can also hold neutrinos when a preset builds them; the same rule
 applies there.
+
+The rule follows the subgraph and not only the first decay vertex. With
+`collapseIntermediateGenParticles = False` a hard-process neutrino (status 23) has a
+status-1 copy as its child, and a test of the direct child alone counts it as visible.
+With the default collapse, all 11 `hardProcess` neutrinos of 20 ttbar events are leaves.
 
 ### A denominator member can be required to have hits in the domain (2026-10-30)
 

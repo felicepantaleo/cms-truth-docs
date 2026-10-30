@@ -529,7 +529,7 @@ std::vector<Particle> truth::particlesAtLevels(graph, {levels}, truth::LevelMatc
 bool truth::isLepton(int32_t pdgId);             // charged leptons, not neutrinos
 bool truth::isNeutrino(int32_t pdgId);           // |pdg| 12, 14, 16
 bool truth::isInvisible(int32_t pdgId);          // neutrinos and invisible BSM states
-bool truth::isInvisibleParticle(graph, id);      // invisible species that the graph does not decay
+bool truth::isInvisibleParticle(graph, id);      // invisible species, every leaf below it invisible
 bool truth::isWeakBoson(int32_t pdgId);          // W and Z; the Higgs is neither
 ```
 
