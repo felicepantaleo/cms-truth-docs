@@ -299,33 +299,26 @@ someone had to write.
 
 In Pythia8 a top quark is coloured, so the string that hadronizes its b quark often ends on
 a beam-remnant parton, an initial-state gluon or a multi-parton-interaction gluon. In the
-graph the string is one GEN vertex: all its partons go in and all its hadrons come out. A
-walk down from the signal through that vertex took every hadron of the string, including
-the forward hadrons of the remnant end.
+graph the string is one GEN vertex: all its partons go in and all its hadrons come out.
 
-Measured on 20 no-PU ttbar events (34834.88, preset `top`), before the fix:
+The rule: a string that the signal reaches is not split. All its hadrons, and the stable
+legs below them, belong to the signal side: `reconstructableFromSignal` and
+`stableLegsFromInitialState`. `underlyingEvent` takes nothing from such a string, so no
+particle is in both `underlyingEvent` and a signal level.
+
+Measured on 20 no-PU ttbar events (34834.88, preset `top`):
 
 - 47 of the 109 string vertices that the tops reach also have a parton that does not
   descend from a top. 345 such partons: 198 initial-state shower, 127 multi-parton
   interaction, 12 direct beam daughters with 16.4 TeV, 8 beam remnant.
 - 1762 of 2615 `reconstructableFromSignal` members (67%) and 33.0 of 45.9 TeV (72%) reach
   the tops only through such a string.
-- The visible energy plus the neutrino energy of the level was 2.83 times the energy of the
+- The visible energy plus the neutrino energy of the level is 2.83 times the energy of the
   two tops on average, and 11.7 times at most.
 
-The rule now: each hadron of a shared string follows the string parton that is nearest to
-it in angle. On the same events the energy ratio is 1.014 on average (0.991 to 1.158), and
-all 40 weakly decaying b hadrons stay in the level. The stricter rule "a string gives
-hadrons only if all its partons are signal" gives 0.73 and keeps 5 of 40 b hadrons. On
-VBF H to bb the Higgs is a colour singlet: 0 of 22 strings are shared, and the level does
-not change. `reconstructableFinalState` seeds on every GEN root, so it has no shared
-string and does not change.
+So on ttbar `reconstructableFromSignal` holds forward hadrons of the remnant end of the
+string. On VBF H to bb the Higgs is a colour singlet: 0 of 22 strings are shared.
 
-The hadrons that follow a non-signal parton are underlying-event activity, so
-`underlyingEvent` takes them, and the stable legs below them, by the same rule as the
-legs off the UnderlyingEvent vertex. On the same 20 events `underlyingEvent` goes from
-7566 to 8875 members and from 205.7 to 232.4 TeV. No particle is in both
-`reconstructableFromSignal` and `underlyingEvent`, and no member of either level is an
-ancestor of a member of the other or of its own level. The visible and neutrino energy of
-the signal level plus the energy of `underlyingEvent` is 1.0043 times the energy of the
-generator-stable particles of the event (1.0077 before this change).
+A split of each string by the nearest parton in angle was tried and rejected. It gives an
+energy ratio of 1.014, but it cuts one hadronization subgraph in two parts that belong to
+different levels.
