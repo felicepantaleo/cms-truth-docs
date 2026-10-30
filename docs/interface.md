@@ -127,6 +127,8 @@ The roles are:
   event. Each keeps its SIM subgraph, which is where its hits are. A GEN particle of
   a `reconstructablePdgIds` species (the pi0) is collected in the same way, with its
   decay products below it, so `reconstructableFinalState` does not depend on the preset.
+  A particle with a selected particle below it is never collected here: a Dalitz pi0
+  above selected electrons hangs off a `BeamSideInput` vertex instead.
 - `VertexRole::BeamSideInput` is an artificial vertex. It holds the GEN parents that a
   kept vertex received from outside the selection, which the selection would otherwise
   drop. That is where a colour string spans the hard scatter and the beam remnant, so

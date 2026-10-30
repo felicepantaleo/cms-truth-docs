@@ -125,14 +125,19 @@ user-facing bipartite Particle ↔ Vertex graph from the raw graph.
   neutrinos from a soft hadron that deposited nothing) go out with it. The GEN
   skeleton outside removed SIM subtrees stays, including invisible decays such as
   Z→νν that never enter the simulation. The decay products of a GEN particle of a
-  `reconstructablePdgIds` species also stay, with or without hits. A pi0 therefore
-  keeps both photons, and the association decides whether the reconstruction
-  resolves or merges them. On 10 TTbar D122 events, 146 of the 1068 GEN pi0 lost one
-  or both photons to the pruning before this rule; now none does (+158 particles,
-  152 of them at |η| > 3). A status-2 GEN particle whose decay products the pruning
-  removed is removed too, up the chain, so no GEN leaf without hits remains (on the
-  same events, 7 K0 and K*0 at |η| > 3). A status-2 particle that keeps a product, such
-  as a tau with its GEN neutrino, stays. The pruning is the first post-processing
+  `reconstructablePdgIds` species with a hit in its subgraph also stay, with or
+  without hits of their own. A pi0 with a hit therefore keeps both photons, and the
+  association decides whether the reconstruction resolves or merges them. The removal
+  of a hitless SIM ancestor still removes these products, and their hitless SIM
+  continuation is still removed. A pi0 with no hit in its subgraph goes with its
+  photons. On 10 TTbar D122 events, 11 of the 1068 GEN pi0 have no hit, all at
+  |η| > 3.3; 16 more, at |η| > 5, keep only the photon that never entered the
+  simulation. A status-2 GEN particle left with only invisible decay products
+  (neutrinos) is removed with them, up the chain, so no GEN leaf without a visible
+  product remains (on the same events, 7 K0 and K*0 at |η| > 3). A tau whose pi- has
+  no hit therefore goes with its GEN neutrino, and `tauDecay` never reports a
+  hadronic tau with nothing visible. Status 2 is the HepMC code of a hadron or a tau
+  that the generator decayed (Pythia8, Herwig7, Sherpa). The pruning is the first post-processing
   step in `TruthLogicalGraphPostProcessor`, before any collapsing or selection. The
   producer supplies the per-particle hit presence by reading the calo, tracker, MTD
   and muon sim-hit collections (`simHitCollections`, `trackerSimHitCollections`,
