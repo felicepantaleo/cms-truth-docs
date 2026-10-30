@@ -213,32 +213,41 @@ default. To turn it on:
   instead of `customiseTruthGenOnly`;
 - in a job that builds the graph at DIGI, add
   `--customise PhysicsTools/TruthInfo/customiseTruthMetadata.customiseTruthMetadata`.
+  The customise needs exactly one graph producer in the job: the GEN-only one or the DIGI
+  one. For another job, call `addTruthMetadata` with the labels.
+
+The truth products go to every EDM output module, except the LHE stream and the NANOAOD
+and DQM output modules.
 
 `TruthGraphMetadataProducer` reads the parameter sets of the modules that ran, in this
-job and in the jobs before it, so the metadata cannot drift from the configuration.
+job and in the jobs before it, so the metadata cannot drift from the configuration. A later
+job can therefore write the metadata of a file it reads. A parameter that the earlier job
+did not have, for example `presetName` in a file of an older release, keeps its default
+value.
 
 | Field | Content |
 |---|---|
-| `buildMode` | `GenOnly`, `GenSim`, or `GenSimMixed` (graph built during mixing) |
+| `buildMode` | `GenOnly`, `GenSim` (no pile-up), or `GenSimMixed` (graph built during mixing with pile-up input). `Unknown`, with a warning, when no graph builder is found, for example in premix |
 | `pileupBunchCrossings` | the bunch crossings whose pile-up is in the graph (`GenSimMixed`) |
 | `cmsswVersion` | the release of the job that built the logical graph |
-| `generatorModule`, `generatorCmsswVersion`, `generatorConfig` | the type, the release and the tracked configuration of the generator module |
+| `generatorModule`, `generatorCmsswVersion`, `generatorConfig` | the type, the release and the configuration of the generator module |
 | `generatorName`, `generatorVersion`, `generatorFragment` | the program, its version and the fragment name |
 | `presetName`, `signalSeedPdgIds`, `seedHadronFlavors`, `reconstructablePdgIds` | the selection |
 | `collapseIntermediateGenParticles`, `dropHitlessSimSubgraphs`, `pruningSimHitCollections` | the pruning |
-| `graphProducerConfig`, `rawGraphProducerConfig` | the tracked configuration of the graph producers |
+| `graphProducerConfig`, `rawGraphProducerConfig` | the configuration of the graph producers |
 | `levelNames`, `levelFlags` | the name of each bit of `levelFlags` |
 | `hitIndexChannels`, `hitIndexInputs`, `hitIndexConfig` | the scope of the hit index |
 | `energySubdetectors`, `energyConventions` | the energy unit of the hit index in each subdetector |
 
 The generator program, its version and the fragment name are in no parameter set. The
 customise fills them only when the same job runs the generator: the version comes from
-`scram tool info` (for example `pythia8`, `317`), and the fragment from the cmsDriver
+the scram toolbox file of the release (for example `pythia8`, `317`), and the fragment from the cmsDriver
 annotation. In a DIGI job these three fields are empty. The other generator fields come
 from the GEN job in the process history.
 
 `applyTruthPreset` writes the preset name in `postProcessing.presetName` of every
-`TruthLogicalGraphProducer`, which includes the GEN-only one.
+`TruthLogicalGraphProducer`, which includes the GEN-only one. With overrides, the name
+lists them, for example `resonance with seedParentDepth`.
 
 When two input files hold different metadata for the same run, the framework keeps the
 first and logs an error. Monte Carlo files all have run 1, so do not merge files that were
