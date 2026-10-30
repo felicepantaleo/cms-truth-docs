@@ -569,16 +569,18 @@ With the default collapse, all 11 `hardProcess` neutrinos of 20 ttbar events are
 
 ### A denominator member can be required to have hits in the domain (2026-10-30)
 
-`requireHits` of `TruthBranchTrackValidator`, `TruthBranchTracksterValidator` and `TruthBranchPFClusterValidator` keeps in the truth-to-reco denominators only the members whose subgraph has hits in the hit-index channel of the domain: `Tracker` for tracks, `Calo` for tracksters and PF clusters. The default is `false`. The cut is in the validator and not in `TruthBranchTargetsProducer`, because one target list serves every domain and only the validator knows its channel.
+`requireHits` of `TruthBranchTrackValidator`, `TruthBranchTracksterValidator` and `TruthBranchPFClusterValidator` keeps in the truth-to-reco denominators only the members whose subgraph has a hit in the detectors of the validated collection. The detectors are the `denominatorDetectors` of the domain's associator: the whole `Tracker` channel for tracks, `HGCalEE`, `HGCalHSi` and `HGCalHSc` for tracksters, `Ecal` for `particleFlowClusterECAL` and `Hcal` for `particleFlowClusterHCAL`. One list in `truthGraphAssociationLabels_cff` feeds the associators and the validators. The `Calo` hit channel is not the cut, because it holds HGCAL, ECAL barrel and HCAL together. The `signalNoSelection` denominator is exempt, because it has no cut at all. The default is `false`. `Validation/TruthInfo/customiseTruthBranchRequireHits.customiseTruthBranchRequireHits` turns it on for every hit-based validator of the process; apply it after the customise that loads the validators.
 
-Measured on 10 no-PU ttbar events (34834.88, one shared `step2.root`). With the default, all histograms agree within the noise floor of two runs. With `requireHits = true`, every numerator is unchanged, because a member without hits in the channel has no match. The denominators change:
+Measured on 10 no-PU ttbar events (34834.88, one shared RECO file, association and validators rerun). With the default, all histograms are bit-identical to the version without the detector cut, except `num_recopurity`, which differs between two runs of the same code. With `requireHits = true`, every truth-driven numerator is unchanged. `num_simul` changes:
 
-| level | `num_simul`, calorimeter domains | `num_simul`, `generalTracks` |
-|---|---|---|
-| `caloBoundary` | 12526 to 11868 (-5.3%) | 12526 to 3222 (-74.3%) |
-| `stableDecayProducts` | 3687 to 3357 (-9.0%) | 3687 to 2457 (-33.4%) |
-| `reconstructableFinalState` | 2925 to 2698 (-7.8%) | 2925 to 2343 (-19.9%) |
-| `hardProcess` | 59 to 53 (-10.2%) | 59 to 53 (-10.2%) |
+| level | default | tracksters | `particleFlowClusterECAL` | `particleFlowClusterHCAL` | `generalTracks` |
+|---|---|---|---|---|---|
+| `caloBoundary` | 12526 | 3035 (-75.8%) | 10052 (-19.8%) | 1213 (-90.3%) | 3222 (-74.3%) |
+| `stableDecayProducts` | 3687 | 1865 (-49.4%) | 2609 (-29.2%) | 975 (-73.6%) | 2457 (-33.4%) |
+| `reconstructableFinalState` | 2925 | 1632 (-44.2%) | 2155 (-26.3%) | 945 (-67.7%) | 2343 (-19.9%) |
+| `hardProcess` | 59 | 53 (-10.2%) | 53 (-10.2%) | 52 (-11.9%) | 53 (-10.2%) |
+
+With the `heavyflavor` preset, `signal` drops from 20 to 19 for the tracksters and for `particleFlowClusterHCAL`, and `signalNoSelection` stays at 20.
 
 ### The secondary-vertex denominator is the heavy-flavour decay vertices (2026-08-04)
 

@@ -167,7 +167,9 @@ The `enableTruth` process modifier does this in every Run4 DIGI step:
    per-cell hit index right after mixing, reading the accumulator's merged sim-hits.
    The default scope is Calo + MTD + Muon + Tracker, see [Data model](data-model.md).
    The MTD channel is filled from `mix:MergedMtdTruthLC`. The hitless-subgraph pruning
-   reads the MTD sim-hits, so a particle with only MTD hits stays in the graph.
+   reads the MTD sim-hits, so a particle with only MTD hits stays in the graph. A kept
+   particle without an `MtdSimLayerCluster` has no hit in the MTD channel: 10 of the 207
+   MTD-only particles in 10 no-PU ttbar events.
    `mixedTruthGraphCustomize.customiseTruthReduced`
    drops the Tracker channel for cost-sensitive runs, and leaves calo + MTD + muon;
 3. `EventContent_cff` keeps the three products in `FEVTDEBUGHLT` and `RECOSIM`. It also
