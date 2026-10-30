@@ -48,7 +48,7 @@ Each particle carries the levels it belongs to, as bits on the graph itself (`Pa
 
 | level | what it holds |
 |---|---|
-| `hardProcess` | the **outgoing legs** of the hard scatter. ttbar gives b, b~ and the W decay products, **not** the two tops; H to two photons gives the photons; VBF gives the two tagging quarks plus the four neutrinos. Empty for a particle gun, correctly. |
+| `hardProcess` | the **outgoing legs** of the hard scatter. ttbar gives b, b~ and the W decay products, **not** the two tops; H to two photons gives the photons; VBF gives the two tagging quarks plus the four neutrinos. The neutrinos stay in the level, but the efficiency denominator drops them (see below). Empty for a particle gun, correctly. |
 | `signal` | the **resonance** a preset names: 2 tops, 1 Z, 1 Higgs, W+ and W- for the diboson sample, 1 top for t-channel. With no preset, the shot particles of a particle gun: 10 taus for TenTau. Empty for a collision with no preset |
 | `stableDecayProducts` | final-state generator particles, ~45% gamma and ~35% charged pions across every template |
 | `caloBoundary` | those reaching the calorimeter, plus secondaries made in material (ttbar 559 to 649, VBF 231 to 468) |
@@ -64,6 +64,16 @@ Each particle carries the levels it belongs to, as bits on the graph itself (`Pa
 `isHardProcess` marks the hard-scatter participants. The deepest-element antichain
 keeps the outgoing ones. That is why this level holds the final state and not the
 resonance. **Use `signal` when you want the object the analysis names.**
+
+A level is a full record of what it names, so it keeps its invisible members. The
+efficiency denominator does not: no reco object can find a neutrino, so a neutrino in
+the denominator caps the efficiency below 1. `TruthBranchTargetsProducer` therefore drops
+every invisible member from `truthToRecoTargets<Level>`. `levelFlags` do not change.
+`truth::isInvisible` in `TruthLevels.h` holds the species: the neutrinos (12, 14, 16),
+the graviton (39), the PDG dark matter states (51, 52, 53), the lightest neutralino
+(1000022), the gravitino (1000039) and the Kaluza-Klein graviton (5100039). A member of
+such a species that the graph decays, for example a long-lived neutralino, stays in the
+denominator, because its decay products are visible.
 
 All twelve templates contain the resonance. The truth graph therefore never has to
 invent one. A synthetic stand-in exists for a generator that omits the resonance.
@@ -522,6 +532,27 @@ momentum no detector measures: a parton, a top quark or a boson that Geant4 neve
 tracked. `partonJets` therefore measures identically with the selector open. A hadron, a
 lepton, a photon and every generator final-state particle keep the cuts, so a b hadron,
 a tau, a pi0 and a particle beyond the detector acceptance are cut like a tracked one.
+
+### Invisible members are not in the efficiency denominator (2026-10-30)
+
+The level keeps its neutrinos. The denominator drops them, so the efficiency can reach 1.
+Measured on 20 no-PU ttbar events (34834.88, one shared `step2.root`, A = the IB, B = the
+change). The signal interaction has 11 neutrinos in `hardProcess` and 46 in
+`stableDecayProducts`, 33 of which pass the pt and eta cuts. No other level holds a
+neutrino on this sample.
+
+| level, axis | `num_simul` A | `num_simul` B | `generalTracks` efficiency A | B |
+|---|---|---|---|---|
+| `hardProcess` | 119 | 108 | 0.908 | 1.000 |
+| `stableDecayProducts`, every cut passed | 2239 | 2206 | 0.577 | 0.586 |
+| `stableDecayProducts`, pt axis | 8506 | 8464 | | |
+
+`hardProcess` reads the same 119 to 108 in every collection: `ticlCandidate` cumulative
+efficiency 0.235 to 0.259, `particleFlowClusterECAL` cumulative 0.798 to 0.880. Every
+numerator is unchanged. Outside these two levels, all histograms agree within the
+noise floor of two A runs (relative difference 1.3e-6). `stableLegsFromInitialState` and
+`underlyingEvent` can also hold neutrinos when a preset builds them; the same rule
+applies there.
 
 ### The secondary-vertex denominator is the heavy-flavour decay vertices (2026-08-04)
 

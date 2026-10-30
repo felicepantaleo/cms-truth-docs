@@ -327,7 +327,7 @@ std::vector<Particle> stableLeaves() const;    // childless members, Geant4 seco
 std::vector<Particle> finalState() const;      // what the branch hands to Geant4
 
 math::XYZTLorentzVectorD  p4() const;          // sum over finalState()
-math::XYZTLorentzVectorD  visibleP4() const;   // excludes neutrinos (|pdg| 12/14/16)
+math::XYZTLorentzVectorD  visibleP4() const;   // excludes the truth::isInvisible species
 double                    energy() const;          // p4().energy()
 double                    visibleEnergy() const;   // visibleP4().energy()
 double                    invisibleEnergy() const; // energy() - visibleEnergy()
@@ -525,6 +525,9 @@ std::vector<Particle> graph.signalParticles();   // the preset's signal, or the 
 std::vector<Particle> truth::particlesAtLevel(graph, level);  // levelAntichain as views
 std::vector<Particle> truth::particlesAtLevels(graph, {levels}, truth::LevelMatch::Any);
 bool truth::isLepton(int32_t pdgId);             // charged leptons, not neutrinos
+bool truth::isNeutrino(int32_t pdgId);           // |pdg| 12, 14, 16
+bool truth::isInvisible(int32_t pdgId);          // neutrinos and invisible BSM states
+bool truth::isInvisibleParticle(graph, id);      // invisible species that the graph does not decay
 bool truth::isWeakBoson(int32_t pdgId);          // W and Z; the Higgs is neither
 ```
 
