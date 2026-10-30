@@ -28,7 +28,7 @@ and the `caloBoundary` level is defined by having it.
 preset cut away, so that what was dropped stays visible. `Interaction` is the root of one
 collision, and it fans out to an `InitialState` vertex, which holds the truncated
 production context of the selected particles, and an `UnderlyingEvent` vertex, which holds
-the stable particles that belong to no selected subgraph. A `BeamSideInput` vertex hangs
+the stable particles and the pi0s that belong to no selected subgraph. A `BeamSideInput` vertex hangs
 off a kept vertex instead, and holds the dropped parents that fed it from the beam side. A
 particle produced at one of these is still a real particle; only the vertex is invented.
 

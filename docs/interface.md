@@ -124,7 +124,9 @@ The roles are:
   and the ISR.
 - `VertexRole::UnderlyingEvent` is an artificial vertex. It collects the stable
   final-state particles that are in no selected subgraph, that is the underlying
-  event. Each keeps its SIM subgraph, which is where its hits are.
+  event. Each keeps its SIM subgraph, which is where its hits are. A GEN particle of
+  a `reconstructablePdgIds` species (the pi0) is collected in the same way, with its
+  decay products below it, so `reconstructableFinalState` does not depend on the preset.
 - `VertexRole::BeamSideInput` is an artificial vertex. It holds the GEN parents that a
   kept vertex received from outside the selection, which the selection would otherwise
   drop. That is where a colour string spans the hard scatter and the beam remnant, so
