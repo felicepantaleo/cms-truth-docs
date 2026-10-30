@@ -295,15 +295,21 @@ all identical run to run: `offsets`, `edges`, `edgeKind`, `pdgId`, `status`,
 `statusFlags`, `eventId`, `genEventOfNode`, `simVertexProcessType`,
 `simTrackBackscattered` and `simTrackToGen`.
 
-One open point is specific to this package. It is worth a look, but it is not a
-blocker. `TruthGraph_mix` is the one branch whose compressed size moves while its
-uncompressed size does not. That means the same length and different bytes.
-`TruthGraph::NodeRef` is `{ NodeKind kind; int64_t key; }`, with `NodeKind` a
-`uint8_t`. It therefore carries seven bytes of padding, and the branch is written
-unsplit. Uninitialised padding would produce exactly that signature, without changing
-any value a consumer reads. This is a hypothesis, not a result. Confirming it needs a
-C++-side dump of the raw buffer, because PyROOT cannot read the unsplit struct reliably.
+`TruthGraph_mix` is the one branch whose compressed size moves while its uncompressed
+size does not. The cause is `TruthGraph::NodeRef` up to class version 3, which stores
+`NodeKind kind`, an enum with `uint8_t` underlying type. ROOT streams an enum member as
+a 4-byte int. It reads those 4 bytes from the object in memory, so the three upper bytes
+are uninitialised padding. In the 20 events of 34834.88, 63093 of 219537 raw-graph nodes
+have non-zero upper bytes in the file. FWLite python reads the same 4 bytes and returns
+these values as the kind. A compiled reader uses only the low byte, which is correct.
 That is also why the hashes above exclude `kind`.
+
+From class version 4, `NodeRef` stores the kind as one `uint8_t`. Use the accessors
+`kind()` and `key()`. An I/O rule reads version 3 files: it takes the low byte of the
+on-file int. The file no longer holds padding bytes, and FWLite python reads
+`nodeRef(i).kind()` correctly. On the same 20 events, re-written with the same output
+settings, the branch goes from 623370 to 590440 bytes/event uncompressed (3 bytes per
+node) and from 78481 to 70543 bytes/event compressed (-10.1%).
 
 ## 7. Event size at PU200
 
