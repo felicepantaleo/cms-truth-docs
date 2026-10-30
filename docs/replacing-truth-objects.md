@@ -85,7 +85,7 @@ A branch is a view, so the truth object is defined at the point of use.
 - **A cross-detector object**, which the legacy split cannot express: one branch carries
   both footprints, so the track truth and the shower truth of an electron are one
   navigable object.
-- **A pileup-aware object**: `isFromPileup()` and `bunchCrossing()` let a consumer keep or
+- **A pileup-aware object**: `isFromPileup()`, `isInTime()` and `bunchCrossing()` let a consumer keep or
   drop truth per bunch crossing. See [Pileup](pileup.md).
 
 The matching stays uniform. One `BranchHitAssociator` associates any reconstructed object

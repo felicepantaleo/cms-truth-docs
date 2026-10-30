@@ -418,6 +418,7 @@ particle.data().bunchCrossing();   // 0 for the in-time interaction
 particle.data().eventIndex();      // 0 for the signal
 particle.isSignal();               // bunch crossing 0 and index 0
 particle.isFromPileup();           // also on truth::Vertex and on ParticleData
+particle.isInTime();               // bunch crossing 0: the signal and the in-time pileup
 particle.data().hasMomentum();     // false when no momentum is known at all
 ```
 
