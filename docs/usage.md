@@ -154,6 +154,55 @@ process.truthLogicalGraphHitIndexProducer = cms.EDProducer(
     the `Cleaned` instances. The association itself matches by `DetId` and does not need
     the map.
 
+### A graph from a GEN-only job
+
+A job without SIM can also make the graph. `customiseTruthGenOnly` adds
+`truthGenOnlyGraphProducer` and `truthGenOnlyLogicalGraphProducer` to the GEN step,
+and every output module of the job keeps their products:
+
+```bash
+cmsDriver.py TTbar_14TeV_TuneCP5_cfi -s GEN -n 10 \
+    --conditions auto:phase2_realistic_T35 --beamspot DBrealisticHLLHC \
+    --era Phase2C26I13M9 --geometry ExtendedRun4D122 \
+    --datatier GEN --eventcontent RAWSIM \
+    --customise PhysicsTools/TruthInfo/customiseTruthGenOnly.customiseTruthGenOnly
+```
+
+In this mode `TruthGraphProducer` has empty `simTracks` and `simVertices` tags. It
+reads no SIM product. It stops with an exception when it finds no GEN record under
+`genEventHepMC3` or `genEventHepMC`. A particle gun writes `generator:unsmeared`, so a
+gun job without vertex smearing sets these two tags to that product.
+
+The raw graph holds every GEN particle and vertex of the record, with the full decay
+chain and the parton shower. The logical graph is built from it as at DIGI, but the
+pruning of particles without hits is off. The graph holds no SIM particle, no hit index
+and no GEN to SIM link. The levels are filled, except `caloBoundary`, which needs the
+SIM and is empty.
+
+Measured on the 20 TTbar events of 34834.88 (D122, no pileup), with the GEN-only graph
+built from the GEN record of `step1.root` and compared with the DIGI graph of
+`step2.root`:
+
+| Quantity | DIGI graph | GEN-only graph |
+|---|---|---|
+| GEN particles | 24088 | 24647 |
+| SIM-only particles | 52932 | 0 |
+| `hardProcess`, `partonJets`, `bHadrons`, `cHadrons`, `tau*` members | same | same |
+| `stableDecayProducts` members | 10871 | 11430 |
+| `reconstructableFinalState` members | 8787 | 8915 |
+| `caloBoundary` members | 5994 | 0 |
+
+Every GEN particle of the DIGI graph is in the GEN-only graph with the same pdgId,
+status and momentum, to 1 MeV. The 559 additional particles are stable GEN particles without
+hits, which the DIGI pruning removes; 537 of them are at |eta| > 3. In
+`reconstructableFinalState`, 19 status-2 K0 and K*0 particles are leaves in the DIGI
+graph because the pruning removed their decay products. In the GEN-only graph their
+decay products are the members.
+
+On one thread, the two producers take 7.5 ms and 0.6 ms per TTbar event. In the
+cmsDriver job above, the products take 11.6 kB (`TruthGraph`) and 50.2 kB
+(`truth::Graph`) per event on disk, compressed.
+
 ## Consuming the products in an EDAnalyzer
 
 The three products are ordinary EDM products: `truth::Graph`,
