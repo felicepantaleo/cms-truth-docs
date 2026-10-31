@@ -223,7 +223,15 @@ and DQM output modules.
 
 `TruthGraphMetadataProducer` reads the parameter sets of the modules that ran, in this
 job and in the jobs before it, so the metadata cannot drift from the configuration. A later
-job can therefore write the metadata of a file it reads. A parameter that the earlier job
+job can therefore write the metadata of a file it reads. For each module label, the
+producer uses the latest job that made a product of that module which is in this job: a
+`TruthGraph` for the raw graph builder, a `truth::Graph` for the graph producer, a
+`truth::LogicalGraphHitIndex` for the hit index. A job that has a module with the same label
+but did not make the product, or whose product was dropped, is skipped. This is the same job
+that `getByLabel` without a process name reads. The generator fields come from the latest
+job that has a module with the generator label, because files often drop the generator
+products.
+A parameter that the earlier job
 did not have, for example `presetName` in a file of an older release, keeps its default
 value.
 
