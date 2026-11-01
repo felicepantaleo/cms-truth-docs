@@ -23,6 +23,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Data flow: dataflow.md
   - Tutorials:
       - 'Quickstart: your first truth graph': quickstart.md
       - 'Getting started: recipes and FAQ': getting-started.md
