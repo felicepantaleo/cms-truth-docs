@@ -1,0 +1,5914 @@
+{
+"modules": [
+{
+"label": "source",
+"type": "PoolSource",
+"events": 20,
+"time_real": 577.128017
+},
+{
+"label": "TriggerResults",
+"type": "TriggerResultInserter",
+"events": 20,
+"time_real": 0.067482
+},
+{
+"label": "digitisation_step",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.198673
+},
+{
+"label": "L1TrackTrigger_step",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.059012
+},
+{
+"label": "L1simulation_step",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.039412
+},
+{
+"label": "Phase2L1GTProducer",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03729
+},
+{
+"label": "Phase2L1GTAlgoBlockProducer",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029649
+},
+{
+"label": "pDoubleEGEle37_24",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.027791
+},
+{
+"label": "pDoubleIsoTkPho22_12",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029263
+},
+{
+"label": "pDoublePuppiJet112_112",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029913
+},
+{
+"label": "pDoublePuppiJet160_35_mass620",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029819
+},
+{
+"label": "pDoublePuppiTau52_52",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.026369
+},
+{
+"label": "pDoubleTkEle25_12",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.028551
+},
+{
+"label": "pDoubleTkElePuppiHT_8_8_390",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.028593
+},
+{
+"label": "pDoubleTkMuPuppiHT_3_3_300",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029948
+},
+{
+"label": "pDoubleTkMuPuppiJetPuppiMet_3_3_60_130",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.027559
+},
+{
+"label": "pDoubleTkMuon15_7",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.030981
+},
+{
+"label": "pDoubleTkMuonTkEle5_5_9",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.026301
+},
+{
+"label": "pDoubleTkMuon_4_4_OS_Dr1p2",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029431
+},
+{
+"label": "pDoubleTkMuon_4p5_4p5_OS_Er2_Mass7to18",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.027637
+},
+{
+"label": "pDoubleTkMuon_OS_Er1p5_Dr1p4",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029558
+},
+{
+"label": "pIsoTkEleEGEle22_12",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.027222
+},
+{
+"label": "pNNPuppiTauPuppiMet_55_190",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.027671
+},
+{
+"label": "pPuppiHT400",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.027329
+},
+{
+"label": "pPuppiHT450",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.030391
+},
+{
+"label": "pPuppiMET200",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.027429
+},
+{
+"label": "pPuppiMHT140",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.028572
+},
+{
+"label": "pPuppiTauTkIsoEle45_22",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.02635
+},
+{
+"label": "pPuppiTauTkMuon42_18",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.028933
+},
+{
+"label": "pQuadJet70_55_40_40",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03221
+},
+{
+"label": "pSingleEGEle51",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.02995
+},
+{
+"label": "pSingleIsoTkEle28",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.02851
+},
+{
+"label": "pSingleIsoTkPho36",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.02943
+},
+{
+"label": "pSinglePuppiJet230",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.030379
+},
+{
+"label": "pSingleTkEle36",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03063
+},
+{
+"label": "pSingleTkMuon22",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.028393
+},
+{
+"label": "pTkEleIsoPuppiHT_26_190",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029799
+},
+{
+"label": "pTkElePuppiJet_28_40_MinDR",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.02849
+},
+{
+"label": "pTkEleTkMuon10_20",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.02908
+},
+{
+"label": "pTkMuPuppiJetPuppiMet_3_110_120",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.028241
+},
+{
+"label": "pTkMuTriPuppiJet_12_40_dRMax_DoubleJet_dEtaMax",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.02887
+},
+{
+"label": "pTkMuonDoubleTkEle6_17_17",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.027604
+},
+{
+"label": "pTkMuonPuppiHT6_320",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.028882
+},
+{
+"label": "pTkMuonTkEle7_23",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.027581
+},
+{
+"label": "pTkMuonTkIsoEle7_20",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.030803
+},
+{
+"label": "pTripleTkMuon5_3_3",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029052
+},
+{
+"label": "pTripleTkMuon_5_3_0_DoubleTkMuon_5_3_OS_MassTo9",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.034628
+},
+{
+"label": "pTripleTkMuon_5_3p5_2p5_OS_Mass5to17",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.057461
+},
+{
+"label": "digi2raw_step",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.033058
+},
+{
+"label": "DST_PFScouting",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.046273
+},
+{
+"label": "HLT_AK4PFPuppiJet520",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03255
+},
+{
+"label": "HLT_PFPuppiHT1070",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029241
+},
+{
+"label": "HLT_PFPuppiMETTypeOne140_PFPuppiMHT140",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029621
+},
+{
+"label": "HLT_DoublePFPuppiJets128_DoublePFPuppiBTagDeepCSV_2p4",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03082
+},
+{
+"label": "HLT_PFHT330PT30_QuadPFPuppiJet_75_60_45_40_TriplePFPuppiBTagDeepFlavour_2p4",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029672
+},
+{
+"label": "HLT_PFHT200PT30_QuadPFPuppiJet_70_40_30_30_TriplePFPuppiBTagDeepFlavour_2p4",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.031842
+},
+{
+"label": "HLT_DoublePFPuppiJets128_DoublePFPuppiBTagDeepFlavour_2p4",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03065
+},
+{
+"label": "HLT_Mu50_FromL1TkMuon",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.033489
+},
+{
+"label": "HLT_IsoMu24_FromL1TkMuon",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.032472
+},
+{
+"label": "HLT_Mu37_Mu27_FromL1TkMuon",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03236
+},
+{
+"label": "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_FromL1TkMuon",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03231
+},
+{
+"label": "HLT_TriMu_10_5_5_DZ_FromL1TkMuon",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.028729
+},
+{
+"label": "HLT_Ele32_WPTight_Unseeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.032239
+},
+{
+"label": "HLT_Ele26_WP70_Unseeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03289
+},
+{
+"label": "HLT_Photon108EB_TightID_TightIso_Unseeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.032629
+},
+{
+"label": "HLT_Photon187_Unseeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03102
+},
+{
+"label": "HLT_DoubleEle25_CaloIdL_PMS2_Unseeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.029622
+},
+{
+"label": "HLT_Diphoton30_23_IsoCaloId_Unseeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03462
+},
+{
+"label": "HLT_Ele32_WPTight_L1Seeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03128
+},
+{
+"label": "HLT_Ele115_NonIso_L1Seeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.033112
+},
+{
+"label": "HLT_Ele26_WP70_L1Seeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.031427
+},
+{
+"label": "HLT_Photon108EB_TightID_TightIso_L1Seeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.034182
+},
+{
+"label": "HLT_Photon187_L1Seeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.035341
+},
+{
+"label": "HLT_DoubleEle25_CaloIdL_PMS2_L1Seeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03445
+},
+{
+"label": "HLT_DoubleEle23_12_Iso_L1Seeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.03078
+},
+{
+"label": "HLT_Diphoton30_23_IsoCaloId_L1Seeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.040949
+},
+{
+"label": "HLT_DoubleMediumChargedIsoPFTauHPS40_eta2p1",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.038143
+},
+{
+"label": "HLT_DoubleMediumDeepTauPFTauHPS35_eta2p1",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.031801
+},
+{
+"label": "HLT_DoubleMediumPFPuppiParTTauh30_eta2p1",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.036211
+},
+{
+"label": "HLT_IsoMu20_eta2p1_LooseDeepTauPFTauHPS27_eta2p1_CrossL1",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.032951
+},
+{
+"label": "HLT_Ele30_WPTight_L1Seeded_LooseDeepTauPFTauHPS30_eta2p1_CrossL1",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.039871
+},
+{
+"label": "HLT_LooseDeepTauPFTauHPS150_L1NN_eta2p1",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.052729
+},
+{
+"label": "MC_JME",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.035539
+},
+{
+"label": "MC_BTV",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.039141
+},
+{
+"label": "MC_TRK",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.040352
+},
+{
+"label": "MC_Ele5_Open_Unseeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.034591
+},
+{
+"label": "MC_Ele5_Open_L1Seeded",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.04366
+},
+{
+"label": "DQM_TRKHeterogeneousValidation",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.06369
+},
+{
+"label": "DQM_HGCALHeterogeneousValidation",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.036463
+},
+{
+"label": "HLTriggerFinalPath",
+"type": "PathStatusInserter",
+"events": 20,
+"time_real": 0.050735
+},
+{
+"label": "HLTAnalyzerEndpath",
+"type": "EndPathStatusInserter",
+"events": 20,
+"time_real": 0.042402
+},
+{
+"label": "endjob_step",
+"type": "EndPathStatusInserter",
+"events": 20,
+"time_real": 0.052601
+},
+{
+"label": "FEVTDEBUGHLToutput_step",
+"type": "EndPathStatusInserter",
+"events": 20,
+"time_real": 0.24743
+},
+{
+"label": "TTClustersFromPhase2TrackerDigis",
+"type": "TTClusterBuilder_Phase2TrackerDigi_",
+"events": 20,
+"time_real": 1258.465908
+},
+{
+"label": "TTStubsFromPhase2TrackerDigis",
+"type": "TTStubBuilder_Phase2TrackerDigi_",
+"events": 20,
+"time_real": 652.674173
+},
+{
+"label": "TTClusterAssociatorFromPixelDigis",
+"type": "TTClusterAssociator_Phase2TrackerDigi_",
+"events": 20,
+"time_real": 149.766099
+},
+{
+"label": "TTStubAssociatorFromPixelDigis",
+"type": "TTStubAssociator_Phase2TrackerDigi_",
+"events": 20,
+"time_real": 26.358552
+},
+{
+"label": "ProducerDTC",
+"type": "trackerDTC::ProducerDTC",
+"events": 20,
+"time_real": 59.509331
+},
+{
+"label": "offlineBeamSpot",
+"type": "BeamSpotProducer",
+"events": 20,
+"time_real": 0.379349
+},
+{
+"label": "l1tTTTracksFromTrackletEmulation",
+"type": "L1FPGATrackProducer",
+"events": 20,
+"time_real": 1162.073335
+},
+{
+"label": "TTTrackAssociatorFromPixelDigis",
+"type": "TTTrackAssociator_Phase2TrackerDigi_",
+"events": 20,
+"time_real": 2.466082
+},
+{
+"label": "l1tTTTracksFromExtendedTrackletEmulation",
+"type": "L1FPGATrackProducer",
+"events": 20,
+"time_real": 9985.485902
+},
+{
+"label": "TTTrackAssociatorFromPixelDigisExtended",
+"type": "TTTrackAssociator_Phase2TrackerDigi_",
+"events": 20,
+"time_real": 4.252744
+},
+{
+"label": "l1tGTProducer",
+"type": "L1GTProducer",
+"events": 20,
+"time_real": 4.125111
+},
+{
+"label": "l1tGTAlgoBlockProducer",
+"type": "L1GTAlgoBlockProducer",
+"events": 20,
+"time_real": 1.37571
+},
+{
+"label": "DoubleEGEle3724",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.171693
+},
+{
+"label": "DoubleIsoTkPho2212",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.119074
+},
+{
+"label": "DoublePuppiJet112112",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.192606
+},
+{
+"label": "DoublePuppiJet16035Mass620",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.223426
+},
+{
+"label": "DoublePuppiTau5252",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.076291
+},
+{
+"label": "DoubleTkEle2512",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.091561
+},
+{
+"label": "DoubleTkElePuppiHT",
+"type": "L1GTTripleObjectCond",
+"events": 20,
+"time_real": 0.151435
+},
+{
+"label": "DoubleTkMuPuppiHT",
+"type": "L1GTTripleObjectCond",
+"events": 20,
+"time_real": 0.032729
+},
+{
+"label": "DoubleTkMuPuppiJetPuppiMet",
+"type": "L1GTQuadObjectCond",
+"events": 20,
+"time_real": 0.041623
+},
+{
+"label": "DoubleTkMuon157",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.02956
+},
+{
+"label": "DoubleTkMuonTkEle559",
+"type": "L1GTTripleObjectCond",
+"events": 20,
+"time_real": 0.031989
+},
+{
+"label": "DoubleTkMuon44OSDr1p2",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.033128
+},
+{
+"label": "DoubleTkMuon4p5OSEr2Mass7to18",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.029341
+},
+{
+"label": "DoubleTkMuonOSEr1p5Dr1p4",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.039283
+},
+{
+"label": "IsoTkEleEGEle2212",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.153414
+},
+{
+"label": "NNPuppiTauPuppiMet",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.0529
+},
+{
+"label": "PuppiHT400",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.03718
+},
+{
+"label": "PuppiHT450",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.052502
+},
+{
+"label": "PuppiMET200",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.041769
+},
+{
+"label": "PuppiMHT140",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.046221
+},
+{
+"label": "PuppiTauTkIsoEle4522",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.076164
+},
+{
+"label": "PuppiTauTkMuon4218",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.052539
+},
+{
+"label": "QuadJet70554040",
+"type": "L1GTQuadObjectCond",
+"events": 20,
+"time_real": 19.194114
+},
+{
+"label": "SingleEGEle51",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.051112
+},
+{
+"label": "SingleIsoTkEle28",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.04202
+},
+{
+"label": "SingleIsoTkPho36",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.047952
+},
+{
+"label": "SinglePuppiJet230",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.0485
+},
+{
+"label": "SingleTkEle36",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.042472
+},
+{
+"label": "SingleTkMuon22",
+"type": "L1GTSingleObjectCond",
+"events": 20,
+"time_real": 0.053434
+},
+{
+"label": "TkEleIsoPuppiHT",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.062742
+},
+{
+"label": "TkElePuppiJetMinDR",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.214203
+},
+{
+"label": "TkEleTkMuon1020",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.049792
+},
+{
+"label": "TkMuPuppiJetPuppiMet",
+"type": "L1GTTripleObjectCond",
+"events": 20,
+"time_real": 0.068053
+},
+{
+"label": "TkMuTriPuppiJetdRMaxDoubleJetdEtaMax",
+"type": "L1GTQuadObjectCond",
+"events": 20,
+"time_real": 0.762944
+},
+{
+"label": "TkMuonDoubleTkEle61717",
+"type": "L1GTTripleObjectCond",
+"events": 20,
+"time_real": 0.07349
+},
+{
+"label": "TkMuonPuppiHT6320",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.042611
+},
+{
+"label": "TkMuonTkEle723",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.04444
+},
+{
+"label": "TkMuonTkIsoEle720",
+"type": "L1GTDoubleObjectCond",
+"events": 20,
+"time_real": 0.07799
+},
+{
+"label": "TripleTkMuon533",
+"type": "L1GTTripleObjectCond",
+"events": 20,
+"time_real": 0.031998
+},
+{
+"label": "TripleTkMuon530OSMassMax9",
+"type": "L1GTTripleObjectCond",
+"events": 20,
+"time_real": 0.036419
+},
+{
+"label": "TripleTkMuon53p52p5OSMass5to17",
+"type": "L1GTTripleObjectCond",
+"events": 20,
+"time_real": 0.092951
+},
+{
+"label": "hltTriggerType",
+"type": "HLTTriggerTypeFilter",
+"events": 20,
+"time_real": 0.034092
+},
+{
+"label": "hltOnlineBeamSpot",
+"type": "BeamSpotOnlineProducer",
+"events": 20,
+"time_real": 0.145792
+},
+{
+"label": "hltPhase2OnlineBeamSpotDevice",
+"type": "BeamSpotDeviceProducer@alpaka",
+"events": 20,
+"time_real": 2.328732
+},
+{
+"label": "hltL1GTAcceptFilter",
+"type": "L1GTAcceptFilter",
+"events": 20,
+"time_real": 0.044384
+},
+{
+"label": "hltHgcalDigis",
+"type": "HGCalRawToDigiFake",
+"events": 20,
+"time_real": 27.571551
+},
+{
+"label": "hltEcalDigis",
+"type": "EcalRawToDigi",
+"events": 20,
+"time_real": 38.030246
+},
+{
+"label": "hltHcalDigis",
+"type": "HcalRawToDigi",
+"events": 20,
+"time_real": 15.509459
+},
+{
+"label": "hltMuonCSCDigis",
+"type": "CSCDCCUnpacker",
+"events": 20,
+"time_real": 5.95195
+},
+{
+"label": "hltMuonDTDigis",
+"type": "DTuROSRawToDigi",
+"events": 20,
+"time_real": 0.668705
+},
+{
+"label": "hltMuonGEMDigis",
+"type": "GEMRawToDigiModule",
+"events": 20,
+"time_real": 1.742653
+},
+{
+"label": "hltBunchSpacingProducer",
+"type": "BunchSpacingProducer",
+"events": 20,
+"time_real": 0.08312
+},
+{
+"label": "hltEcalDetIdToBeRecovered",
+"type": "EcalDetIdToBeRecoveredProducer",
+"events": 20,
+"time_real": 0.787091
+},
+{
+"label": "hltEcalMultiFitUncalibRecHit",
+"type": "EcalUncalibRecHitProducer",
+"events": 20,
+"time_real": 413.99325
+},
+{
+"label": "hltEcalRecHit",
+"type": "EcalRecHitProducer",
+"events": 20,
+"time_real": 14.892837
+},
+{
+"label": "hltEcalDetailedTimeRecHit",
+"type": "EcalDetailedTimeRecHitProducer",
+"events": 20,
+"time_real": 4.319669
+},
+{
+"label": "hltHbhereco",
+"type": "HBHEPhase1Reconstructor",
+"events": 20,
+"time_real": 15.876101
+},
+{
+"label": "hltHoreco",
+"type": "HcalHitReconstructor",
+"events": 20,
+"time_real": 2.76273
+},
+{
+"label": "hltHfprereco",
+"type": "HFPreReconstructor",
+"events": 20,
+"time_real": 14.59598
+},
+{
+"label": "hltHfreco",
+"type": "HFPhase1Reconstructor",
+"events": 20,
+"time_real": 9.064152
+},
+{
+"label": "hltHGCalUncalibRecHit",
+"type": "HGCalUncalibRecHitProducer",
+"events": 20,
+"time_real": 46.627571
+},
+{
+"label": "hltHGCalRecHit",
+"type": "HGCalRecHitProducer",
+"events": 20,
+"time_real": 17.234637
+},
+{
+"label": "hltHgcalLayerClustersEE",
+"type": "HGCalLayerClusterProducer",
+"events": 20,
+"time_real": 222.734762
+},
+{
+"label": "hltHgcalLayerClustersHSci",
+"type": "HGCalLayerClusterProducer",
+"events": 20,
+"time_real": 8.152712
+},
+{
+"label": "hltHgcalLayerClustersHSi",
+"type": "HGCalLayerClusterProducer",
+"events": 20,
+"time_real": 61.171328
+},
+{
+"label": "hltMergeLayerClusters",
+"type": "MergeClusterProducer",
+"events": 20,
+"time_real": 5.111763
+},
+{
+"label": "hltPhase2SiPixelClustersSoA",
+"type": "SiPixelPhase2DigiToCluster@alpaka",
+"events": 20,
+"time_real": 85.79908
+},
+{
+"label": "hltSiPixelClusters",
+"type": "SiPixelDigisClustersFromSoAAlpakaPhase2",
+"events": 20,
+"time_real": 8.564463
+},
+{
+"label": "hltSiPixelClusterShapeCache",
+"type": "SiPixelClusterShapeCacheProducer",
+"events": 20,
+"time_real": 11.382095
+},
+{
+"label": "hltPhase2SiPixelRecHitsSoA",
+"type": "SiPixelRecHitAlpakaPhase2@alpaka",
+"events": 20,
+"time_real": 5.741672
+},
+{
+"label": "hltSiPixelRecHits",
+"type": "SiPixelRecHitFromSoAAlpaka",
+"events": 20,
+"time_real": 6.406626
+},
+{
+"label": "hltSiPhase2Clusters",
+"type": "Phase2TrackerClusterizer",
+"events": 20,
+"time_real": 3.011068
+},
+{
+"label": "hltMeasurementTrackerEvent",
+"type": "MeasurementTrackerEventProducer",
+"events": 20,
+"time_real": 3.394059
+},
+{
+"label": "hltSiPhase2RecHits",
+"type": "Phase2TrackerRecHits",
+"events": 20,
+"time_real": 21.369651
+},
+{
+"label": "hltTrackerClusterCheck",
+"type": "ClusterCheckerEDProducer",
+"events": 20,
+"time_real": 0.097981
+},
+{
+"label": "hltPhase2PixelFitterByHelixProjections",
+"type": "PixelFitterByHelixProjectionsProducer",
+"events": 20,
+"time_real": 0.12496
+},
+{
+"label": "hltPhase2PixelTrackFilterByKinematics",
+"type": "PixelTrackFilterByKinematicsProducer",
+"events": 20,
+"time_real": 0.064941
+},
+{
+"label": "hltPhase2OtRecHitsSoA",
+"type": "Phase2OTRecHitsSoAConverter@alpaka",
+"events": 20,
+"time_real": 25.538161
+},
+{
+"label": "hltPhase2PixelTracksSoA",
+"type": "CAHitNtupletAlpakaPhase2OT@alpaka",
+"events": 20,
+"time_real": 737.698319
+},
+{
+"label": "hltPhase2PixelTrackTorchHighPuritySelector",
+"type": "PixelTrackTorchHighPuritySelector@alpaka",
+"events": 20,
+"time_real": 24.870643
+},
+{
+"label": "hltPhase2PixelTracks",
+"type": "PixelTrackProducerFromSoAAlpaka",
+"events": 20,
+"time_real": 12.846801
+},
+{
+"label": "hltPhase2PixelVertices",
+"type": "PixelVertexProducer",
+"events": 20,
+"time_real": 1.554734
+},
+{
+"label": "hltInitialStepSeeds",
+"type": "SeedGeneratorFromProtoTracksEDProducer",
+"events": 20,
+"time_real": 20.527245
+},
+{
+"label": "hltInputLST",
+"type": "LSTInputProducer@alpaka",
+"events": 20,
+"time_real": 12.37586
+},
+{
+"label": "hltLST",
+"type": "LSTProducer@alpaka",
+"events": 20,
+"time_real": 951.91167
+},
+{
+"label": "hltInitialStepTrajectorySeedsLST",
+"type": "LSTOutputConverter",
+"events": 20,
+"time_real": 40.314164
+},
+{
+"label": "hltMkFitSiPixelHits",
+"type": "MkFitSiPixelHitConverter",
+"events": 20,
+"time_real": 3.210663
+},
+{
+"label": "hltMkFitSiPhase2Hits",
+"type": "MkFitPhase2HitConverter",
+"events": 20,
+"time_real": 10.345574
+},
+{
+"label": "hltMkFitEventOfHits",
+"type": "MkFitEventOfHitsProducer",
+"events": 20,
+"time_real": 15.915668
+},
+{
+"label": "hltInitialStepMkFitSeeds",
+"type": "MkFitSeedConverter",
+"events": 20,
+"time_real": 1.513416
+},
+{
+"label": "hltInitialStepTrackCandidatesMkFit",
+"type": "MkFitProducer",
+"events": 20,
+"time_real": 34.225546
+},
+{
+"label": "hltInitialStepTrackCandidates",
+"type": "MkFitOutputConverter",
+"events": 20,
+"time_real": 8.783255
+},
+{
+"label": "hltInitialStepTracks",
+"type": "TrackProducer",
+"events": 20,
+"time_real": 181.636836
+},
+{
+"label": "hltInitialStepTrackFeatureExtractor",
+"type": "alpaka_serial_sync::TrackFeatureExtractor",
+"events": 20,
+"time_real": 0.914464
+},
+{
+"label": "hltInitialStepTrackTorchClassifier",
+"type": "alpaka_serial_sync::TrackTorchClassifierAlpaka",
+"events": 20,
+"time_real": 15.415309
+},
+{
+"label": "hltInitialStepTrackTorchClassifierOutput",
+"type": "TrackTorchClassifierFromSoA",
+"events": 20,
+"time_real": 0.264545
+},
+{
+"label": "hltInitialStepTrackSelectionHighPurity",
+"type": "TrackCollectionFilterCloner",
+"events": 20,
+"time_real": 1.890107
+},
+{
+"label": "hltGeneralTracks",
+"type": "TrackListMerger",
+"events": 20,
+"time_real": 2.898979
+},
+{
+"label": "hltCsc2DRecHits",
+"type": "CSCRecHitDProducer",
+"events": 20,
+"time_real": 3.65854
+},
+{
+"label": "hltCscSegments",
+"type": "CSCSegmentProducer",
+"events": 20,
+"time_real": 2.908029
+},
+{
+"label": "hltDt1DRecHits",
+"type": "DTRecHitProducer",
+"events": 20,
+"time_real": 0.472091
+},
+{
+"label": "hltDt4DSegments",
+"type": "DTRecSegment4DProducer",
+"events": 20,
+"time_real": 5.133715
+},
+{
+"label": "hltGemRecHits",
+"type": "GEMRecHitProducer",
+"events": 20,
+"time_real": 0.402901
+},
+{
+"label": "hltGemSegments",
+"type": "GEMSegmentProducer",
+"events": 20,
+"time_real": 2.293042
+},
+{
+"label": "hltRpcRecHits",
+"type": "RPCRecHitProducer",
+"events": 20,
+"time_real": 0.272933
+},
+{
+"label": "hltL2MuonSeedsFromL1TkMuon",
+"type": "Phase2L2MuonSeedCreator",
+"events": 20,
+"time_real": 1.427947
+},
+{
+"label": "hltL2MuonsFromL1TkMuon",
+"type": "L2MuonProducer",
+"events": 20,
+"time_real": 10.40444
+},
+{
+"label": "hltPhase2L3FromL1TkMuonPixelLayerQuadruplets",
+"type": "SeedingLayersEDProducer",
+"events": 20,
+"time_real": 0.384745
+},
+{
+"label": "hltPhase2L3FromL1TkMuonPixelTracksTrackingRegions",
+"type": "CandidateSeededTrackingRegionsEDProducer",
+"events": 20,
+"time_real": 0.361387
+},
+{
+"label": "hltPhase2L3FromL1TkMuonPixelTracksHitDoublets",
+"type": "HitPairEDProducer",
+"events": 20,
+"time_real": 0.523212
+},
+{
+"label": "hltPhase2L3FromL1TkMuonPixelTracksHitQuadruplets",
+"type": "CAHitQuadrupletEDProducer",
+"events": 20,
+"time_real": 0.563683
+},
+{
+"label": "hltPhase2L3FromL1TkMuonPixelTracks",
+"type": "PixelTrackProducer",
+"events": 20,
+"time_real": 0.411329
+},
+{
+"label": "hltPhase2L3FromL1TkMuonPixelVertices",
+"type": "PixelVertexProducer",
+"events": 20,
+"time_real": 1.029331
+},
+{
+"label": "hltPhase2L3FromL1TkMuonTrimmedPixelVertices",
+"type": "PixelVertexCollectionTrimmer",
+"events": 20,
+"time_real": 0.118042
+},
+{
+"label": "hltIter0Phase2L3FromL1TkMuonPixelSeedsFromPixelTracks",
+"type": "SeedGeneratorFromProtoTracksEDProducer",
+"events": 20,
+"time_real": 0.283
+},
+{
+"label": "hltIter0Phase2L3FromL1TkMuonCkfTrackCandidates",
+"type": "CkfTrackCandidateMaker",
+"events": 20,
+"time_real": 4.903332
+},
+{
+"label": "hltIter0Phase2L3FromL1TkMuonCtfWithMaterialTracks",
+"type": "TrackProducer",
+"events": 20,
+"time_real": 1.3463
+},
+{
+"label": "hltIter0Phase2L3FromL1TkMuonTrackCutClassifier",
+"type": "TrackCutClassifier",
+"events": 20,
+"time_real": 0.16716
+},
+{
+"label": "hltIter0Phase2L3FromL1TkMuonTrackSelectionHighPurity",
+"type": "TrackCollectionFilterCloner",
+"events": 20,
+"time_real": 0.291866
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonClustersRefRemoval",
+"type": "TrackClusterRemoverPhase2",
+"events": 20,
+"time_real": 0.222877
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonMaskedMeasurementTrackerEvent",
+"type": "MaskedMeasurementTrackerEventProducer",
+"events": 20,
+"time_real": 0.300457
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonPixelLayerTriplets",
+"type": "SeedingLayersEDProducer",
+"events": 20,
+"time_real": 0.660143
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonPixelClusterCheck",
+"type": "ClusterCheckerEDProducer",
+"events": 20,
+"time_real": 0.049
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonPixelHitDoublets",
+"type": "HitPairEDProducer",
+"events": 20,
+"time_real": 0.386471
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonPixelHitTriplets",
+"type": "CAHitTripletEDProducer",
+"events": 20,
+"time_real": 0.198071
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonPixelSeeds",
+"type": "SeedCreatorFromRegionConsecutiveHitsTripletOnlyEDProducer",
+"events": 20,
+"time_real": 0.242236
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonPixelSeedsFiltered",
+"type": "MuonHLTSeedMVAClassifierPhase2",
+"events": 20,
+"time_real": 27.889795
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonCkfTrackCandidates",
+"type": "CkfTrackCandidateMaker",
+"events": 20,
+"time_real": 3.168192
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonCtfWithMaterialTracks",
+"type": "TrackProducer",
+"events": 20,
+"time_real": 0.458793
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonTrackCutClassifier",
+"type": "TrackCutClassifier",
+"events": 20,
+"time_real": 0.07252
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonTrackSelectionHighPurity",
+"type": "TrackCollectionFilterCloner",
+"events": 20,
+"time_real": 0.137443
+},
+{
+"label": "hltIter2Phase2L3FromL1TkMuonMerged",
+"type": "TrackListMerger",
+"events": 20,
+"time_real": 0.344841
+},
+{
+"label": "hltPhase2L3MuonFilter",
+"type": "Phase2HLTMuonSelectorForL3",
+"events": 20,
+"time_real": 0.217294
+},
+{
+"label": "hltPhase2L3OISeedsFromL2Muons",
+"type": "TSGForOIFromL2",
+"events": 20,
+"time_real": 0.466961
+},
+{
+"label": "hltPhase2L3OITrackCandidates",
+"type": "CkfTrackCandidateMaker",
+"events": 20,
+"time_real": 0.142607
+},
+{
+"label": "hltPhase2L3OIMuCtfWithMaterialTracks",
+"type": "TrackProducer",
+"events": 20,
+"time_real": 0.124294
+},
+{
+"label": "hltPhase2L3OIMuonTrackCutClassifier",
+"type": "TrackCutClassifier",
+"events": 20,
+"time_real": 0.069609
+},
+{
+"label": "hltPhase2L3OIMuonTrackSelectionHighPurity",
+"type": "TrackCollectionFilterCloner",
+"events": 20,
+"time_real": 0.095731
+},
+{
+"label": "hltPhase2L3MuonMerged",
+"type": "TrackListMerger",
+"events": 20,
+"time_real": 0.165433
+},
+{
+"label": "hltPhase2L3GlbMuon",
+"type": "L3MuonProducer",
+"events": 20,
+"time_real": 4.805478
+},
+{
+"label": "hltPhase2L3MuonsNoID",
+"type": "MuonIdProducer",
+"events": 20,
+"time_real": 19.702017
+},
+{
+"label": "hltPhase2L3Muons",
+"type": "MuonIDFilterProducerForHLT",
+"events": 20,
+"time_real": 0.201462
+},
+{
+"label": "hltPhase2L3MuonCandidates",
+"type": "L3MuonCandidateProducerFromMuons",
+"events": 20,
+"time_real": 0.085524
+},
+{
+"label": "hltParticleFlowRecHitECALUnseeded",
+"type": "PFRecHitProducer",
+"events": 20,
+"time_real": 4.588577
+},
+{
+"label": "hltParticleFlowRecHitHBHE",
+"type": "PFRecHitProducer",
+"events": 20,
+"time_real": 1.872145
+},
+{
+"label": "hltParticleFlowBadHcalPseudoCluster",
+"type": "PFBadHcalPseudoClusterProducer",
+"events": 20,
+"time_real": 0.137002
+},
+{
+"label": "hltParticleFlowClusterECALUncorrected",
+"type": "PFClusterProducer",
+"events": 20,
+"time_real": 5.615454
+},
+{
+"label": "hltEcalBarrelClusterFastTimer",
+"type": "EcalBarrelClusterFastTimer",
+"events": 20,
+"time_real": 0.749964
+},
+{
+"label": "hltParticleFlowTimeAssignerECAL",
+"type": "PFClusterTimeAssigner",
+"events": 20,
+"time_real": 0.174193
+},
+{
+"label": "hltParticleFlowClusterECAL",
+"type": "CorrectedECALPFClusterProducer",
+"events": 20,
+"time_real": 15.1559
+},
+{
+"label": "hltParticleFlowClusterHBHE",
+"type": "PFClusterProducer",
+"events": 20,
+"time_real": 2.748138
+},
+{
+"label": "hltParticleFlowClusterHCAL",
+"type": "PFMultiDepthClusterProducer",
+"events": 20,
+"time_real": 1.16182
+},
+{
+"label": "hltParticleFlowRecHitHF",
+"type": "PFRecHitProducer",
+"events": 20,
+"time_real": 6.281981
+},
+{
+"label": "hltParticleFlowClusterHF",
+"type": "PFClusterProducer",
+"events": 20,
+"time_real": 5.459235
+},
+{
+"label": "hltParticleFlowRecHitHO",
+"type": "PFRecHitProducer",
+"events": 20,
+"time_real": 0.75173
+},
+{
+"label": "hltParticleFlowClusterHO",
+"type": "PFClusterProducer",
+"events": 20,
+"time_real": 0.126361
+},
+{
+"label": "hltTiclLayerTileProducer",
+"type": "TICLLayerTileProducer",
+"events": 20,
+"time_real": 234.385376
+},
+{
+"label": "hltFilteredLayerClustersCLUE3DHigh",
+"type": "FilteredLayerClustersProducer",
+"events": 20,
+"time_real": 0.812778
+},
+{
+"label": "hltTiclSeedingGlobal",
+"type": "TICLSeedingRegionProducer",
+"events": 20,
+"time_real": 0.087688
+},
+{
+"label": "hltTiclTrackstersCLUE3DHigh",
+"type": "TrackstersProducer",
+"events": 20,
+"time_real": 139.007867
+},
+{
+"label": "hltFilteredLayerClustersRecovery",
+"type": "FilteredLayerClustersProducer",
+"events": 20,
+"time_real": 0.76933
+},
+{
+"label": "hltTiclTrackstersRecovery",
+"type": "TrackstersProducer",
+"events": 20,
+"time_real": 5.313129
+},
+{
+"label": "hltTiclTracksterLinks",
+"type": "TracksterLinksProducer",
+"events": 20,
+"time_real": 37.397752
+},
+{
+"label": "hltTiclCandidate",
+"type": "TICLCandidateProducer",
+"events": 20,
+"time_real": 63.24262
+},
+{
+"label": "hltPfTICL",
+"type": "PFTICLProducer",
+"events": 20,
+"time_real": 0.591951
+},
+{
+"label": "hltFirstStepPrimaryVerticesUnsorted",
+"type": "PrimaryVertexProducer",
+"events": 20,
+"time_real": 37.374488
+},
+{
+"label": "hltPhase2TowerMakerForAll",
+"type": "CaloTowersCreator",
+"events": 20,
+"time_real": 18.31457
+},
+{
+"label": "hltAk4CaloJetsForTrk",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 17.76214
+},
+{
+"label": "hltUnsortedOfflinePrimaryVertices",
+"type": "PrimaryVertexProducer",
+"events": 20,
+"time_real": 68.660346
+},
+{
+"label": "hltTrackWithVertexRefSelectorBeforeSorting",
+"type": "TrackWithVertexRefSelector",
+"events": 20,
+"time_real": 1.04112
+},
+{
+"label": "hltTrackRefsForJetsBeforeSorting",
+"type": "ChargedRefCandidateProducer",
+"events": 20,
+"time_real": 0.846028
+},
+{
+"label": "hltOfflinePrimaryVertices",
+"type": "RecoChargedRefCandidatePrimaryVertexSorter",
+"events": 20,
+"time_real": 2.459986
+},
+{
+"label": "hltParticleFlowSuperClusterECAL",
+"type": "PFECALSuperClusterProducer",
+"events": 20,
+"time_real": 13.058686
+},
+{
+"label": "hltTowerMaker",
+"type": "CaloTowersCreator",
+"events": 20,
+"time_real": 21.39382
+},
+{
+"label": "hltPfTrack",
+"type": "PFTrackProducer",
+"events": 20,
+"time_real": 7.352484
+},
+{
+"label": "hltParticleFlowBlock",
+"type": "PFBlockProducer",
+"events": 20,
+"time_real": 20.520591
+},
+{
+"label": "hltParticleFlowTmpBarrel",
+"type": "PFProducer",
+"events": 20,
+"time_real": 9.606206
+},
+{
+"label": "hltParticleFlowTmp",
+"type": "PFCandidateListMerger",
+"events": 20,
+"time_real": 2.23836
+},
+{
+"label": "hltFixedGridRhoFastjetAll",
+"type": "FixedGridRhoProducerFastjet",
+"events": 20,
+"time_real": 1.508335
+},
+{
+"label": "hltParticleFlowClusterECALUncorrectedUnseeded",
+"type": "PFClusterProducer",
+"events": 20,
+"time_real": 6.397523
+},
+{
+"label": "hltParticleFlowClusterECALUnseeded",
+"type": "CorrectedECALPFClusterProducer",
+"events": 20,
+"time_real": 16.430309
+},
+{
+"label": "hltParticleFlowRecHitHGC",
+"type": "PFRecHitProducer",
+"events": 20,
+"time_real": 260.47721
+},
+{
+"label": "hltTiclTracksterLinksSuperclusteringDNNUnseeded",
+"type": "TracksterLinksProducer",
+"events": 20,
+"time_real": 2.208462
+},
+{
+"label": "hltTiclEGammaSuperClusterProducerUnseeded",
+"type": "EGammaSuperclusterProducer",
+"events": 20,
+"time_real": 24.597194
+},
+{
+"label": "hltParticleFlowSuperClusterECALUnseeded",
+"type": "PFECALSuperClusterProducer",
+"events": 20,
+"time_real": 8.136604
+},
+{
+"label": "hltFixedGridRhoFastjetAllCaloForEGamma",
+"type": "FixedGridRhoProducerFastjetFromRecHit",
+"events": 20,
+"time_real": 2.578767
+},
+{
+"label": "hltEgammaCandidatesUnseeded",
+"type": "EgammaHLTRecoEcalCandidateProducers",
+"events": 20,
+"time_real": 0.148693
+},
+{
+"label": "hltEgammaHoverEUnseeded",
+"type": "EgammaHLTHcalVarProducerFromRecHit",
+"events": 20,
+"time_real": 1.43872
+},
+{
+"label": "hltPixelLayerTriplets",
+"type": "SeedingLayersEDProducer",
+"events": 20,
+"time_real": 0.664555
+},
+{
+"label": "hltEgammaSuperClustersToPixelMatchUnseeded",
+"type": "EgammaHLTFilteredSuperClusterProducer",
+"events": 20,
+"time_real": 0.128015
+},
+{
+"label": "hltEleSeedsTrackingRegionsUnseeded",
+"type": "TrackingRegionsFromSuperClustersEDProducer",
+"events": 20,
+"time_real": 0.4604
+},
+{
+"label": "hltElePixelHitDoubletsForTripletsUnseeded",
+"type": "HitPairEDProducer",
+"events": 20,
+"time_real": 7.003725
+},
+{
+"label": "hltElePixelHitTripletsUnseeded",
+"type": "CAHitTripletEDProducer",
+"events": 20,
+"time_real": 5.258529
+},
+{
+"label": "hltElePixelSeedsTripletsUnseeded",
+"type": "SeedCreatorFromRegionConsecutiveHitsEDProducer",
+"events": 20,
+"time_real": 37.100462
+},
+{
+"label": "hltElePixelHitTripletsClusterRemoverUnseeded",
+"type": "SeedClusterRemoverPhase2",
+"events": 20,
+"time_real": 0.504932
+},
+{
+"label": "hltPixelLayerPairsUnseeded",
+"type": "SeedingLayersEDProducer",
+"events": 20,
+"time_real": 0.968564
+},
+{
+"label": "hltElePixelHitDoubletsUnseeded",
+"type": "HitPairEDProducer",
+"events": 20,
+"time_real": 4.961842
+},
+{
+"label": "hltElePixelSeedsDoubletsUnseeded",
+"type": "SeedCreatorFromRegionConsecutiveHitsEDProducer",
+"events": 20,
+"time_real": 4.659562
+},
+{
+"label": "hltElePixelSeedsCombinedUnseeded",
+"type": "SeedCombiner",
+"events": 20,
+"time_real": 1.402722
+},
+{
+"label": "hltEgammaElectronPixelSeedsUnseeded",
+"type": "ElectronNHitSeedProducer",
+"events": 20,
+"time_real": 191.733182
+},
+{
+"label": "hltEgammaPixelMatchVarsUnseeded",
+"type": "EgammaHLTPixelMatchVarProducer",
+"events": 20,
+"time_real": 6.385303
+},
+{
+"label": "hltEgammaCkfTrackCandidatesForGSFUnseeded",
+"type": "CkfTrackCandidateMaker",
+"events": 20,
+"time_real": 64.517725
+},
+{
+"label": "hltEgammaGsfTracksUnseeded",
+"type": "GsfTrackProducer",
+"events": 20,
+"time_real": 64.604509
+},
+{
+"label": "hltEgammaGsfElectronsUnseeded",
+"type": "EgammaHLTPixelMatchElectronProducers",
+"events": 20,
+"time_real": 2.642929
+},
+{
+"label": "hltEgammaBestGsfTrackVarsUnseeded",
+"type": "EgammaHLTGsfTrackVarProducer",
+"events": 20,
+"time_real": 1.654426
+},
+{
+"label": "hltEgammaGsfTrackVarsUnseeded",
+"type": "EgammaHLTGsfTrackVarProducer",
+"events": 20,
+"time_real": 2.471014
+},
+{
+"label": "hltEgammaEleL1TrkIsoUnseeded",
+"type": "EgammaHLTEleL1TrackIsolProducer",
+"events": 20,
+"time_real": 0.170164
+},
+{
+"label": "hltEgammaClusterShapeUnseeded",
+"type": "EgammaHLTClusterShapeProducer",
+"events": 20,
+"time_real": 1.82857
+},
+{
+"label": "hltEgammaR9Unseeded",
+"type": "EgammaHLTR9IDProducer",
+"events": 20,
+"time_real": 0.43977
+},
+{
+"label": "hltEgammaEcalPFClusterIsoUnseeded",
+"type": "EgammaHLTEcalPFClusterIsolationProducer",
+"events": 20,
+"time_real": 2.023868
+},
+{
+"label": "hltEgammaEleGsfTrackIsoUnseeded",
+"type": "EgammaHLTElectronTrackIsolationProducers",
+"events": 20,
+"time_real": 0.509682
+},
+{
+"label": "hltEgammaHcalPFClusterIsoUnseeded",
+"type": "EgammaHLTHcalPFClusterIsolationProducer",
+"events": 20,
+"time_real": 0.624803
+},
+{
+"label": "hltPhase2L3MuonPixelTracksAndHighPtTripletTrackingRegions",
+"type": "CandidateSeededTrackingRegionsEDProducer",
+"events": 18,
+"time_real": 0.170944
+},
+{
+"label": "hltPhase2L3MuonPixelTracksSeedLayers",
+"type": "SeedingLayersEDProducer",
+"events": 18,
+"time_real": 0.611215
+},
+{
+"label": "hltPhase2L3MuonPixelTracksHitDoublets",
+"type": "HitPairEDProducer",
+"events": 18,
+"time_real": 0.513604
+},
+{
+"label": "hltPhase2L3MuonPixelTracksHitQuadruplets",
+"type": "CAHitQuadrupletEDProducer",
+"events": 18,
+"time_real": 0.207522
+},
+{
+"label": "hltPhase2L3MuonPixelTracks",
+"type": "PixelTrackProducer",
+"events": 18,
+"time_real": 0.117824
+},
+{
+"label": "hltPhase2L3MuonPixelVertices",
+"type": "PixelVertexProducer",
+"events": 18,
+"time_real": 0.272018
+},
+{
+"label": "hltPhase2L3MuonInitialStepSeeds",
+"type": "SeedGeneratorFromProtoTracksEDProducer",
+"events": 18,
+"time_real": 0.08448
+},
+{
+"label": "hltPhase2L3MuonInitialStepTrackCandidates",
+"type": "CkfTrackCandidateMaker",
+"events": 18,
+"time_real": 0.592231
+},
+{
+"label": "hltPhase2L3MuonInitialStepTracks",
+"type": "TrackProducer",
+"events": 18,
+"time_real": 0.338747
+},
+{
+"label": "hltPhase2L3MuonInitialStepTrackCutClassifier",
+"type": "TrackCutClassifier",
+"events": 18,
+"time_real": 0.061449
+},
+{
+"label": "hltPhase2L3MuonInitialStepTracksSelectionHighPurity",
+"type": "TrackCollectionFilterCloner",
+"events": 18,
+"time_real": 0.099455
+},
+{
+"label": "hltPhase2L3MuonHighPtTripletStepClusters",
+"type": "TrackClusterRemoverPhase2",
+"events": 18,
+"time_real": 0.094832
+},
+{
+"label": "hltPhase2L3MuonHighPtTripletStepSeedLayers",
+"type": "SeedingLayersEDProducer",
+"events": 18,
+"time_real": 1.033042
+},
+{
+"label": "hltPhase2L3MuonHighPtTripletStepHitDoublets",
+"type": "HitPairEDProducer",
+"events": 18,
+"time_real": 0.425864
+},
+{
+"label": "hltPhase2L3MuonHighPtTripletStepHitTriplets",
+"type": "CAHitTripletEDProducer",
+"events": 18,
+"time_real": 0.196785
+},
+{
+"label": "hltPhase2L3MuonHighPtTripletStepSeeds",
+"type": "SeedCreatorFromRegionConsecutiveHitsEDProducer",
+"events": 18,
+"time_real": 0.210623
+},
+{
+"label": "hltPhase2L3MuonHighPtTripletStepTrackCandidates",
+"type": "CkfTrackCandidateMaker",
+"events": 18,
+"time_real": 2.006546
+},
+{
+"label": "hltPhase2L3MuonHighPtTripletStepTracks",
+"type": "TrackProducer",
+"events": 18,
+"time_real": 0.508392
+},
+{
+"label": "hltPhase2L3MuonHighPtTripletStepTrackCutClassifier",
+"type": "TrackCutClassifier",
+"events": 18,
+"time_real": 0.062283
+},
+{
+"label": "hltPhase2L3MuonHighPtTripletStepTracksSelectionHighPurity",
+"type": "TrackCollectionFilterCloner",
+"events": 18,
+"time_real": 0.089619
+},
+{
+"label": "hltPhase2L3MuonGeneralTracks",
+"type": "TrackListMerger",
+"events": 18,
+"time_real": 0.139243
+},
+{
+"label": "hltAK4PFJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 142.857134
+},
+{
+"label": "hltAK4PFJetCorrectorL1",
+"type": "L1FastjetCorrectorProducer",
+"events": 20,
+"time_real": 0.069292
+},
+{
+"label": "hltAK4PFJetCorrectorL2",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.161293
+},
+{
+"label": "hltAK4PFJetCorrectorL3",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.292296
+},
+{
+"label": "hltAK4PFJetCorrector",
+"type": "ChainedJetCorrectorProducer",
+"events": 20,
+"time_real": 0.05563
+},
+{
+"label": "hltAK4PFJetsCorrected",
+"type": "CorrectedPFJetProducer",
+"events": 20,
+"time_real": 0.79743
+},
+{
+"label": "hltAK4PFJetsForTaus",
+"type": "FastjetJetProducer",
+"events": 18,
+"time_real": 13.087024
+},
+{
+"label": "hltTauPFJets08Region",
+"type": "RecoTauJetRegionProducer",
+"events": 18,
+"time_real": 1.146883
+},
+{
+"label": "hltHpsTauPFJetsRecoTauChargedHadronsWithNeutrals",
+"type": "PFRecoTauChargedHadronProducer",
+"events": 18,
+"time_real": 3.106421
+},
+{
+"label": "hltPFTauPiZeros",
+"type": "RecoTauPiZeroProducer",
+"events": 18,
+"time_real": 2.437574
+},
+{
+"label": "hltHpsCombinatoricRecoTaus",
+"type": "RecoTauProducer",
+"events": 18,
+"time_real": 150.383112
+},
+{
+"label": "hltHpsSelectionDiscriminator",
+"type": "PFRecoTauDiscriminationByHPSSelection",
+"events": 18,
+"time_real": 3.266066
+},
+{
+"label": "hltHpsPFTauProducerSansRefs",
+"type": "RecoTauCleaner",
+"events": 18,
+"time_real": 10.308891
+},
+{
+"label": "hltHpsPFTauProducer",
+"type": "RecoTauPiZeroUnembedder",
+"events": 18,
+"time_real": 0.431057
+},
+{
+"label": "hltHpsPFTauDiscriminationByDecayModeFindingNewDMs",
+"type": "PFRecoTauDiscriminationByHPSSelection",
+"events": 18,
+"time_real": 0.143954
+},
+{
+"label": "hltHpsPFTauTrackFindingDiscriminator",
+"type": "PFRecoTauDiscriminationByLeadingObjectPtCut",
+"events": 18,
+"time_real": 0.061661
+},
+{
+"label": "hltHpsSelectedPFTausTrackFinding",
+"type": "PFTauSelector",
+"events": 18,
+"time_real": 0.355148
+},
+{
+"label": "hltHpsPFTauTrack",
+"type": "HLT1PFTau",
+"events": 18,
+"time_real": 0.202056
+},
+{
+"label": "hltHpsPFTauPrimaryVertexProducerForDeepTau",
+"type": "PFTauPrimaryVertexProducer",
+"events": 18,
+"time_real": 67.828924
+},
+{
+"label": "hltHpsPFTauSecondaryVertexProducerForDeepTau",
+"type": "PFTauSecondaryVertexProducer",
+"events": 18,
+"time_real": 3.338703
+},
+{
+"label": "hltHpsPFTauTransverseImpactParametersForDeepTau",
+"type": "PFTauTransverseImpactParameters",
+"events": 18,
+"time_real": 0.766217
+},
+{
+"label": "hltHpsPFTauBasicDiscriminatorsForDeepTau",
+"type": "PFRecoTauDiscriminationByIsolationContainer",
+"events": 18,
+"time_real": 3.629161
+},
+{
+"label": "hltHpsPFTauBasicDiscriminatorsdR03ForDeepTau",
+"type": "PFRecoTauDiscriminationByIsolationContainer",
+"events": 18,
+"time_real": 2.901316
+},
+{
+"label": "hltHpsPFTauDeepTauProducer",
+"type": "DeepTauId",
+"events": 18,
+"time_real": 475.590359
+},
+{
+"label": "hltGoodOfflinePrimaryVertices",
+"type": "VertexSelector",
+"events": 20,
+"time_real": 0.375979
+},
+{
+"label": "hltPixelClustersMultiplicity",
+"type": "HLTSiPixelClusterMultiplicityValueProducer",
+"events": 20,
+"time_real": 0.245004
+},
+{
+"label": "hltPFPuppi",
+"type": "PuppiProducer",
+"events": 20,
+"time_real": 11.45156
+},
+{
+"label": "hltAK4PFPuppiJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 139.664966
+},
+{
+"label": "hltAK4PFPuppiJetCorrectorL1",
+"type": "L1FastjetCorrectorProducer",
+"events": 20,
+"time_real": 0.05262
+},
+{
+"label": "hltAK4PFPuppiJetCorrectorL2",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.168255
+},
+{
+"label": "hltAK4PFPuppiJetCorrectorL3",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.063422
+},
+{
+"label": "hltAK4PFPuppiJetCorrector",
+"type": "ChainedJetCorrectorProducer",
+"events": 20,
+"time_real": 0.057632
+},
+{
+"label": "hltAK4PFPuppiJetsCorrected",
+"type": "CorrectedPFJetProducer",
+"events": 20,
+"time_real": 0.826367
+},
+{
+"label": "hltPFPuppiHT",
+"type": "HLTHtMhtProducer",
+"events": 20,
+"time_real": 0.064152
+},
+{
+"label": "hltPFPuppiMHT",
+"type": "HLTHtMhtProducer",
+"events": 20,
+"time_real": 0.230496
+},
+{
+"label": "hltDeepBLifetimeTagInfosPFPuppi",
+"type": "CandIPProducer",
+"events": 20,
+"time_real": 24.207444
+},
+{
+"label": "hltDeepInclusiveVertexFinderPF",
+"type": "InclusiveCandidateVertexFinder",
+"events": 20,
+"time_real": 88.782801
+},
+{
+"label": "hltDeepInclusiveSecondaryVerticesPF",
+"type": "CandidateVertexMerger",
+"events": 20,
+"time_real": 0.54861
+},
+{
+"label": "hltDeepTrackVertexArbitratorPF",
+"type": "CandidateVertexArbitrator",
+"events": 20,
+"time_real": 14.203586
+},
+{
+"label": "hltDeepInclusiveMergedVerticesPF",
+"type": "CandidateVertexMerger",
+"events": 20,
+"time_real": 0.09293
+},
+{
+"label": "hltDeepSecondaryVertexTagInfosPFPuppi",
+"type": "CandSecondaryVertexProducer",
+"events": 20,
+"time_real": 2.606978
+},
+{
+"label": "hltDeepCombinedSecondaryVertexBJetTagsInfosPuppi",
+"type": "DeepNNTagInfoProducer",
+"events": 20,
+"time_real": 3.772493
+},
+{
+"label": "hltDeepCombinedSecondaryVertexBJetTagsPFPuppi",
+"type": "DeepFlavourJetTagsProducer",
+"events": 20,
+"time_real": 4.132853
+},
+{
+"label": "hltPrimaryVertexAssociation",
+"type": "PFCandidatePrimaryVertexSorter",
+"events": 20,
+"time_real": 3.697836
+},
+{
+"label": "hltPfDeepFlavourTagInfos",
+"type": "DeepFlavourTagInfoProducer",
+"events": 20,
+"time_real": 5.281218
+},
+{
+"label": "hltPfDeepFlavourJetTags",
+"type": "DeepFlavourONNXJetTagsProducer",
+"events": 20,
+"time_real": 21.782739
+},
+{
+"label": "hltPFPuppiNoLep",
+"type": "PuppiProducer",
+"events": 20,
+"time_real": 11.364495
+},
+{
+"label": "hltPFPuppiMET",
+"type": "PFMETProducer",
+"events": 20,
+"time_real": 0.95253
+},
+{
+"label": "hltPFPuppiMETTypeOneCorrector",
+"type": "PFJetMETcorrInputProducer",
+"events": 20,
+"time_real": 0.534933
+},
+{
+"label": "hltPFPuppiMETTypeOne",
+"type": "CorrectedPFMETProducer",
+"events": 20,
+"time_real": 0.175333
+},
+{
+"label": "hltBoolEnd",
+"type": "HLTBool",
+"events": 18,
+"time_real": 0.02305
+},
+{
+"label": "hltL1SeedsForPuppiJetFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.060233
+},
+{
+"label": "hltSingleAK4PFPuppiJet520",
+"type": "HLT1PFJet",
+"events": 5,
+"time_real": 0.022311
+},
+{
+"label": "hltL1SeedsForPuppiHTFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.055831
+},
+{
+"label": "hltPFPuppiHT1070",
+"type": "HLTHtMhtFilter",
+"events": 9,
+"time_real": 0.088791
+},
+{
+"label": "hltL1SeedsForPuppiMETFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.056641
+},
+{
+"label": "hltPFPuppiMETTypeOne140",
+"type": "HLT1PFMET",
+"events": 2,
+"time_real": 0.01349
+},
+{
+"label": "hltPFPuppiMHT140",
+"type": "HLTMhtFilter",
+"events": 1,
+"time_real": 0.00866
+},
+{
+"label": "hltL1SeedsForDoublePuppiJetBtagFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.100062
+},
+{
+"label": "hltDoublePFPuppiJets128MaxEta2p4",
+"type": "HLT1PFJet",
+"events": 11,
+"time_real": 0.075182
+},
+{
+"label": "hltDoublePFPuppiJets128Eta2p4MaxDeta1p6",
+"type": "HLT2PFJetPFJet",
+"events": 5,
+"time_real": 0.298087
+},
+{
+"label": "hltPFPuppiJetForBtagSelectorEta2p4",
+"type": "HLT1PFJet",
+"events": 9,
+"time_real": 0.02905
+},
+{
+"label": "hltPFPuppiJetForBtagEta2p4",
+"type": "HLTPFJetCollectionProducer",
+"events": 9,
+"time_real": 0.073772
+},
+{
+"label": "hltDeepBLifetimeTagInfosPFPuppiModEta2p4",
+"type": "CandIPProducer",
+"events": 9,
+"time_real": 10.587118
+},
+{
+"label": "hltDeepSecondaryVertexTagInfosPFPuppiModEta2p4",
+"type": "CandSecondaryVertexProducer",
+"events": 9,
+"time_real": 0.725164
+},
+{
+"label": "hltDeepCombinedSecondaryVertexBJetTagsInfosPuppiModEta2p4",
+"type": "DeepNNTagInfoProducer",
+"events": 9,
+"time_real": 1.673887
+},
+{
+"label": "hltDeepCombinedSecondaryVertexBJetTagsPFPuppiModEta2p4",
+"type": "DeepFlavourJetTagsProducer",
+"events": 4,
+"time_real": 0.676975
+},
+{
+"label": "hltBTagPFPuppiDeepCSV0p865DoubleEta2p4",
+"type": "HLTPFJetTag",
+"events": 4,
+"time_real": 0.0171
+},
+{
+"label": "hltL1PuppiHT400",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.073832
+},
+{
+"label": "hltL1QuadJet70554040",
+"type": "HLTP2GTQuadObjectFilter",
+"events": 9,
+"time_real": 0.296739
+},
+{
+"label": "hltPFPuppiCentralJetQuad30MaxEta2p4",
+"type": "HLT1PFJet",
+"events": 9,
+"time_real": 0.039871
+},
+{
+"label": "hlt1PFPuppiCentralJet75MaxEta2p4",
+"type": "HLT1PFJet",
+"events": 9,
+"time_real": 0.03982
+},
+{
+"label": "hlt2PFPuppiCentralJet60MaxEta2p4",
+"type": "HLT1PFJet",
+"events": 9,
+"time_real": 0.02441
+},
+{
+"label": "hlt3PFPuppiCentralJet45MaxEta2p4",
+"type": "HLT1PFJet",
+"events": 9,
+"time_real": 0.027383
+},
+{
+"label": "hlt4PFPuppiCentralJet40MaxEta2p4",
+"type": "HLT1PFJet",
+"events": 9,
+"time_real": 0.024492
+},
+{
+"label": "hltHtMhtPFPuppiCentralJetsQuadC30MaxEta2p4",
+"type": "HLTHtMhtProducer",
+"events": 9,
+"time_real": 0.029971
+},
+{
+"label": "hltPFPuppiCentralJetsQuad30HT330MaxEta2p4",
+"type": "HLTHtMhtFilter",
+"events": 9,
+"time_real": 0.031062
+},
+{
+"label": "hltPrimaryVertexAssociationModEta2p4",
+"type": "PFCandidatePrimaryVertexSorter",
+"events": 9,
+"time_real": 1.76025
+},
+{
+"label": "hltPfDeepFlavourTagInfosModEta2p4",
+"type": "DeepFlavourTagInfoProducer",
+"events": 9,
+"time_real": 2.071937
+},
+{
+"label": "hltPfDeepFlavourJetTagsModEta2p4",
+"type": "DeepFlavourONNXJetTagsProducer",
+"events": 9,
+"time_real": 7.041007
+},
+{
+"label": "hltBTagPFPuppiDeepFlavour0p275Eta2p4TripleEta2p4",
+"type": "HLTPFJetTag",
+"events": 9,
+"time_real": 0.0265
+},
+{
+"label": "hlt1PFPuppiCentralJet70MaxEta2p4",
+"type": "HLT1PFJet",
+"events": 9,
+"time_real": 0.0266
+},
+{
+"label": "hlt2PFPuppiCentralJet40MaxEta2p4",
+"type": "HLT1PFJet",
+"events": 9,
+"time_real": 0.025369
+},
+{
+"label": "hltPFPuppiCentralJetsQuad30HT200MaxEta2p4",
+"type": "HLTHtMhtFilter",
+"events": 9,
+"time_real": 0.030222
+},
+{
+"label": "hltBTagPFPuppiDeepFlavour0p375Eta2p4TripleEta2p4",
+"type": "HLTPFJetTag",
+"events": 9,
+"time_real": 0.069832
+},
+{
+"label": "hltBTagPFPuppiDeepFlavour0p935DoubleEta2p4",
+"type": "HLTPFJetTag",
+"events": 4,
+"time_real": 0.058573
+},
+{
+"label": "hltSingleTkMuon22L1TkMuonFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.066363
+},
+{
+"label": "hltL3fL1TkSingleMu22L3Filtered50Q",
+"type": "HLTMuonTrkL1TkMuFilter",
+"events": 3,
+"time_real": 0.01192
+},
+{
+"label": "hltL3fL1TkSingleMu22L3Filtered24Q",
+"type": "HLTMuonTrkL1TkMuFilter",
+"events": 3,
+"time_real": 0.046181
+},
+{
+"label": "hltPhase2L3MuonsEcalIsodR0p3dRVeto0p000",
+"type": "MuonHLTEcalPFClusterIsolationProducer",
+"events": 3,
+"time_real": 0.179573
+},
+{
+"label": "hltPhase2L3MuonsHcalIsodR0p3dRVeto0p000",
+"type": "MuonHLTHcalPFClusterIsolationProducer",
+"events": 3,
+"time_real": 0.173074
+},
+{
+"label": "hltPhase2L3MuonsHgcalLCIsodR0p2dRVetoEM0p00dRVetoHad0p02minEEM0p00minEHad0p00",
+"type": "MuonHLTHGCalLayerClusterIsolationProducer",
+"events": 3,
+"time_real": 1.931741
+},
+{
+"label": "hltL3crIsoL1TkSingleMu22L3f24QL3pfecalIsoFiltered0p41",
+"type": "HLTMuonGenericFilter",
+"events": 3,
+"time_real": 0.01535
+},
+{
+"label": "hltL3crIsoL1TkSingleMu22L3f24QL3pfhcalIsoFiltered0p40",
+"type": "HLTMuonGenericFilter",
+"events": 3,
+"time_real": 0.009699
+},
+{
+"label": "hltL3crIsoL1TkSingleMu22L3f24QL3pfhgcalIsoFiltered4p70",
+"type": "HLTMuonGenericFilter",
+"events": 3,
+"time_real": 0.01027
+},
+{
+"label": "hltPhase2L3MuonsTrkIsoRegionalNewdR0p3dRVeto0p005dz0p25dr0p20ChisqInfPtMin0p0Cut0p07",
+"type": "L3MuonCombinedRelativeIsolationProducer",
+"events": 3,
+"time_real": 0.298117
+},
+{
+"label": "hltL3crIsoL1TkSingleMu22L3f24QL3trkIsoRegionalNewFiltered0p07EcalHcalHgcalTrk",
+"type": "HLTMuonIsoFilter",
+"events": 3,
+"time_real": 0.046371
+},
+{
+"label": "hltDoubleMuon7DZ1p0",
+"type": "HLT2L1P2GTCandL1P2GTCandDZ",
+"events": 20,
+"time_real": 0.06941
+},
+{
+"label": "hltL3fL1DoubleMu155fPreFiltered27",
+"type": "HLTMuonTrkL1TkMuFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltL3fL1DoubleMu155fFiltered37",
+"type": "HLTMuonTrkL1TkMuFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDoubleTkMuon157L1TkMuonFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.071201
+},
+{
+"label": "hltL3fL1DoubleMu155fPreFiltered8",
+"type": "HLTMuonTrkL1TkMuFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltL3fL1DoubleMu155fFiltered17",
+"type": "HLTMuonTrkL1TkMuFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltPhase2L3MuonsTrkIsoRegionalNewdR0p3dRVeto0p005dz0p25dr0p20ChisqInfPtMin0p0Cut0p4",
+"type": "L3MuonCombinedRelativeIsolationProducer",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiMuon178RelTrkIsoFiltered0p4",
+"type": "HLTMuonIsoFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiMuon178RelTrkIsoFiltered0p4DzFiltered0p2",
+"type": "HLT2MuonMuonDZ",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltTripleMuon3DZ1p0",
+"type": "HLT2L1P2GTCandL1P2GTCandDZ",
+"events": 20,
+"time_real": 0.113262
+},
+{
+"label": "hltTripleMuon3DR0",
+"type": "HLT2L1P2GTCandL1P2GTCandDZ",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltL3fL1TkTripleMu533PreFiltered555",
+"type": "HLTMuonTrkL1TkMuFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltL3fL1TkTripleMu533L3Filtered1055",
+"type": "HLTMuonTrkL1TkMuFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltL3fL1TkTripleMu533L31055DZFiltered0p2",
+"type": "HLT2MuonMuonDZ",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEGL1SeedsForSingleEleIsolatedFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.06679
+},
+{
+"label": "hltEgammaCandidatesWrapperUnseeded",
+"type": "HLTEgammaTriggerFilterObjectWrapper",
+"events": 20,
+"time_real": 0.127713
+},
+{
+"label": "hltEG32EtUnseededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 8,
+"time_real": 0.021631
+},
+{
+"label": "hltEle32WPTightClusterShapeUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 6,
+"time_real": 0.020021
+},
+{
+"label": "hltEgammaHGCALIDVarsUnseeded",
+"type": "EgammaHLTHGCalIDVarProducer",
+"events": 20,
+"time_real": 22.264651
+},
+{
+"label": "hltEle32WPTightClusterShapeSigmavvUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.012761
+},
+{
+"label": "hltEle32WPTightClusterShapeSigmawwUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.011531
+},
+{
+"label": "hltEle32WPTightHgcalHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01257
+},
+{
+"label": "hltEle32WPTightHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01387
+},
+{
+"label": "hltEle32WPTightEcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01357
+},
+{
+"label": "hltEgammaHGCalLayerClusterIsoUnseeded",
+"type": "EgammaHLTHGCalLayerClusterIsolationProducer",
+"events": 20,
+"time_real": 54.727797
+},
+{
+"label": "hltEle32WPTightHgcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.018752
+},
+{
+"label": "hltEle32WPTightHcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01229
+},
+{
+"label": "hltEle32WPTightPixelMatchUnseededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 4,
+"time_real": 0.026671
+},
+{
+"label": "hltEle32WPTightPMS2UnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.01162
+},
+{
+"label": "hltEle32WPTightGsfOneOEMinusOneOPUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01201
+},
+{
+"label": "hltEle32WPTightGsfDetaUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01106
+},
+{
+"label": "hltEle32WPTightGsfDphiUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01078
+},
+{
+"label": "hltEle32WPTightBestGsfNLayerITUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.011801
+},
+{
+"label": "hltEle32WPTightBestGsfChi2UnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.010931
+},
+{
+"label": "hltEle32WPTightGsfTrackIsoFromL1TracksUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01189
+},
+{
+"label": "hltEle32WPTightGsfTrackIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.011121
+},
+{
+"label": "hltEG26EtUnseededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 8,
+"time_real": 0.023369
+},
+{
+"label": "hltEle26WP70ClusterShapeUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 7,
+"time_real": 0.029271
+},
+{
+"label": "hltEle26WP70ClusterShapeSigmavvUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 6,
+"time_real": 0.02053
+},
+{
+"label": "hltEle26WP70ClusterShapeSigmawwUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 6,
+"time_real": 0.01907
+},
+{
+"label": "hltEle26WP70HgcalHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 6,
+"time_real": 0.02028
+},
+{
+"label": "hltEle26WP70HEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 6,
+"time_real": 0.022632
+},
+{
+"label": "hltEle26WP70EcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.02227
+},
+{
+"label": "hltEle26WP70HgcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.015559
+},
+{
+"label": "hltEle26WP70HcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.0147
+},
+{
+"label": "hltEle26WP70PixelMatchUnseededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 5,
+"time_real": 0.03362
+},
+{
+"label": "hltEle26WP70PMS2UnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.01245
+},
+{
+"label": "hltEle26WP70GsfOneOEMinusOneOPUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01196
+},
+{
+"label": "hltEle26WP70GsfDetaUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.011861
+},
+{
+"label": "hltEle26WP70GsfDphiUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01277
+},
+{
+"label": "hltEle26WP70BestGsfNLayerITUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.013272
+},
+{
+"label": "hltEle26WP70BestGsfChi2UnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.01239
+},
+{
+"label": "hltEle26WP70GsfTrackIsoFromL1TracksUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.0126
+},
+{
+"label": "hltEle26WP70GsfTrackIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01198
+},
+{
+"label": "hltEGL1SeedsForSinglePhotonIsolatedFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.059873
+},
+{
+"label": "hltEG108EtUnseededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 4,
+"time_real": 0.01131
+},
+{
+"label": "hltPhoton108EBTightIDTightIsoClusterShapeUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltPhoton108EBTightIDTightIsoHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltPhoton108EBTightIDTightIsoEcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltPhoton108EBTightIDTightIsoHcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEGL1SeedsForSinglePhotonNonIsolatedFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.058292
+},
+{
+"label": "hltEG187EtUnseededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 1,
+"time_real": 0.00887
+},
+{
+"label": "hltPhoton187HgcalHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltPhoton187HEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEGL1SeedsForDoubleEleNonIsolatedFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.06127
+},
+{
+"label": "hltDiEG25EtUnseededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 7,
+"time_real": 0.02022
+},
+{
+"label": "hltDiEG25CaloIdLClusterShapeUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 6,
+"time_real": 0.028882
+},
+{
+"label": "hltDiEG25CaloIdLClusterShapeSigmavvUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 3,
+"time_real": 0.01093
+},
+{
+"label": "hltDiEG25CaloIdLHgcalHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 2,
+"time_real": 0.00767
+},
+{
+"label": "hltDiEG25CaloIdLHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 2,
+"time_real": 0.00748
+},
+{
+"label": "hltDiEle25CaloIdLPixelMatchUnseededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 1,
+"time_real": 0.00583
+},
+{
+"label": "hltDiEle25CaloIdLPMS2UnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEGL1SeedsForDoublePhotonIsolatedFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.093452
+},
+{
+"label": "hltEG30EtUnseededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 7,
+"time_real": 0.024259
+},
+{
+"label": "hltDiEG23EtUnseededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 4,
+"time_real": 0.01313
+},
+{
+"label": "hltDiEG3023IsoCaloIdClusterShapeUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.02671
+},
+{
+"label": "hltDiEG3023IsoCaloIdClusterShapeSigmavvUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 3,
+"time_real": 0.01167
+},
+{
+"label": "hltDiEG3023IsoCaloIdClusterShapeSigmawwUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 1,
+"time_real": 0.0039
+},
+{
+"label": "hltDiEG3023IsoCaloIdHgcalHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.00424
+},
+{
+"label": "hltDiEG3023IsoCaloIdHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.004671
+},
+{
+"label": "hltDiEG3023IsoCaloIdEcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.00434
+},
+{
+"label": "hltDiEG3023IsoCaloIdHgcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.00424
+},
+{
+"label": "hltDiEG3023IsoCaloIdHcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.00405
+},
+{
+"label": "hltL1TEGammaFilteredCollectionProducer",
+"type": "L1TEGammaFilteredCollectionProducer",
+"events": 20,
+"time_real": 0.098493
+},
+{
+"label": "hltEcalBarrelDigisInRegions",
+"type": "HLTEcalEBDigisInRegionsProducer",
+"events": 20,
+"time_real": 6.205601
+},
+{
+"label": "hltEcalUncalibRecHitL1Seeded",
+"type": "EcalUncalibRecHitProducer",
+"events": 20,
+"time_real": 75.452386
+},
+{
+"label": "hltEcalRecHitL1Seeded",
+"type": "EcalRecHitProducer",
+"events": 20,
+"time_real": 3.351324
+},
+{
+"label": "hltRechitInRegionsECAL",
+"type": "HLTEcalRecHitsInRegionsProducer",
+"events": 20,
+"time_real": 1.682758
+},
+{
+"label": "hltParticleFlowRecHitECALL1Seeded",
+"type": "PFRecHitProducer",
+"events": 20,
+"time_real": 0.995331
+},
+{
+"label": "hltParticleFlowClusterECALUncorrectedL1Seeded",
+"type": "PFClusterProducer",
+"events": 20,
+"time_real": 1.594824
+},
+{
+"label": "hltParticleFlowClusterECALL1Seeded",
+"type": "CorrectedECALPFClusterProducer",
+"events": 20,
+"time_real": 4.513417
+},
+{
+"label": "hltParticleFlowSuperClusterECALL1Seeded",
+"type": "PFECALSuperClusterProducer",
+"events": 20,
+"time_real": 2.531456
+},
+{
+"label": "hltL1TEGammaHGCFilteredCollectionProducer",
+"type": "L1TEGammaFilteredCollectionProducer",
+"events": 20,
+"time_real": 0.11701
+},
+{
+"label": "hltHgcalDigisL1Seeded",
+"type": "HLTHGCalDigisInRegionsProducer",
+"events": 20,
+"time_real": 223.505841
+},
+{
+"label": "hltHGCalUncalibRecHitL1Seeded",
+"type": "HGCalUncalibRecHitProducer",
+"events": 20,
+"time_real": 1.909884
+},
+{
+"label": "hltHGCalRecHitL1Seeded",
+"type": "HGCalRecHitProducer",
+"events": 20,
+"time_real": 0.987541
+},
+{
+"label": "hltParticleFlowRecHitHGCL1Seeded",
+"type": "PFRecHitProducer",
+"events": 20,
+"time_real": 5.437452
+},
+{
+"label": "hltRechitInRegionsHGCAL",
+"type": "HLTHGCalRecHitsInRegionsProducer",
+"events": 20,
+"time_real": 4.482948
+},
+{
+"label": "hltHgcalLayerClustersEEL1Seeded",
+"type": "HGCalLayerClusterProducer",
+"events": 20,
+"time_real": 44.071635
+},
+{
+"label": "hltHgcalLayerClustersHSciL1Seeded",
+"type": "HGCalLayerClusterProducer",
+"events": 20,
+"time_real": 6.108532
+},
+{
+"label": "hltHgcalLayerClustersHSiL1Seeded",
+"type": "HGCalLayerClusterProducer",
+"events": 20,
+"time_real": 39.771044
+},
+{
+"label": "hltMergeLayerClustersL1Seeded",
+"type": "MergeClusterProducer",
+"events": 20,
+"time_real": 0.392957
+},
+{
+"label": "hltFilteredLayerClustersCLUE3DHighL1Seeded",
+"type": "FilteredLayerClustersProducer",
+"events": 20,
+"time_real": 0.156794
+},
+{
+"label": "hltTiclSeedingL1",
+"type": "TICLSeedingRegionProducer",
+"events": 20,
+"time_real": 0.116303
+},
+{
+"label": "hltTiclLayerTileProducerL1Seeded",
+"type": "TICLLayerTileProducer",
+"events": 20,
+"time_real": 215.79582
+},
+{
+"label": "hltTiclTrackstersCLUE3DHighL1Seeded",
+"type": "TrackstersProducer",
+"events": 20,
+"time_real": 8.9392
+},
+{
+"label": "hltTiclTracksterLinksSuperclusteringDNNL1Seeded",
+"type": "TracksterLinksProducer",
+"events": 20,
+"time_real": 0.609034
+},
+{
+"label": "hltTiclEGammaSuperClusterProducerL1Seeded",
+"type": "EGammaSuperclusterProducer",
+"events": 20,
+"time_real": 6.211839
+},
+{
+"label": "hltEgammaCandidatesL1Seeded",
+"type": "EgammaHLTRecoEcalCandidateProducers",
+"events": 20,
+"time_real": 0.186547
+},
+{
+"label": "hltEgammaCandidatesWrapperL1Seeded",
+"type": "HLTEgammaTriggerFilterObjectWrapper",
+"events": 20,
+"time_real": 0.210394
+},
+{
+"label": "hltEG32EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 8,
+"time_real": 0.02061
+},
+{
+"label": "hltEgammaClusterShapeL1Seeded",
+"type": "EgammaHLTClusterShapeProducer",
+"events": 14,
+"time_real": 1.29899
+},
+{
+"label": "hltEle32WPTightClusterShapeL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 5,
+"time_real": 0.01473
+},
+{
+"label": "hltEgammaHGCALIDVarsL1Seeded",
+"type": "EgammaHLTHGCalIDVarProducer",
+"events": 14,
+"time_real": 1.938784
+},
+{
+"label": "hltEle32WPTightClusterShapeSigmavvL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.01159
+},
+{
+"label": "hltEle32WPTightClusterShapeSigmawwL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.0117
+},
+{
+"label": "hltEle32WPTightHgcalHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.0124
+},
+{
+"label": "hltEgammaHoverEL1Seeded",
+"type": "EgammaHLTHcalVarProducerFromRecHit",
+"events": 14,
+"time_real": 0.641462
+},
+{
+"label": "hltEle32WPTightHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.014611
+},
+{
+"label": "hltEgammaEcalPFClusterIsoL1Seeded",
+"type": "EgammaHLTEcalPFClusterIsolationProducer",
+"events": 14,
+"time_real": 0.320117
+},
+{
+"label": "hltEle32WPTightEcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01414
+},
+{
+"label": "hltEgammaHGCalLayerClusterIsoL1Seeded",
+"type": "EgammaHLTHGCalLayerClusterIsolationProducer",
+"events": 14,
+"time_real": 2.097228
+},
+{
+"label": "hltEle32WPTightHgcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01361
+},
+{
+"label": "hltEgammaHcalPFClusterIsoL1Seeded",
+"type": "EgammaHLTHcalPFClusterIsolationProducer",
+"events": 14,
+"time_real": 0.345078
+},
+{
+"label": "hltEle32WPTightHcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01307
+},
+{
+"label": "hltEgammaSuperClustersToPixelMatchL1Seeded",
+"type": "EgammaHLTFilteredSuperClusterProducer",
+"events": 14,
+"time_real": 0.102551
+},
+{
+"label": "hltEleSeedsTrackingRegionsL1Seeded",
+"type": "TrackingRegionsFromSuperClustersEDProducer",
+"events": 14,
+"time_real": 0.230014
+},
+{
+"label": "hltElePixelHitDoubletsForTripletsL1Seeded",
+"type": "HitPairEDProducer",
+"events": 14,
+"time_real": 2.573927
+},
+{
+"label": "hltElePixelHitTripletsL1Seeded",
+"type": "CAHitTripletEDProducer",
+"events": 14,
+"time_real": 0.775405
+},
+{
+"label": "hltElePixelSeedsTripletsL1Seeded",
+"type": "SeedCreatorFromRegionConsecutiveHitsEDProducer",
+"events": 14,
+"time_real": 2.917514
+},
+{
+"label": "hltElePixelHitTripletsClusterRemoverL1Seeded",
+"type": "SeedClusterRemoverPhase2",
+"events": 14,
+"time_real": 0.15217
+},
+{
+"label": "hltPixelLayerPairsL1Seeded",
+"type": "SeedingLayersEDProducer",
+"events": 14,
+"time_real": 0.590767
+},
+{
+"label": "hltElePixelHitDoubletsL1Seeded",
+"type": "HitPairEDProducer",
+"events": 14,
+"time_real": 1.917861
+},
+{
+"label": "hltElePixelSeedsDoubletsL1Seeded",
+"type": "SeedCreatorFromRegionConsecutiveHitsEDProducer",
+"events": 14,
+"time_real": 1.417072
+},
+{
+"label": "hltElePixelSeedsCombinedL1Seeded",
+"type": "SeedCombiner",
+"events": 14,
+"time_real": 0.122784
+},
+{
+"label": "hltEgammaElectronPixelSeedsL1Seeded",
+"type": "ElectronNHitSeedProducer",
+"events": 14,
+"time_real": 4.997193
+},
+{
+"label": "hltEgammaPixelMatchVarsL1Seeded",
+"type": "EgammaHLTPixelMatchVarProducer",
+"events": 14,
+"time_real": 0.338768
+},
+{
+"label": "hltEle32WPTightPixelMatchL1SeededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 4,
+"time_real": 0.01536
+},
+{
+"label": "hltEle32WPTightPMS2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.0109
+},
+{
+"label": "hltEgammaCkfTrackCandidatesForGSFL1Seeded",
+"type": "CkfTrackCandidateMaker",
+"events": 14,
+"time_real": 10.923738
+},
+{
+"label": "hltEgammaGsfTracksL1Seeded",
+"type": "GsfTrackProducer",
+"events": 14,
+"time_real": 20.485161
+},
+{
+"label": "hltEgammaGsfTrackVarsL1Seeded",
+"type": "EgammaHLTGsfTrackVarProducer",
+"events": 14,
+"time_real": 0.734428
+},
+{
+"label": "hltEgammaGsfElectronsL1Seeded",
+"type": "EgammaHLTPixelMatchElectronProducers",
+"events": 14,
+"time_real": 0.766177
+},
+{
+"label": "hltEgammaBestGsfTrackVarsL1Seeded",
+"type": "EgammaHLTGsfTrackVarProducer",
+"events": 14,
+"time_real": 0.813899
+},
+{
+"label": "hltEle32WPTightGsfOneOEMinusOneOPL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01291
+},
+{
+"label": "hltEle32WPTightGsfDetaL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.0111
+},
+{
+"label": "hltEle32WPTightGsfDphiL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.013569
+},
+{
+"label": "hltEle32WPTightBestGsfNLayerITL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.01377
+},
+{
+"label": "hltEle32WPTightBestGsfChi2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.010661
+},
+{
+"label": "hltEgammaEleL1TrkIsoL1Seeded",
+"type": "EgammaHLTEleL1TrackIsolProducer",
+"events": 7,
+"time_real": 0.131913
+},
+{
+"label": "hltEle32WPTightGsfTrackIsoFromL1TracksL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01124
+},
+{
+"label": "hltEgammaEleGsfTrackIsoL1Seeded",
+"type": "EgammaHLTElectronTrackIsolationProducers",
+"events": 7,
+"time_real": 0.150275
+},
+{
+"label": "hltEle32WPTightGsfTrackIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01263
+},
+{
+"label": "hltEGL1SeedsForSingleEleNonIsolatedFilter",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.059229
+},
+{
+"label": "hltEG115EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 6,
+"time_real": 0.016223
+},
+{
+"label": "hltEle115NonIsoClusterShapeL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEle115NonIsoClusterShapeSigmavvL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEle115NonIsoClusterShapeSigmawwL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEle115NonIsoHgcalHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEle115NonIsoHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEle115NonIsoPixelMatchL1SeededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEle115NonIsoPMS2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEle115NonIsoGsfDetaL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEle115NonIsoGsfDphiL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEG26EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 8,
+"time_real": 0.02316
+},
+{
+"label": "hltEle26WP70ClusterShapeL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 6,
+"time_real": 0.01934
+},
+{
+"label": "hltEle26WP70ClusterShapeSigmavvL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 6,
+"time_real": 0.018241
+},
+{
+"label": "hltEle26WP70ClusterShapeSigmawwL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 6,
+"time_real": 0.018011
+},
+{
+"label": "hltEle26WP70HgcalHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 6,
+"time_real": 0.018042
+},
+{
+"label": "hltEle26WP70HEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 6,
+"time_real": 0.023331
+},
+{
+"label": "hltEle26WP70EcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.0176
+},
+{
+"label": "hltEle26WP70HgcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.01419
+},
+{
+"label": "hltEle26WP70HcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.015779
+},
+{
+"label": "hltEle26WP70PixelMatchL1SeededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 5,
+"time_real": 0.01876
+},
+{
+"label": "hltEle26WP70PMS2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.011889
+},
+{
+"label": "hltEle26WP70GsfOneOEMinusOneOPL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.011571
+},
+{
+"label": "hltEle26WP70GsfDetaL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.011931
+},
+{
+"label": "hltEle26WP70GsfDphiL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.012289
+},
+{
+"label": "hltEle26WP70BestGsfNLayerITL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.01149
+},
+{
+"label": "hltEle26WP70BestGsfChi2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.01153
+},
+{
+"label": "hltEle26WP70GsfTrackIsoFromL1TracksL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.011761
+},
+{
+"label": "hltEle26WP70GsfTrackIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.010941
+},
+{
+"label": "hltEG108EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 4,
+"time_real": 0.012291
+},
+{
+"label": "hltPhoton108EBTightIDTightIsoClusterShapeL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltPhoton108EBTightIDTightIsoHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltPhoton108EBTightIDTightIsoEcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltPhoton108EBTightIDTightIsoHcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEG187EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 1,
+"time_real": 0.00914
+},
+{
+"label": "hltPhoton187HgcalHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltPhoton187HEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiEG25EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 7,
+"time_real": 0.031391
+},
+{
+"label": "hltDiEG25CaloIdLClusterShapeL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 5,
+"time_real": 0.015569
+},
+{
+"label": "hltDiEG25CaloIdLClusterShapeSigmavvL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 3,
+"time_real": 0.00967
+},
+{
+"label": "hltDiEG25CaloIdLHgcalHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 3,
+"time_real": 0.00946
+},
+{
+"label": "hltDiEG25CaloIdLHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 3,
+"time_real": 0.01176
+},
+{
+"label": "hltDiEle25CaloIdLPixelMatchL1SeededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 2,
+"time_real": 0.038402
+},
+{
+"label": "hltDiEle25CaloIdLPMS2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEGL1SeedsForDoubleEleIsolatedFilter",
+"type": "HLTP2GTDoubleObjectFilter",
+"events": 20,
+"time_real": 0.114223
+},
+{
+"label": "hltEG23EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 9,
+"time_real": 0.028129
+},
+{
+"label": "hltDiEG12EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 7,
+"time_real": 0.021102
+},
+{
+"label": "hltDiEG2312IsoClusterShapeL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 7,
+"time_real": 0.032431
+},
+{
+"label": "hltDiEG2312IsoClusterShapeSigmavvL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 6,
+"time_real": 0.02116
+},
+{
+"label": "hltDiEG2312IsoClusterShapeSigmawwL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 6,
+"time_real": 0.018942
+},
+{
+"label": "hltDiEG2312IsoHgcalHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 6,
+"time_real": 0.01831
+},
+{
+"label": "hltDiEG2312IsoHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 6,
+"time_real": 0.026119
+},
+{
+"label": "hltDiEG2312IsoEcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 6,
+"time_real": 0.022549
+},
+{
+"label": "hltDiEG2312IsoHgcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.01629
+},
+{
+"label": "hltDiEG2312IsoHcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.019409
+},
+{
+"label": "hltDiEle2312IsoPixelMatchL1SeededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 5,
+"time_real": 0.019881
+},
+{
+"label": "hltDiEle2312IsoPMS2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiEle2312IsoGsfOneOEMinusOneOPL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiEle2312IsoGsfDetaL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiEle2312IsoGsfDphiL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiEle2312IsoBestGsfNLayerITL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiEle2312IsoBestGsfChi2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiEle2312IsoGsfTrackIsoFromL1TracksL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltDiEle2312IsoGsfTrackIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "hltEG30EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 10,
+"time_real": 0.03175
+},
+{
+"label": "hltDiEG23EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 4,
+"time_real": 0.011861
+},
+{
+"label": "hltDiEG3023IsoCaloIdClusterShapeL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 3,
+"time_real": 0.010721
+},
+{
+"label": "hltDiEG3023IsoCaloIdClusterShapeSigmavvL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 1,
+"time_real": 0.00373
+},
+{
+"label": "hltDiEG3023IsoCaloIdClusterShapeSigmawwL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 1,
+"time_real": 0.0031
+},
+{
+"label": "hltDiEG3023IsoCaloIdHgcalHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.0038
+},
+{
+"label": "hltDiEG3023IsoCaloIdHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.00522
+},
+{
+"label": "hltDiEG3023IsoCaloIdEcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.007291
+},
+{
+"label": "hltDiEG3023IsoCaloIdHgcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.00431
+},
+{
+"label": "hltDiEG3023IsoCaloIdHcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 1,
+"time_real": 0.00397
+},
+{
+"label": "hltL1P2GTTau",
+"type": "HLTP2GTSingleObjectFilter",
+"events": 20,
+"time_real": 0.094924
+},
+{
+"label": "hltPreDoublePFTauHPS",
+"type": "HLTPrescaler",
+"events": 6,
+"time_real": 0.01381
+},
+{
+"label": "hltHpsPFTauMediumAbsoluteChargedIsolationDiscriminator",
+"type": "PFRecoTauDiscriminationByIsolation",
+"events": 6,
+"time_real": 0.059752
+},
+{
+"label": "hltHpsPFTauMediumRelativeChargedIsolationDiscriminator",
+"type": "PFRecoTauDiscriminationByIsolation",
+"events": 6,
+"time_real": 0.044152
+},
+{
+"label": "hltHpsPFTauMediumAbsOrRelChargedIsolationDiscriminator",
+"type": "PFTauDiscriminatorLogicalAndProducer",
+"events": 6,
+"time_real": 0.02101
+},
+{
+"label": "hltHpsSelectedPFTausTrackPt1MediumChargedIsolation",
+"type": "PFTauSelector",
+"events": 6,
+"time_real": 0.069672
+},
+{
+"label": "hltHpsDoublePFTau40TrackPt1MediumChargedIsolation",
+"type": "HLT1PFTau",
+"events": 6,
+"time_real": 0.02848
+},
+{
+"label": "hltHpsSelectedPFTausMediumDitauWPDeepTau",
+"type": "PFTauSelector",
+"events": 6,
+"time_real": 0.333197
+},
+{
+"label": "hltHpsDoublePFTau35MediumDitauWPDeepTau",
+"type": "HLT1PFTau",
+"events": 6,
+"time_real": 0.045861
+},
+{
+"label": "hltPFJetForBtagSelector",
+"type": "HLT1PFJet",
+"events": 6,
+"time_real": 0.03312
+},
+{
+"label": "hltParticleTransformerAK4TagInfos",
+"type": "HLTParticleTransformerAK4TagInfoProducer",
+"events": 6,
+"time_real": 260.144907
+},
+{
+"label": "hltParticleTransformerONNXJetTags",
+"type": "HLTParticleTransformerAK4ONNXJetTagsProducer",
+"events": 6,
+"time_real": 111.153644
+},
+{
+"label": "hltParticleTransformerDiscriminatorsJetTags",
+"type": "BTagProbabilityToDiscriminator",
+"events": 6,
+"time_real": 0.126313
+},
+{
+"label": "hltDoublePFJets30ParTTauhTagMediumWPL2DoubleTau",
+"type": "TauTagFilter",
+"events": 6,
+"time_real": 0.126103
+},
+{
+"label": "hltPuppiTauTkMuon4218L1TkFilter",
+"type": "HLTP2GTDoubleObjectFilter",
+"events": 20,
+"time_real": 0.074404
+},
+{
+"label": "hltL3fL1TkSingleMu18Filtered20",
+"type": "HLTMuonTrkL1TkMuFilter",
+"events": 2,
+"time_real": 0.03178
+},
+{
+"label": "hltL3crIsoL1TkSingleMu22EcalIso0p41",
+"type": "HLTMuonGenericFilter",
+"events": 2,
+"time_real": 0.014341
+},
+{
+"label": "hltL3crIsoL1TkSingleMu22HcalIso0p40",
+"type": "HLTMuonGenericFilter",
+"events": 2,
+"time_real": 0.007979
+},
+{
+"label": "hltL3crIsoL1TkSingleMu22HgcalIso4p70",
+"type": "HLTMuonGenericFilter",
+"events": 2,
+"time_real": 0.00732
+},
+{
+"label": "hltL3crIsoL1TkSingleMu22TrkIsoRegionalNewFiltered0p07EcalHcalHgcalTrk",
+"type": "HLTMuonIsoFilter",
+"events": 2,
+"time_real": 0.019201
+},
+{
+"label": "hltHpsSelectedPFTauLooseTauWPDeepTau",
+"type": "PFTauSelector",
+"events": 10,
+"time_real": 0.239266
+},
+{
+"label": "hltHpsPFTau27LooseTauWPDeepTau",
+"type": "HLT1PFTau",
+"events": 2,
+"time_real": 0.01843
+},
+{
+"label": "hltPuppiTauTkIsoEle45and22L1TkFilter",
+"type": "HLTP2GTDoubleObjectFilter",
+"events": 20,
+"time_real": 0.278626
+},
+{
+"label": "hltEle30WPTightClusterShapeL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 5,
+"time_real": 0.01713
+},
+{
+"label": "hltEle30WPTightClusterShapeSigmavvL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 5,
+"time_real": 0.01601
+},
+{
+"label": "hltEle30WPTightClusterShapeSigmawwL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 5,
+"time_real": 0.01424
+},
+{
+"label": "hltEle30WPTightHgcalHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.015661
+},
+{
+"label": "hltEle30WPTightHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 5,
+"time_real": 0.02068
+},
+{
+"label": "hltEle30WPTightEcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01432
+},
+{
+"label": "hltEle30WPTightHgcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.011641
+},
+{
+"label": "hltEle30WPTightHcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01403
+},
+{
+"label": "hltEle30WPTightPixelMatchL1SeededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 4,
+"time_real": 0.015439
+},
+{
+"label": "hltEle30WPTightPMS2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.01169
+},
+{
+"label": "hltEle30WPTightGsfOneOEMinusOneOPL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.013549
+},
+{
+"label": "hltEle30WPTightGsfDetaL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01225
+},
+{
+"label": "hltEle30WPTightGsfDphiL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.011541
+},
+{
+"label": "hltEle30WPTightBestGsfNLayerITL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.011231
+},
+{
+"label": "hltEle30WPTightBestGsfChi2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 4,
+"time_real": 0.012299
+},
+{
+"label": "hltEle30WPTightGsfTrackIsoFromL1TracksL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.01089
+},
+{
+"label": "hltEle30WPTightGsfTrackIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 4,
+"time_real": 0.011629
+},
+{
+"label": "hltHpsPFTau30LooseTauWPDeepTau",
+"type": "HLT1PFTau",
+"events": 4,
+"time_real": 0.01954
+},
+{
+"label": "hltL1SingleNNTau150",
+"type": "L1TPFTauFilter",
+"events": 20,
+"time_real": 0.293096
+},
+{
+"label": "hltHpsPFTau150LooseTauWPDeepTau",
+"type": "HLT1PFTau",
+"events": 5,
+"time_real": 0.046552
+},
+{
+"label": "hltParticleFlowClusterHGCal",
+"type": "PFClusterProducer",
+"events": 20,
+"time_real": 34.864282
+},
+{
+"label": "hltParticleFlowSuperClusterHGCal",
+"type": "PFECALSuperClusterProducer",
+"events": 20,
+"time_real": 5.146265
+},
+{
+"label": "hltCaloMET",
+"type": "CaloMETProducer",
+"events": 20,
+"time_real": 3.959422
+},
+{
+"label": "hltPfClusterRefsForJetsECAL",
+"type": "PFClusterRefCandidateProducer",
+"events": 20,
+"time_real": 1.146725
+},
+{
+"label": "hltPfClusterRefsForJetsHCAL",
+"type": "PFClusterRefCandidateProducer",
+"events": 20,
+"time_real": 0.388525
+},
+{
+"label": "hltPfClusterRefsForJetsHF",
+"type": "PFClusterRefCandidateProducer",
+"events": 20,
+"time_real": 1.420594
+},
+{
+"label": "hltPfClusterRefsForJetsHGCAL",
+"type": "PFClusterRefCandidateProducer",
+"events": 20,
+"time_real": 0.563683
+},
+{
+"label": "hltPfClusterRefsForJetsHO",
+"type": "PFClusterRefCandidateProducer",
+"events": 20,
+"time_real": 0.102833
+},
+{
+"label": "hltPfClusterRefsForJets",
+"type": "PFClusterRefCandidateMerger",
+"events": 20,
+"time_real": 0.339746
+},
+{
+"label": "hltAK4PFClusterJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 2.936765
+},
+{
+"label": "hltAK8PFClusterJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 4.235934
+},
+{
+"label": "hltPFClusterMET",
+"type": "PFClusterMETProducer",
+"events": 20,
+"time_real": 0.417006
+},
+{
+"label": "hltAK8PFJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 169.673661
+},
+{
+"label": "hltAK8PFJetCorrectorL1",
+"type": "L1FastjetCorrectorProducer",
+"events": 20,
+"time_real": 0.168213
+},
+{
+"label": "hltAK8PFJetCorrectorL2",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.050921
+},
+{
+"label": "hltAK8PFJetCorrectorL3",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.036999
+},
+{
+"label": "hltAK8PFJetCorrector",
+"type": "ChainedJetCorrectorProducer",
+"events": 20,
+"time_real": 0.091062
+},
+{
+"label": "hltAK8PFJetsCorrected",
+"type": "CorrectedPFJetProducer",
+"events": 20,
+"time_real": 0.442051
+},
+{
+"label": "hltParticleFlowPtrs",
+"type": "PFCandidateFwdPtrProducer",
+"events": 20,
+"time_real": 0.487609
+},
+{
+"label": "hltPfPileUpJME",
+"type": "PFPileUp",
+"events": 20,
+"time_real": 0.633493
+},
+{
+"label": "hltPfNoPileUpJME",
+"type": "TPPFCandidatesOnPFCandidates",
+"events": 20,
+"time_real": 0.217083
+},
+{
+"label": "hltAK4PFCHSJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 144.328181
+},
+{
+"label": "hltAK4PFCHSJetCorrectorL1",
+"type": "L1FastjetCorrectorProducer",
+"events": 20,
+"time_real": 0.056384
+},
+{
+"label": "hltAK4PFCHSJetCorrectorL2",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.0551
+},
+{
+"label": "hltAK4PFCHSJetCorrectorL3",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.035301
+},
+{
+"label": "hltAK4PFCHSJetCorrector",
+"type": "ChainedJetCorrectorProducer",
+"events": 20,
+"time_real": 0.04861
+},
+{
+"label": "hltAK4PFCHSJetsCorrected",
+"type": "CorrectedPFJetProducer",
+"events": 20,
+"time_real": 0.542442
+},
+{
+"label": "hltAK8PFCHSJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 187.99012
+},
+{
+"label": "hltAK8PFCHSJetCorrectorL1",
+"type": "L1FastjetCorrectorProducer",
+"events": 20,
+"time_real": 0.0516
+},
+{
+"label": "hltAK8PFCHSJetCorrectorL2",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.054321
+},
+{
+"label": "hltAK8PFCHSJetCorrectorL3",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.049381
+},
+{
+"label": "hltAK8PFCHSJetCorrector",
+"type": "ChainedJetCorrectorProducer",
+"events": 20,
+"time_real": 0.047851
+},
+{
+"label": "hltAK8PFCHSJetsCorrected",
+"type": "CorrectedPFJetProducer",
+"events": 20,
+"time_real": 1.027423
+},
+{
+"label": "hltPFMET",
+"type": "PFMETProducer",
+"events": 20,
+"time_real": 0.710667
+},
+{
+"label": "hltPFMETTypeOneCorrector",
+"type": "PFJetMETcorrInputProducer",
+"events": 20,
+"time_real": 58.016712
+},
+{
+"label": "hltPFMETTypeOne",
+"type": "CorrectedPFMETProducer",
+"events": 20,
+"time_real": 0.08521
+},
+{
+"label": "hltAK8PFPuppiJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 161.129671
+},
+{
+"label": "hltAK8PFPuppiJetCorrectorL1",
+"type": "L1FastjetCorrectorProducer",
+"events": 20,
+"time_real": 0.045749
+},
+{
+"label": "hltAK8PFPuppiJetCorrectorL2",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.051288
+},
+{
+"label": "hltAK8PFPuppiJetCorrectorL3",
+"type": "LXXXCorrectorProducer",
+"events": 20,
+"time_real": 0.033872
+},
+{
+"label": "hltAK8PFPuppiJetCorrector",
+"type": "ChainedJetCorrectorProducer",
+"events": 20,
+"time_real": 0.048881
+},
+{
+"label": "hltAK8PFPuppiJetsCorrected",
+"type": "CorrectedPFJetProducer",
+"events": 20,
+"time_real": 0.433406
+},
+{
+"label": "hltPreEle5OpenUnseeded",
+"type": "HLTPrescaler",
+"events": 20,
+"time_real": 0.029191
+},
+{
+"label": "hltEgammaHollowTrackIsoUnseeded",
+"type": "EgammaHLTPhotonTrackIsolationProducersRegional",
+"events": 20,
+"time_real": 1.20703
+},
+{
+"label": "hltEG5EtUnseededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 20,
+"time_real": 0.092613
+},
+{
+"label": "hltEle5DphiUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 19,
+"time_real": 0.235774
+},
+{
+"label": "hltEle5WPTightClusterShapeUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 12,
+"time_real": 0.079961
+},
+{
+"label": "hltEle5WPTightClusterShapeSigmavvUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 12,
+"time_real": 0.080943
+},
+{
+"label": "hltEle5WPTightClusterShapeSigmawwUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 12,
+"time_real": 0.044323
+},
+{
+"label": "hltEle5WPTightHgcalHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.056252
+},
+{
+"label": "hltEle5WPTightHEUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.037711
+},
+{
+"label": "hltEle5WPTightEcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.038301
+},
+{
+"label": "hltEle5WPTightHgcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.038599
+},
+{
+"label": "hltEle5WPTightHcalIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.034431
+},
+{
+"label": "hltEle5WPTightPixelMatchUnseededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 12,
+"time_real": 0.108793
+},
+{
+"label": "hltEle5WPTightPMS2UnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 12,
+"time_real": 0.03619
+},
+{
+"label": "hltEle5WPTightGsfOneOEMinusOneOPUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.034962
+},
+{
+"label": "hltEle5WPTightGsfDetaUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.033901
+},
+{
+"label": "hltEle5WPTightGsfDphiUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.031712
+},
+{
+"label": "hltEle5WPTightBestGsfNLayerITUnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 12,
+"time_real": 0.032041
+},
+{
+"label": "hltEle5WPTightBestGsfChi2UnseededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 12,
+"time_real": 0.031923
+},
+{
+"label": "hltEle5WPTightGsfTrackIsoFromL1TracksUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.043311
+},
+{
+"label": "hltEle5WPTightGsfTrackIsoUnseededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 12,
+"time_real": 0.0429
+},
+{
+"label": "hltPreEle5OpenL1Seeded",
+"type": "HLTPrescaler",
+"events": 20,
+"time_real": 0.043318
+},
+{
+"label": "hltEG5EtL1SeededFilter",
+"type": "HLTEgammaEtFilter",
+"events": 20,
+"time_real": 0.111961
+},
+{
+"label": "hltEle5WPTightClusterShapeL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 14,
+"time_real": 0.099063
+},
+{
+"label": "hltEgammaR9L1Seeded",
+"type": "EgammaHLTR9IDProducer",
+"events": 14,
+"time_real": 0.147052
+},
+{
+"label": "hltEle5WPTightClusterShapeSigmavvL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 14,
+"time_real": 0.06837
+},
+{
+"label": "hltEle5WPTightClusterShapeSigmawwL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 14,
+"time_real": 0.045962
+},
+{
+"label": "hltEle5WPTightHgcalHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 14,
+"time_real": 0.05941
+},
+{
+"label": "hltEle5WPTightHEL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 14,
+"time_real": 0.067691
+},
+{
+"label": "hltEle5WPTightEcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 14,
+"time_real": 0.06411
+},
+{
+"label": "hltEle5WPTightHgcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 14,
+"time_real": 0.046991
+},
+{
+"label": "hltEle5WPTightHcalIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 14,
+"time_real": 0.05166
+},
+{
+"label": "hltEle5WPTightPixelMatchL1SeededFilter",
+"type": "HLTElectronPixelMatchFilter",
+"events": 14,
+"time_real": 0.062751
+},
+{
+"label": "hltEle5WPTightPMS2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 14,
+"time_real": 0.046332
+},
+{
+"label": "hltEle5WPTightGsfOneOEMinusOneOPL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 14,
+"time_real": 0.043599
+},
+{
+"label": "hltEle5WPTightGsfDetaL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 14,
+"time_real": 0.0402
+},
+{
+"label": "hltEle5WPTightGsfDphiL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 14,
+"time_real": 0.038471
+},
+{
+"label": "hltEle5WPTightBestGsfNLayerITL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 14,
+"time_real": 0.041881
+},
+{
+"label": "hltEle5WPTightBestGsfChi2L1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 14,
+"time_real": 0.037609
+},
+{
+"label": "hltEle5DphiL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticFilter",
+"events": 14,
+"time_real": 0.152634
+},
+{
+"label": "hltEle5WPTightGsfTrackIsoFromL1TracksL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 7,
+"time_real": 0.022551
+},
+{
+"label": "hltEgammaHollowTrackIsoL1Seeded",
+"type": "EgammaHLTPhotonTrackIsolationProducersRegional",
+"events": 7,
+"time_real": 0.336938
+},
+{
+"label": "hltEle5WPTightGsfTrackIsoL1SeededFilter",
+"type": "HLTEgammaGenericQuadraticEtaFilter",
+"events": 7,
+"time_real": 0.02136
+},
+{
+"label": "hltBackend",
+"type": "AlpakaBackendProducer@alpaka",
+"events": 20,
+"time_real": 0.069412
+},
+{
+"label": "hltStatusOnGPUFilter",
+"type": "AlpakaBackendFilter",
+"events": 20,
+"time_real": 0.0441
+},
+{
+"label": "hltTriggerSummaryAOD",
+"type": "TriggerSummaryProducerAOD",
+"events": 20,
+"time_real": 4.476752
+},
+{
+"label": "hltTriggerSummaryRAW",
+"type": "TriggerSummaryProducerRAW",
+"events": 20,
+"time_real": 1.638187
+},
+{
+"label": "hltBoolFalse",
+"type": "HLTBool",
+"events": 20,
+"time_real": 0.029223
+},
+{
+"label": "hltPreHLTAnalyzerEndpath",
+"type": "HLTPrescaler",
+"events": 20,
+"time_real": 0.05409
+},
+{
+"label": "hltTrigReport",
+"type": "HLTrigReport",
+"events": 20,
+"time_real": 0.119417
+},
+{
+"label": "MEtoEDMConverter",
+"type": "MEtoEDMConverter",
+"events": 20,
+"time_real": 0.053461
+},
+{
+"label": "FEVTDEBUGHLToutput",
+"type": "PoolOutputModule",
+"events": 20,
+"time_real": 9729.792
+},
+{
+"label": "CalibratedDigis",
+"type": "CalibratedDigis",
+"events": 20,
+"time_real": 0.231953
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "addPileupInfo",
+"type": "PileupInformation",
+"events": 20,
+"time_real": 0.258464
+},
+{
+"label": "ak4GenJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 11.938876
+},
+{
+"label": "ak4GenJetsNoNu",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 10.007846
+},
+{
+"label": "ak8GenJets",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 12.902568
+},
+{
+"label": "ak8GenJetsNoNu",
+"type": "FastjetJetProducer",
+"events": 20,
+"time_real": 12.378891
+},
+{
+"label": "bmtfStage2Raw",
+"type": "L1TDigiToRaw",
+"events": 20,
+"time_real": 9.852873
+},
+{
+"label": "caloLayer1RawFed1354",
+"type": "L1TDigiToRaw",
+"events": 20,
+"time_real": 7.048351
+},
+{
+"label": "caloLayer1RawFed1356",
+"type": "L1TDigiToRaw",
+"events": 20,
+"time_real": 5.70102
+},
+{
+"label": "caloLayer1RawFed1358",
+"type": "L1TDigiToRaw",
+"events": 20,
+"time_real": 5.700139
+},
+{
+"label": "caloStage2Raw",
+"type": "L1TDigiToRaw",
+"events": 20,
+"time_real": 1.494276
+},
+{
+"label": "cscpacker",
+"type": "CSCDigiToRawModule",
+"events": 20,
+"time_real": 30.535136
+},
+{
+"label": "dtTriggerPhase2PrimitiveDigis",
+"type": "DTTrigPhase2Prod",
+"events": 20,
+"time_real": 19.993947
+},
+{
+"label": "dtTriggerPhase2PrimitivePairDigis",
+"type": "DTTrigPhase2PairsProd",
+"events": 20,
+"time_real": 0.254757
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "dtpacker",
+"type": "DTuROSDigiToRaw",
+"events": 20,
+"time_real": 1.511166
+},
+{
+"label": "ecalPacker",
+"type": "EcalDigiToRaw",
+"events": 20,
+"time_real": 38.457191
+},
+{
+"label": "esDigiToRaw",
+"type": "ESDigiToRaw",
+"events": 20,
+"time_real": 0.431925
+},
+{
+"label": "ge0TriggerConvertedPseudoDigis",
+"type": "GE0TriggerPseudoProducer",
+"events": 20,
+"time_real": 0.516993
+},
+{
+"label": "gemPacker",
+"type": "GEMDigiToRawModule",
+"events": 20,
+"time_real": 46.257507
+},
+{
+"label": "gemRecHits",
+"type": "GEMRecHitProducer",
+"events": 20,
+"time_real": 1.03507
+},
+{
+"label": "gemSegments",
+"type": "GEMSegmentProducer",
+"events": 20,
+"time_real": 3.385135
+},
+{
+"label": "genCandidatesForMET",
+"type": "InputGenJetsParticleSelector",
+"events": 20,
+"time_real": 3.349985
+},
+{
+"label": "genMetCalo",
+"type": "GenMETProducer",
+"events": 20,
+"time_real": 1.199538
+},
+{
+"label": "genMetTrue",
+"type": "GenMETProducer",
+"events": 20,
+"time_real": 0.846331
+},
+{
+"label": "genPUProtons",
+"type": "GenPUProtonProducer",
+"events": 20,
+"time_real": 1.615078
+},
+{
+"label": "genParticles",
+"type": "GenParticleProducer",
+"events": 20,
+"time_real": 159.406712
+},
+{
+"label": "genParticlesForJets",
+"type": "InputGenJetsParticleSelector",
+"events": 20,
+"time_real": 3.939832
+},
+{
+"label": "genParticlesForJetsNoNu",
+"type": "InputGenJetsParticleSelector",
+"events": 20,
+"time_real": 3.377768
+},
+{
+"label": "genParticlesForMETAllVisible",
+"type": "InputGenJetsParticleSelector",
+"events": 20,
+"time_real": 3.273433
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "gmtStage2Raw",
+"type": "L1TDigiToRaw",
+"events": 20,
+"time_real": 1.070518
+},
+{
+"label": "gtStage2Raw",
+"type": "L1TDigiToRaw",
+"events": 20,
+"time_real": 2.363193
+},
+{
+"label": "hcalRawDataVME",
+"type": "HcalDigiToRaw",
+"events": 20,
+"time_real": 6.041128
+},
+{
+"label": "hcalRawDatauHTR",
+"type": "HcalDigiToRawuHTR",
+"events": 20,
+"time_real": 30.132659
+},
+{
+"label": "l1tBJetProducerPuppi",
+"type": "L1BJetProducer",
+"events": 20,
+"time_real": 9.656198
+},
+{
+"label": "l1tBJetProducerPuppiCorrectedEmulator",
+"type": "L1BJetProducer",
+"events": 20,
+"time_real": 19.225185
+},
+{
+"label": "l1tCaloJet",
+"type": "L1CaloJetProducer",
+"events": 20,
+"time_real": 4.016959
+},
+{
+"label": "l1tCaloJetHTT",
+"type": "L1CaloJetHTTProducer",
+"events": 20,
+"time_real": 0.110921
+},
+{
+"label": "l1tEGammaClusterEmuProducer",
+"type": "L1EGCrystalClusterEmulatorProducer",
+"events": 20,
+"time_real": 43.671105
+},
+{
+"label": "l1tFwdMuonsGmt",
+"type": "Phase2L1TGMTFwdMuonTranslator",
+"events": 20,
+"time_real": 0.755475
+},
+{
+"label": "l1tGTTInputProducer",
+"type": "L1GTTInputProducer",
+"events": 20,
+"time_real": 11.772046
+},
+{
+"label": "l1tGTTInputProducerExtended",
+"type": "L1GTTInputProducer",
+"events": 20,
+"time_real": 18.636078
+},
+{
+"label": "l1tHGCalBackEndLayer1Producer",
+"type": "HGCalBackendLayer1Producer",
+"events": 20,
+"time_real": 15.490217
+},
+{
+"label": "l1tHGCalBackEndLayer2Producer",
+"type": "HGCalBackendLayer2Producer",
+"events": 20,
+"time_real": 48.43582
+},
+{
+"label": "l1tHGCalConcentratorProducer",
+"type": "HGCalConcentratorProducer",
+"events": 20,
+"time_real": 8364.965457
+},
+{
+"label": "l1tHGCalEnergySplitTowerMapProducer",
+"type": "HGCalTowerMapProducer",
+"events": 20,
+"time_real": 451.675059
+},
+{
+"label": "l1tHGCalEnergySplitTowerProducer",
+"type": "HGCalTowerProducer",
+"events": 20,
+"time_real": 113.280199
+},
+{
+"label": "l1tHGCalTowerMapProducer",
+"type": "HGCalTowerMapProducer",
+"events": 20,
+"time_real": 320.784686
+},
+{
+"label": "l1tHGCalTowerProducer",
+"type": "HGCalTowerProducer",
+"events": 20,
+"time_real": 77.797999
+},
+{
+"label": "l1tHGCalVFEProducer",
+"type": "HGCalVFEProducer",
+"events": 20,
+"time_real": 502.961278
+},
+{
+"label": "l1tHPSPFTauProducer",
+"type": "L1HPSPFTauProducer",
+"events": 20,
+"time_real": 1.883294
+},
+{
+"label": "l1tKMTFMuonsGmt",
+"type": "Phase2L1TGMTKMTFProducer",
+"events": 20,
+"time_real": 1.193167
+},
+{
+"label": "l1tLayer1",
+"type": "L1TPFCandMultiMerger",
+"events": 20,
+"time_real": 0.48937
+},
+{
+"label": "l1tLayer1Barrel",
+"type": "L1TCorrelatorLayer1Producer",
+"events": 20,
+"time_real": 57.184037
+},
+{
+"label": "l1tLayer1BarrelElliptic",
+"type": "L1TCorrelatorLayer1Producer",
+"events": 20,
+"time_real": 45.817622
+},
+{
+"label": "l1tLayer1BarrelExtended",
+"type": "L1TCorrelatorLayer1Producer",
+"events": 20,
+"time_real": 55.93241
+},
+{
+"label": "l1tLayer1EG",
+"type": "L1TEGMultiMerger",
+"events": 20,
+"time_real": 0.183796
+},
+{
+"label": "l1tLayer1EGElliptic",
+"type": "L1TEGMultiMerger",
+"events": 20,
+"time_real": 0.156643
+},
+{
+"label": "l1tLayer1Extended",
+"type": "L1TPFCandMultiMerger",
+"events": 20,
+"time_real": 0.496303
+},
+{
+"label": "l1tLayer1HF",
+"type": "L1TCorrelatorLayer1Producer",
+"events": 20,
+"time_real": 1.666996
+},
+{
+"label": "l1tLayer1HGCal",
+"type": "L1TCorrelatorLayer1Producer",
+"events": 20,
+"time_real": 263.447891
+},
+{
+"label": "l1tLayer1HGCalElliptic",
+"type": "L1TCorrelatorLayer1Producer",
+"events": 20,
+"time_real": 263.33803
+},
+{
+"label": "l1tLayer1HGCalExtended",
+"type": "L1TCorrelatorLayer1Producer",
+"events": 20,
+"time_real": 262.96937
+},
+{
+"label": "l1tLayer1HGCalNoTK",
+"type": "L1TCorrelatorLayer1Producer",
+"events": 20,
+"time_real": 187.40084
+},
+{
+"label": "l1tLayer2Deregionizer",
+"type": "DeregionizerProducer",
+"events": 20,
+"time_real": 10.931587
+},
+{
+"label": "l1tLayer2DeregionizerExtended",
+"type": "DeregionizerProducer",
+"events": 20,
+"time_real": 10.842034
+},
+{
+"label": "l1tLayer2EG",
+"type": "L1TCtL2EgProducer",
+"events": 20,
+"time_real": 4.727897
+},
+{
+"label": "l1tLayer2EGElliptic",
+"type": "L1TCtL2EgProducer",
+"events": 20,
+"time_real": 3.757846
+},
+{
+"label": "l1tMETMLProducer",
+"type": "L1MetPfProducer",
+"events": 20,
+"time_real": 29.652628
+},
+{
+"label": "l1tMETPFProducer",
+"type": "L1MetPfProducer",
+"events": 20,
+"time_real": 0.415701
+},
+{
+"label": "l1tNNCaloTauEmulator",
+"type": "L1NNCaloTauEmulator",
+"events": 20,
+"time_real": 183.349072
+},
+{
+"label": "l1tNNCaloTauProducer",
+"type": "L1NNCaloTauProducer",
+"events": 20,
+"time_real": 32.950669
+},
+{
+"label": "l1tNNTauProducerPuppi",
+"type": "L1NNTauProducer",
+"events": 20,
+"time_real": 14.932208
+},
+{
+"label": "l1tPFClustersFromCombinedCaloHCal",
+"type": "L1TPFCaloProducer",
+"events": 20,
+"time_real": 6.342057
+},
+{
+"label": "l1tPFClustersFromCombinedCaloHF",
+"type": "L1TPFCaloProducer",
+"events": 20,
+"time_real": 6.852925
+},
+{
+"label": "l1tPFClustersFromL1EGClusters",
+"type": "PFClusterProducerFromL1EGClusters",
+"events": 20,
+"time_real": 0.705245
+},
+{
+"label": "l1tPFTracksFromL1Tracks",
+"type": "PFTrackProducerFromL1Tracks",
+"events": 20,
+"time_real": 12.55349
+},
+{
+"label": "l1tPFTracksFromL1TracksExtended",
+"type": "PFTrackProducerFromL1Tracks",
+"events": 20,
+"time_real": 21.114484
+},
+{
+"label": "l1tPhase1JetCalibrator9x9",
+"type": "Phase1L1TJetCalibrator",
+"events": 20,
+"time_real": 0.084431
+},
+{
+"label": "l1tPhase1JetCalibrator9x9trimmed",
+"type": "Phase1L1TJetCalibrator",
+"events": 20,
+"time_real": 0.130962
+},
+{
+"label": "l1tPhase1JetProducer9x9",
+"type": "Phase1L1TJetProducer",
+"events": 20,
+"time_real": 5.556505
+},
+{
+"label": "l1tPhase1JetProducer9x9trimmed",
+"type": "Phase1L1TJetProducer",
+"events": 20,
+"time_real": 7.194222
+},
+{
+"label": "l1tPhase1JetSumsProducer9x9",
+"type": "Phase1L1TJetSumsProducer",
+"events": 20,
+"time_real": 0.056729
+},
+{
+"label": "l1tPhase1JetSumsProducer9x9trimmed",
+"type": "Phase1L1TJetSumsProducer",
+"events": 20,
+"time_real": 0.114951
+},
+{
+"label": "l1tPhase2CaloJetEmulator",
+"type": "Phase2L1CaloJetEmulator",
+"events": 20,
+"time_real": 12.250158
+},
+{
+"label": "l1tPhase2CaloPFClusterEmulator",
+"type": "Phase2L1CaloPFClusterEmulator",
+"events": 20,
+"time_real": 4.894977
+},
+{
+"label": "l1tPhase2CaloToCorrelatorTM18",
+"type": "Phase2L1CaloToCorrelatorTM18",
+"events": 20,
+"time_real": 0.663837
+},
+{
+"label": "l1tPhase2GCTBarrelToCorrelatorLayer1Emulator",
+"type": "Phase2GCTBarrelToCorrelatorLayer1",
+"events": 20,
+"time_real": 1.426124
+},
+{
+"label": "l1tPhase2L1CaloEGammaEmulator",
+"type": "Phase2L1CaloEGammaEmulator",
+"events": 20,
+"time_real": 327.743087
+},
+{
+"label": "l1tSAMuonsGmt",
+"type": "Phase2L1TGMTSAMuonGhostCleaner",
+"events": 20,
+"time_real": 1.934311
+},
+{
+"label": "l1tSC4NGJetProducer",
+"type": "L1TSC4NGJetProducer",
+"events": 20,
+"time_real": 55.490258
+},
+{
+"label": "l1tSC4PFL1PF",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 0.474833
+},
+{
+"label": "l1tSC4PFL1Puppi",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 0.401687
+},
+{
+"label": "l1tSC4PFL1PuppiCorrected",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 0.34345
+},
+{
+"label": "l1tSC4PFL1PuppiCorrectedEmulator",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 2.476283
+},
+{
+"label": "l1tSC4PFL1PuppiCorrectedEmulatorMHT",
+"type": "L1MhtPfProducer",
+"events": 20,
+"time_real": 8.360021
+},
+{
+"label": "l1tSC4PFL1PuppiEmulator",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 1.960964
+},
+{
+"label": "l1tSC4PFL1PuppiExtended",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 0.351305
+},
+{
+"label": "l1tSC4PFL1PuppiExtendedCorrectedEmulator",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 2.15395
+},
+{
+"label": "l1tSC4PFL1PuppiExtendedEmulator",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 2.257081
+},
+{
+"label": "l1tSC82ProngJetProducer",
+"type": "L1TSC82ProngJetProducer",
+"events": 20,
+"time_real": 246.889905
+},
+{
+"label": "l1tSC8PFL1Puppi",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 0.211864
+},
+{
+"label": "l1tSC8PFL1PuppiCorrected",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 0.220183
+},
+{
+"label": "l1tSC8PFL1PuppiCorrectedEmulator",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 1.874932
+},
+{
+"label": "l1tSC8PFL1PuppiEmulator",
+"type": "L1SeedConePFJetProducer",
+"events": 20,
+"time_real": 1.633136
+},
+{
+"label": "l1tStubsGmt",
+"type": "Phase2L1TGMTStubProducer",
+"events": 20,
+"time_real": 1.120278
+},
+{
+"label": "l1tTOoLLiPProducer",
+"type": "TOoLLiPProducer",
+"events": 20,
+"time_real": 10.166126
+},
+{
+"label": "l1tTOoLLiPProducerCorrectedEmulator",
+"type": "TOoLLiPProducer",
+"events": 20,
+"time_real": 11.895948
+},
+{
+"label": "l1tTkMuonsGmt",
+"type": "Phase2L1TGMTTkMuonProducer",
+"events": 20,
+"time_real": 10.800054
+},
+{
+"label": "l1tTowerCalibration",
+"type": "L1TowerCalibrator",
+"events": 20,
+"time_real": 4.260626
+},
+{
+"label": "l1tTrackFastJets",
+"type": "L1TrackFastJetProducer",
+"events": 20,
+"time_real": 0.948763
+},
+{
+"label": "l1tTrackJets",
+"type": "L1TrackJetProducer",
+"events": 20,
+"time_real": 0.86519
+},
+{
+"label": "l1tTrackJetsEmulation",
+"type": "L1TrackJetEmulatorProducer",
+"events": 20,
+"time_real": 8.196304
+},
+{
+"label": "l1tTrackJetsExtended",
+"type": "L1TrackJetProducer",
+"events": 20,
+"time_real": 1.226946
+},
+{
+"label": "l1tTrackJetsExtendedEmulation",
+"type": "L1TrackJetEmulatorProducer",
+"events": 20,
+"time_real": 10.277425
+},
+{
+"label": "l1tTrackSelectionProducer",
+"type": "L1TrackSelectionProducer",
+"events": 20,
+"time_real": 15.885911
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "l1tTrackSelectionProducerExtendedForJets",
+"type": "L1TrackSelectionProducer",
+"events": 20,
+"time_real": 23.60193
+},
+{
+"label": "l1tTrackSelectionProducerForEtMiss",
+"type": "L1TrackSelectionProducer",
+"events": 20,
+"time_real": 15.784561
+},
+{
+"label": "l1tTrackSelectionProducerForJets",
+"type": "L1TrackSelectionProducer",
+"events": 20,
+"time_real": 16.659263
+},
+{
+"label": "l1tTrackTripletEmulation",
+"type": "L1TrackTripletEmulatorProducer",
+"events": 20,
+"time_real": 3.684754
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "l1tTrackVertexAssociationProducerExtendedForJets",
+"type": "L1TrackVertexAssociationProducer",
+"events": 20,
+"time_real": 183.898137
+},
+{
+"label": "l1tTrackVertexAssociationProducerForEtMiss",
+"type": "L1TrackVertexAssociationProducer",
+"events": 20,
+"time_real": 71.16889
+},
+{
+"label": "l1tTrackVertexAssociationProducerForJets",
+"type": "L1TrackVertexAssociationProducer",
+"events": 20,
+"time_real": 72.401513
+},
+{
+"label": "l1tTrackerEmuEtMiss",
+"type": "L1TrackerEtMissEmulatorProducer",
+"events": 20,
+"time_real": 3.184494
+},
+{
+"label": "l1tTrackerEmuHTMiss",
+"type": "L1TkHTMissEmulatorProducer",
+"events": 20,
+"time_real": 1.054954
+},
+{
+"label": "l1tTrackerEmuHTMissExtended",
+"type": "L1TkHTMissEmulatorProducer",
+"events": 20,
+"time_real": 1.537634
+},
+{
+"label": "l1tTrackerEtMiss",
+"type": "L1TrackerEtMissProducer",
+"events": 20,
+"time_real": 0.184113
+},
+{
+"label": "l1tTrackerHTMiss",
+"type": "L1TkHTMissProducer",
+"events": 20,
+"time_real": 0.110125
+},
+{
+"label": "l1tVertexFinder",
+"type": "VertexProducer",
+"events": 20,
+"time_real": 0.905328
+},
+{
+"label": "l1tVertexFinderEmulator",
+"type": "VertexProducer",
+"events": 20,
+"time_real": 10.492616
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "l1tZDCEtSums",
+"type": "L1TZDCEtSumsProducer",
+"events": 20,
+"time_real": 0.196234
+},
+{
+"label": "mix",
+"type": "MixingModule",
+"events": 20,
+"time_real": 47787.913709
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "prunedDigiSimLinks",
+"type": "DigiSimLinkPruner",
+"events": 20,
+"time_real": 10.610269
+},
+{
+"label": "prunedTrackingParticles",
+"type": "TrackingParticleSelectorByGen",
+"events": 20,
+"time_real": 58.519058
+},
+{
+"label": "randomEngineStateProducer",
+"type": "RandomEngineStateProducer",
+"events": 20,
+"time_real": 0.371744
+},
+{
+"label": "rawDataCollector",
+"type": "RawDataCollectorByLabel",
+"events": 20,
+"time_real": 4.188855
+},
+{
+"label": "rpcRecHitsForEMTF",
+"type": "RPCRecHitProducer",
+"events": 20,
+"time_real": 0.572961
+},
+{
+"label": "simBmtfDigis",
+"type": "L1TMuonBarrelTrackProducer",
+"events": 20,
+"time_real": 15.02021
+},
+{
+"label": "simCaloStage2Digis",
+"type": "L1TStage2Layer2Producer",
+"events": 20,
+"time_real": 63.909177
+},
+{
+"label": "simCaloStage2Layer1Digis",
+"type": "L1TCaloLayer1",
+"events": 20,
+"time_real": 24.736197
+},
+{
+"label": "simCaloStage2Layer1Summary",
+"type": "L1TCaloSummary_CICADA_vXp1p2",
+"events": 20,
+"time_real": 16.920449
+},
+{
+"label": "simCscTriggerPrimitiveDigis",
+"type": "CSCTriggerPrimitivesProducer",
+"events": 20,
+"time_real": 95.025839
+},
+{
+"label": "simCscTriggerPrimitiveDigisForEMTF",
+"type": "CSCTriggerPrimitivesProducer",
+"events": 20,
+"time_real": 96.229733
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "simDtTriggerPrimitiveDigis",
+"type": "DTTrigProd",
+"events": 20,
+"time_real": 14.800588
+},
+{
+"label": "simEcalDigis",
+"type": "EcalSelectiveReadoutProducer",
+"events": 20,
+"time_real": 412.203242
+},
+{
+"label": "simEcalEBTriggerPrimitiveDigis",
+"type": "EcalEBTrigPrimProducer",
+"events": 20,
+"time_real": 803.223922
+},
+{
+"label": "simEcalPreshowerDigis",
+"type": "ESZeroSuppressionProducer",
+"events": 20,
+"time_real": 0.1471
+},
+{
+"label": "simEcalTriggerPrimitiveDigis",
+"type": "EcalTrigPrimProducer",
+"events": 20,
+"time_real": 476.184752
+},
+{
+"label": "simEmtfDigis",
+"type": "L1TMuonEndCapTrackProducer",
+"events": 20,
+"time_real": 119.49918
+},
+{
+"label": "simEmtfDigisPhase2",
+"type": "L1TMuonEndCapPhase2TrackProducer",
+"events": 20,
+"time_real": 2872.32322
+},
+{
+"label": "simEmtfShowers",
+"type": "L1TMuonEndCapShowerProducer",
+"events": 20,
+"time_real": 0.184155
+},
+{
+"label": "simGmtCaloSumDigis",
+"type": "L1TMuonCaloSumProducer",
+"events": 20,
+"time_real": 26.997568
+},
+{
+"label": "simGmtShowerDigis",
+"type": "L1TMuonShowerProducer",
+"events": 20,
+"time_real": 0.101222
+},
+{
+"label": "simGmtStage2Digis",
+"type": "L1TMuonProducer",
+"events": 20,
+"time_real": 1.667619
+},
+{
+"label": "simGtExtFakeStage2Digis",
+"type": "L1TExtCondProducer",
+"events": 20,
+"time_real": 0.426519
+},
+{
+"label": "simGtStage2Digis",
+"type": "L1TGlobalProducer",
+"events": 20,
+"time_real": 19.134098
+},
+{
+"label": "simHcalDigis",
+"type": "HcalRealisticZS",
+"events": 20,
+"time_real": 9.244738
+},
+{
+"label": "",
+"type": "",
+"events": 0,
+"time_real": 0.0
+},
+{
+"label": "simHcalTriggerPrimitiveDigis",
+"type": "HcalTrigPrimDigiProducer",
+"events": 20,
+"time_real": 170.835488
+},
+{
+"label": "simKBmtfDigis",
+"type": "L1TMuonBarrelKalmanTrackProducer",
+"events": 20,
+"time_real": 18.63609
+},
+{
+"label": "simKBmtfStubs",
+"type": "L1TMuonBarrelKalmanStubProducer",
+"events": 20,
+"time_real": 1.472732
+},
+{
+"label": "simMuonCSCDigis",
+"type": "CSCDigiProducer",
+"events": 20,
+"time_real": 94.579229
+},
+{
+"label": "simMuonDTDigis",
+"type": "DTDigitizer",
+"events": 20,
+"time_real": 1.131364
+},
+{
+"label": "simMuonGEMDigis",
+"type": "GEMDigiProducer",
+"events": 20,
+"time_real": 140.080927
+},
+{
+"label": "simMuonGEMPadDigiClusters",
+"type": "GEMPadDigiClusterProducer",
+"events": 20,
+"time_real": 11.680989
+},
+{
+"label": "simMuonGEMPadDigis",
+"type": "GEMPadDigiProducer",
+"events": 20,
+"time_real": 2.263333
+},
+{
+"label": "simMuonRPCDigis",
+"type": "RPCandIRPCDigiProducer",
+"events": 20,
+"time_real": 389.173361
+},
+{
+"label": "simOmtfDigis",
+"type": "L1TMuonOverlapPhase1TrackProducer",
+"events": 20,
+"time_real": 10.072055
+},
+{
+"label": "simOmtfPhase2Digis",
+"type": "L1TMuonOverlapPhase2TrackProducer",
+"events": 20,
+"time_real": 7.095902
+},
+{
+"label": "simTwinMuxDigis",
+"type": "L1TTwinMuxProducer",
+"events": 20,
+"time_real": 4.645915
+},
+{
+"label": "truthLogicalGraphHitIndexProducer",
+"type": "TruthLogicalGraphHitIndexProducer",
+"events": 20,
+"time_real": 178.022373
+},
+{
+"label": "truthLogicalGraphProducer",
+"type": "TruthLogicalGraphProducer",
+"events": 20,
+"time_real": 94.243366
+},
+{
+"label": "cleanup",
+"type": "cleanup",
+"events": 20,
+"time_real": 257.453983
+},
+{
+"label": "other",
+"type": "other",
+"events": 20,
+"time_real": 84600.201052
+},
+{
+"label": "eventsetup",
+"type": "eventsetup",
+"events": 20,
+"time_real": 4536.596279
+},
+{
+"label": "idle",
+"type": "idle",
+"events": 20,
+"time_real": 1142.014169
+}
+],
+"total": {
+"label": "HLT",
+"type": "Job",
+"events": 20,
+"time_real": 189284.10433
+}
+}

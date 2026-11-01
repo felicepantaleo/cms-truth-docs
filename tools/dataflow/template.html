@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Truth Graph Data Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* One band per processing stage, wires between module cards; the detail panel is beside the diagram on wide
+   screens and below it on narrow ones. */
+:root {
+  --bg: #f3f5f7; --panel: #ffffff; --ink: #18222d; --muted: #5a6876; --line: #c9d2db; --wire: #7d8c9b;
+  --accent: #0b6e79;
+  --s-default: #2f7d4f; --s-study: #1d5fa8; --s-hlt: #6a4fb3; --s-pr: #b4560d; --s-ext: #9aa5b1; --s-work: #b4560d;
+  --chip: #e8edf1;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11171d; --panel: #18212a; --ink: #e3e9ef; --muted: #98a6b3; --line: #2c3946; --wire: #6d7f90;
+  --accent: #46b8c4;
+  --s-default: #5cb882; --s-study: #6aa7ea; --s-hlt: #a690e6; --s-pr: #e9944c; --s-ext: #64717e; --s-work: #e9944c;
+  --chip: #222d38; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #11171d; --panel: #18212a; --ink: #e3e9ef; --muted: #98a6b3; --line: #2c3946; --wire: #6d7f90;
+  --accent: #46b8c4;
+  --s-default: #5cb882; --s-study: #6aa7ea; --s-hlt: #a690e6; --s-pr: #e9944c; --s-ext: #64717e; --s-work: #e9944c;
+  --chip: #222d38; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { font-size: 15px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 2rem; letter-spacing: .01em; }
+h2 { font-size: 1.35rem; margin-bottom: 10px; }
+code, .mono { font-family: var(--f-mono); font-size: .86em; }
+a { color: var(--accent); }
+.wrap { max-width: 1500px; margin: 0 auto; display: grid; gap: 28px; }
+header { display: grid; gap: 8px; }
+header p { margin: 0; color: var(--muted); max-width: 75ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 500; padding: 2px 9px 2px 7px;
+  border-radius: 99px; background: var(--chip); color: var(--ink); white-space: nowrap; }
+.pill i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; background: var(--c); }
+label.toggle { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; color: var(--muted); cursor: pointer; }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
+@media (max-width: 1100px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.scroller { overflow-x: auto; }
+#diagram { position: relative; min-width: 760px; }
+#wires { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.band { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 14px; padding: 16px 0; border-top: 1px solid var(--line); }
+.band:first-child { border-top: 0; }
+.band-label { display: grid; gap: 2px; align-content: start; }
+.band-label .k { font-family: var(--f-mono); font-size: .72rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.band-label h3 { font-size: 1.05rem; }
+.band-label p { margin: 0; font-size: .8rem; color: var(--muted); }
+.cards { display: flex; flex-wrap: wrap; gap: 28px 26px; align-items: flex-start; }
+.card { position: relative; z-index: 1; width: 210px; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c);
+  border-radius: 4px; padding: 7px 9px 8px; display: grid; gap: 3px; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.card:hover, .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.card.sel { outline: 2px solid var(--accent); }
+.card.dim { opacity: .35; }
+.card .lab { font-family: var(--f-mono); font-size: .78rem; font-weight: 500; overflow-wrap: anywhere; }
+.card .typ { font-size: .7rem; color: var(--muted); overflow-wrap: anywhere; }
+.card .alg { font-size: .74rem; }
+.card .row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.tag { font-family: var(--f-mono); font-size: .66rem; padding: 0 5px; border-radius: 3px; background: var(--chip); color: var(--muted); }
+.tag.model { color: var(--ink); }
+.tag.pr { color: var(--c); font-weight: 500; }
+.tag.t { margin-left: auto; font-variant-numeric: tabular-nums; }
+.tag.flag { background: var(--s-work); color: var(--panel); }
+.ext-card { width: 170px; border-left-style: dashed; }
+path.w { fill: none; stroke: var(--wire); stroke-width: 2; opacity: .6; }
+path.w.note { stroke: var(--s-work); stroke-dasharray: 7 4; opacity: .9; }
+#wires .ah { fill: var(--wire); }
+#wires .ah-hi { fill: var(--accent); }
+#wires .ah-note { fill: var(--s-work); }
+.wnote { font-family: var(--f-mono); font-size: 11px; fill: var(--s-work); paint-order: stroke; stroke: var(--bg); stroke-width: 4px; }
+path.w.common { stroke-dasharray: 3 3; opacity: .4; stroke-width: 1.4; }
+path.w.hi { stroke: var(--accent); opacity: 1; stroke-width: 3; }
+path.w.lo { opacity: .08; }
+.wnote.lo { opacity: .15; }
+aside { position: sticky; top: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px;
+  display: grid; gap: 12px; max-height: calc(100vh - 24px); overflow: auto; min-width: 0; }
+@media (max-width: 1100px) { aside { position: static; max-height: none; } }
+aside h2 { font-family: var(--f-mono); font-size: 1rem; font-weight: 500; overflow-wrap: anywhere; margin: 0; }
+aside .sub { color: var(--muted); font-size: .8rem; }
+aside h4 { margin: 0 0 4px; font-size: .72rem; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+aside ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; font-size: .86rem; }
+aside ol { margin: 0; padding-left: 20px; display: grid; gap: 3px; font-size: .86rem; }
+aside .kv { font-size: .8rem; overflow-wrap: anywhere; }
+aside .issue { border-left: 3px solid var(--s-work); padding-left: 8px; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; cursor: pointer; text-decoration: underline; text-align: left; }
+section { display: grid; gap: 10px; min-width: 0; }
+section > p { margin: 0; color: var(--muted); max-width: 80ch; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: .84rem; }
+th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-top: 1px solid var(--line); }
+th { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; border-top: 0; }
+td.f { font-family: var(--f-mono); font-size: .76rem; overflow-wrap: anywhere; min-width: 220px; }
+.issues { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.issues > div { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 4px; padding: 9px 11px; font-size: .86rem; min-width: 0; }
+.issues .who { font-family: var(--f-mono); font-size: .74rem; color: var(--muted); }
+footer { color: var(--muted); font-size: .8rem; max-width: 90ch; }
+@media (prefers-reduced-motion: no-preference) { path.w { transition: opacity .15s, stroke-width .15s; } }
+ol.how { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: .9rem; max-width: 95ch; }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Truth Graph Data Flow</h1>
+  <p>The modules that build the MC-truth graph at DIGI, keep it in the output, and use it at RECO to associate and validate the reconstruction. Module labels, types and inputs come from the configuration of the runTheMatrix workflow 34834.88 (TTbar, D122, no pile-up) in the IB. Select a module to see what it reads, what reads it, its main parameters, its open items and the documentation.</p>
+  <div class="controls">
+    <div class="legend" id="legend"></div>
+    <label class="toggle"><input type="checkbox" id="allInputs"> Draw the logical graph and the hit index as wires</label>
+  </div>
+</header>
+
+<div class="main">
+  <div class="scroller"><div id="diagram"><svg id="wires" aria-hidden="true"></svg></div></div>
+  <aside id="detail" aria-live="polite"></aside>
+</div>
+
+<section>
+  <h2>How to turn each part on</h2>
+  <ol class="how">
+    <li><b>Build and keep the graph.</b> Nothing to do in a Run4 workflow whose era applies <code>enableTruth</code> (the C17 eras). Premix and FastSim do not build it. Other eras: <code>--procModifiers enableTruth</code>.</li>
+    <li><b>Graph summary and comparison with the legacy truth.</b> On by default in the validation step under <code>enableTruth</code>: <code>truthGraphSummaryValidator</code>, <code>branchHGCalValidator</code>, <code>branchTrackingValidator</code>.</li>
+    <li><b>Association maps and their plots.</b> <code>--customise SimGeneral/TruthGraphAssociatorProducers/customiseTruthGraphAssociators.customiseTruthBranchValidation</code> on the RECO and the HARVESTING steps, or the <code>.88</code> workflows of runTheMatrix.</li>
+    <li><b>Association maps in the output file.</b> <code>customiseTruthGraphAssociators.customiseTruthGraphAssociators</code>.</li>
+    <li><b>HLT collections.</b> <code>customiseTruthGraphAssociators.customiseTruthHltValidation</code>.</li>
+    <li><b>Run metadata.</b> <code>--customise PhysicsTools/TruthInfo/customiseTruthMetadata.addTruthMetadata</code> (#52350, not in the IB).</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Open items</h2>
+  <p>The known limits and the open pull requests, from the module cards. Orange: in an open pull request.</p>
+  <div class="issues" id="issues"></div>
+</section>
+
+<section>
+  <h2>Products</h2>
+  <p>What each module writes, and which event content keeps it.</p>
+  <div class="tbl"><table id="products"></table></div>
+</section>
+
+<section>
+  <h2>Open pull requests</h2>
+  <p>The truth pull requests that change a module of this diagram.</p>
+  <div class="tbl"><table id="prs"></table></div>
+</section>
+
+<footer id="footer"></footer>
+</div>
+
+<script>
+const D = __DATA__;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const col = st => `var(--s-${st})`;
+const prUrl = p => "https://github.com/cms-sw/cmssw/pull/" + p.replace("#", "");
+let showAll = false, selected = null;
+
+$("#legend").innerHTML = Object.entries(D.status).map(([k, [name, desc]]) =>
+  `<span class="pill" style="--c:${col(k)}" title="${esc(desc)}"><i></i>${esc(name)}</span>`).join("");
+
+const consumers = {}, producers = {};
+for (const e of D.edges) { (consumers[e.s] ||= []).push(e.t); (producers[e.t] ||= []).push(e.s); }
+
+const diagram = $("#diagram");
+D.stages.forEach((st, i) => {
+  const ids = Object.values(D.nodes).filter(n => n.stage === st.id).map(n => n.id);
+  if (!ids.length) return;
+  const band = document.createElement("div");
+  band.className = "band";
+  band.innerHTML = `<div class="band-label"><span class="k">step ${i + 1}</span><h3>${esc(st.name)}</h3><p>${esc(st.desc)}</p></div><div class="cards"></div>`;
+  const box = band.querySelector(".cards");
+  for (const id of ids) box.appendChild(card(D.nodes[id]));
+  diagram.appendChild(band);
+});
+
+function card(n) {
+  const b = document.createElement("button");
+  b.className = "card" + (n.status === "ext" ? " ext-card" : "");
+  b.id = "n-" + n.id;
+  b.style.setProperty("--c", col(n.status));
+  const commonIn = [...new Set(n.inputs.map(i => i[2]).filter(v => D.common.includes(v)))];
+  b.innerHTML = `<span class="lab">${esc(n.title)}</span>
+    <span class="typ">${esc(n.type)}</span>
+    ${commonIn.length ? `<span class="row">${commonIn.map(c => `<span class="tag">${esc({truthLogicalGraphProducer: "graph", truthLogicalGraphHitIndexProducer: "hit index"}[c] || c)}</span>`).join("")}</span>` : ""}
+    <span class="row">${n.prs.map(p => `<span class="tag pr" style="--c:var(--s-pr)">${esc(p)}</span>`).join("")}${n.time != null ? `<span class="tag t">${n.time.toFixed(2)} ms</span>` : ""}</span>`;
+  b.addEventListener("click", () => select(n.id));
+  b.addEventListener("mouseenter", () => highlight(n.id));
+  b.addEventListener("mouseleave", () => highlight(selected));
+  return b;
+}
+
+const svg = $("#wires");
+function draw() {
+  const R = diagram.getBoundingClientRect();
+  svg.setAttribute("width", R.width); svg.setAttribute("height", R.height);
+  svg.setAttribute("viewBox", `0 0 ${R.width} ${R.height}`);
+  const rect = id => { const r = $("#n-" + id).getBoundingClientRect(); return {x: r.left - R.left, y: r.top - R.top, w: r.width, h: r.height}; };
+  const outCount = {}, inCount = {}, outIdx = {}, inIdx = {};
+  const vis = D.edges.filter(e => showAll || !e.common);
+  vis.forEach(e => { outCount[e.s] = (outCount[e.s] || 0) + 1; inCount[e.t] = (inCount[e.t] || 0) + 1; });
+  let html = ["ah", "ah-hi"].map(c => `<marker id="${c}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="${c}" d="M0,0 L10,5 L0,10 z"/></marker>`).join("");
+  html = `<defs>${html}</defs>`;
+  for (const e of vis) {
+    const a = rect(e.s), b = rect(e.t);
+    const io = outIdx[e.s] = (outIdx[e.s] || 0) + 1, ii = inIdx[e.t] = (inIdx[e.t] || 0) + 1;
+    let d;
+    if (Math.abs(a.y - b.y) < 8) {
+      const left = a.x < b.x;
+      const x1 = left ? a.x + a.w : a.x, x2 = left ? b.x : b.x + b.w;
+      const y1 = a.y + a.h * io / (outCount[e.s] + 1), y2 = b.y + b.h * ii / (inCount[e.t] + 1);
+      const mx = (x1 + x2) / 2;
+      d = `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;
+    } else {
+      const x1 = a.x + a.w * io / (outCount[e.s] + 1), y1 = a.y + a.h;
+      const x2 = b.x + b.w * ii / (inCount[e.t] + 1), y2 = b.y;
+      const dy = Math.max(30, (y2 - y1) * 0.45);
+      d = `M${x1},${y1} C${x1},${y1 + dy} ${x2},${y2 - dy} ${x2},${y2 - 2}`;
+    }
+    html += `<path class="w${e.common ? " common" : ""}" data-s="${e.s}" data-t="${e.t}" d="${d}" marker-end="url(#ah)"><title>${esc(e.s + " to " + e.t)}</title></path>`;
+  }
+  svg.innerHTML = html;
+  highlight(selected);
+}
+function highlight(id) {
+  const linked = new Set([id]);
+  svg.querySelectorAll("path.w").forEach(p => {
+    const on = id && (p.dataset.s === id || p.dataset.t === id);
+    p.classList.toggle("hi", !!on); p.classList.toggle("lo", !!id && !on);
+    p.setAttribute("marker-end", `url(#${on ? "ah-hi" : "ah"})`);
+  });
+  if (id) { (producers[id] || []).forEach(x => linked.add(x)); (consumers[id] || []).forEach(x => linked.add(x)); }
+  document.querySelectorAll(".card").forEach(c => c.classList.toggle("dim", !!id && !linked.has(c.id.slice(2))));
+}
+
+function nodeLink(id) { return D.nodes[id] ? `<button class="linkbtn mono" data-go="${esc(id)}">${esc(D.nodes[id].title)}</button>` : `<code>${esc(id)}</code>`; }
+function select(id) {
+  selected = id;
+  document.querySelectorAll(".card").forEach(c => c.classList.toggle("sel", c.id === "n-" + id));
+  const n = D.nodes[id];
+  const outs = [...new Set(consumers[id] || [])];
+  $("#detail").innerHTML = `
+    <div><h2>${esc(n.title)}</h2><div class="sub">${esc(n.type)}</div></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill" style="--c:${col(n.status)}"><i></i>${esc(D.status[n.status][0])}</span>${n.prs.map(p => `<a class="pill" href="${prUrl(p)}" target="_blank" rel="noopener">${esc(p)}</a>`).join("")}${n.time != null ? `<span class="pill">${n.time.toFixed(2)} ms/event</span>` : ""}</div>
+    <div>${esc(n.text)}</div>
+    ${n.steps ? `<div><h4>Steps</h4><ol>${n.steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol></div>` : ""}
+    ${n.params ? `<div><h4>Parameters</h4><div class="kv mono">${esc(n.params)}</div></div>` : ""}
+    ${n.issues.length ? `<div><h4>Open items</h4><ul>${n.issues.map(s => `<li class="issue">${esc(s)}</li>`).join("")}</ul></div>` : ""}
+    ${n.inputs.length ? `<div><h4>Reads</h4><ul>${n.inputs.map(i => `<li class="kv"><span class="mono">${esc(i[0])}</span> = ${nodeLink(i[2])}${i[1] !== i[2] ? ` <span class="mono">(${esc(i[1])})</span>` : ""}</li>`).join("")}</ul></div>` : ""}
+    ${outs.length ? `<div><h4>Read by</h4><ul>${outs.map(o => `<li>${nodeLink(o)}</li>`).join("")}</ul></div>` : ""}
+    ${n.doc.length ? `<div><h4>Documentation</h4><ul>${n.doc.map(([k, u]) => `<li><a href="${esc(u)}" target="_top">${esc(u.replace(/^\.\.\//, "").replace(/\/$/, ""))}</a></li>`).join("")}</ul></div>` : ""}`;
+  $("#detail").querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => {
+    select(b.dataset.go); document.getElementById("n-" + b.dataset.go).scrollIntoView({block: "nearest", inline: "nearest"});
+  }));
+  highlight(id);
+  try { history.replaceState(null, "", "#" + id); } catch (e) {}
+}
+
+const order = {pr: 0, default: 1, study: 2, hlt: 3, ext: 4};
+$("#issues").innerHTML = Object.values(D.nodes).filter(n => n.issues.length)
+  .sort((a, b) => order[a.status] - order[b.status])
+  .flatMap(n => n.issues.map(s => {
+    const c = /#\d{5}/.test(s) || n.status === "pr" ? "pr" : n.status;
+    return `<div style="--c:${col(c)}"><div class="who">${nodeLink(n.id)}</div>${esc(s)}</div>`;
+  })).join("");
+
+$("#products").innerHTML = `<tr><th>Type</th><th>Module label</th><th>Instances</th><th>Kept in</th></tr>` +
+  D.products.map(([t, m, inst, node, kept]) => `<tr><td class="f">${esc(t)}</td><td>${D.nodes[node] && node === m ? nodeLink(node) : `<code>${esc(m)}</code>`}</td><td class="f">${esc(inst || "(none)")}</td><td>${esc(kept)}</td></tr>`).join("");
+$("#prs").innerHTML = `<tr><th>PR</th><th>Content</th><th>Modules</th><th>State on 2026-11-01</th></tr>` +
+  D.prs.map(([p, title, mods, st]) => `<tr><td style="white-space:nowrap"><a href="${prUrl(p)}" target="_blank" rel="noopener">${esc(p)}</a></td><td>${esc(title)}</td><td>${mods.map(nodeLink).join(", ")}</td><td>${esc(st)}</td></tr>`).join("");
+$("#footer").innerHTML = D.footer;
+document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => {
+  select(b.dataset.go); document.getElementById("n-" + b.dataset.go).scrollIntoView({block: "center"});
+}));
+
+$("#allInputs").addEventListener("change", e => { showAll = e.target.checked; draw(); });
+new ResizeObserver(draw).observe(diagram);
+if (document.fonts) document.fonts.ready.then(draw);
+const start = decodeURIComponent(location.hash.slice(1));
+if (D.nodes[start]) select(start);
+else $("#detail").innerHTML = `<h4>How to read</h4><div>Each card is one module, or one external product that a truth module reads. The colour of the left edge says when the module runs. Almost every module after the DIGI step reads the logical graph and the hit index: grey tags show this, and the check box above draws these inputs as wires. Orange tags are open pull requests. The time is ms per event (see the footer). Select a card for its details.</div>`;
+draw();
+</script>
+</body>
+</html>
