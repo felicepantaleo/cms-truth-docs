@@ -1,3 +1,4 @@
 # Local build environment and output (see the Makefile).
 .venv/
 site/
+__pycache__/
