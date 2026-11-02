@@ -478,9 +478,12 @@ Start at `validation/index.html`. [Validation](validation.md) explains the plots
 To make the gallery from your own DQM file:
 
 ```bash
-python3 $CMSSW_BASE/src/Validation/TruthInfo/scripts/makeTruthValidationPlots.py \
-    DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO.root --outputDir plots --sample "my sample"
+makeTruthValidationPlots.py DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO.root \
+    --outputDir plots --sample "my sample"
 ```
+
+The script takes one harvested DQM file per sample. It stops with an error when two inputs
+hold the same folder, because one would replace the other.
 
 ## FAQ
 

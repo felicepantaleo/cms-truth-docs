@@ -44,9 +44,9 @@ which schedules both flavours and adds the keep statements.
 | `TruthBranchTargetsProducer` | `truthBranchTargets` | The truth-side targets, once per event: `selectedRoots` (every cut of the selector except its pt floor), `denominatorRoots` (every cut, plus the level targets; the vertex associators count findable tracks over them), `assignableRoots`, the signal-seed denominators and one truth-to-reco denominator per level |
 | `AllTrackToTruthBranchAssociatorsProducer` | `allTrackToTruthBranchAssociators` | Tracks, by shared tracker elements |
 | `TruthBranchTracksterAssociatorsProducer` | `truthBranchTracksterAssociators` | TICL tracksters, by shared calorimeter cells |
-| `TruthBranchCandidateAssociatorsProducer` | `truthBranchCandidateAssociators` | TICL candidates, by the shared calorimeter cells of all their tracksters |
+| `TruthBranchPFClusterAssociatorsProducer` | `truthBranchPFClusterEcalAssociators`, `truthBranchPFClusterHcalAssociators` | Particle-flow clusters of the barrel calorimeters, by shared calorimeter cells. The HLT menu has no such maps |
 | `AllVertexToTruthBranchAssociatorsProducer` | `allVertexToTruthBranchAssociators` | Primary vertices, through the track maps |
-| `AllSecondaryVertexToTruthBranchAssociatorsProducer` | `allSecondaryVertexToTruthBranchAssociators` | Secondary vertices, through the track maps, against heavy-flavour decay vertices |
+| `AllVertexToTruthBranchAssociatorsProducer` | `allSecondaryVertexToTruthBranchAssociators` | Secondary vertices, through the track maps, against heavy-flavour decay vertices. A clone of the primary-vertex module |
 
 Every collection label lives in one place,
 `python/truthGraphAssociationLabels_cff.py`, together with the working points and the
@@ -116,16 +116,14 @@ something else, or with nothing, for most tracks of a preset job. The invented n
 barred by their own role instead.
 
 The barred roots stay in `selectedRoots` and in the `Fixed` map, because the levels made
-of those particles need them as truth-side denominators, and the truth-driven direction
-reads its pair scores from the first working point's map. Only the adaptive rows are
+of those particles need them as truth-side denominators. Only the adaptive rows are
 filtered. An object whose every candidate is barred gets no row and reads as unmatched,
 rather than being assigned a particle no detector could see.
 
 ## The DQM package
 
 `Validation/TruthInfo` holds one templated `TruthBranchRecoValidator` over tracks,
-vertices, secondary vertices and tracksters, with `DQMGenericClient` harvesting. The
-reco-driven metrics are booked per working point, the truth-driven ones per truth level.
-`TruthBranchCandidateValidator` validates the TICL candidates on two channels, the
-calorimeter match of their tracksters and the particle of their track.
+vertices, secondary vertices, tracksters and PF clusters, with `DQMGenericClient`
+harvesting. The first working point of a validator must be `Fixed`. The reco-driven
+metrics are booked per working point, the truth-driven ones per truth level.
 See [Validation](validation.md) for the metric definitions and the measured numbers.

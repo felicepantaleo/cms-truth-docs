@@ -52,7 +52,7 @@ dumps DOT graphs per event. It exposes selection options (`-n/--maxevts`,
 `-m/--merge`, `-c/--collapse`, `-s/--seeds`, `-f/--flavors`, `-o/--outdir`):
 
 ```bash
-cmsRun PhysicsTools/TruthInfo/test/dumpTruthGraphsFromGENSIMRECO_cfg.py step3.root -n 5
+cmsRun $CMSSW_RELEASE_BASE/src/PhysicsTools/TruthInfo/test/dumpTruthGraphsFromGENSIMRECO_cfg.py step3.root -n 5
 ```
 
 The minimal cfg wiring is:
@@ -280,7 +280,8 @@ The three products are ordinary EDM products: `truth::Graph`,
 `truth::LogicalGraphHitIndex`, and the raw `TruthGraph` if you need provenance
 back-references. Declare a token in the constructor. Fetch the product with
 `event.get` in `analyze`. The bundled validators in `Validation/TruthInfo` (`BranchTrackingValidator`,
-`BranchHGCalValidator`, `TruthBranchRecoValidator`) use exactly this pattern:
+`BranchHGCalValidator`, and the template `TruthBranchRecoValidator` behind `TruthBranchTrackValidator`,
+`TruthBranchVertexValidator`, `TruthBranchTracksterValidator` and `TruthBranchPFClusterValidator`) use exactly this pattern:
 
 ```cpp
 #include "FWCore/Framework/interface/global/EDAnalyzer.h"
@@ -513,10 +514,10 @@ only on the physics. The selections collapse to these archetypes:
 | `resonance` | `ZMM`/`ZEE`/`DYTo*` (incl. n-jet `DY1jTo*`/`dyellell*`), `Zp*`, `WTo*` and **W+jets** (`WJetsToLNu`/`W4JToLNu`) | seed the boson (+ ISR), channel decay group |
 | `vbf` | `VBFH*` (incl. VBF HH), `QQToHToTauTau` | seed Higgs **+ keepProductionSiblings** |
 | `ggf` | `H125GGgluonfusion`, **di-Higgs** `GluGluToHH*`/`HHto*` | seed Higgs (seeds every Higgs) |
-| `vh` | **`WH*`/`ZH*`/`VH*`/`WWH*`/`ZZH*`** (associated Higgs) | seed Higgs **+ keepProductionSiblings** (recoiling boson) |
+| `vh` | **`WH*`/`WplusH*`/`WminusH*`/`ZH*`/`VH*`/`WWH*`/`ZZH*`** (associated Higgs) | seed Higgs **+ keepProductionSiblings** (recoiling boson) |
 | `top` | `TTbar*`, **ttX** (`ttH`/`ttW`/`ttZ`/`ttbb`/four-top/`ttDM`), `Tprime*` | seed the top(s) **+ keepProductionSiblings** |
 | `singletop` | `ST_t*`/`ST_tW`/`ST_s-channel` | seed top **+ keepProductionSiblings** (production partner) |
-| `diboson` | **`WW*`/`WZ*`/`ZZ*`/`VBS*`/same-sign WW** | seed the bosons `{23,24,−24}` **+ keepProductionSiblings** |
+| `diboson` | **`WW*`/`WZ*`/`ZZ*`/`VBS*`/same-sign WW**, and the tribosons `WWW*`/`WWZ*`/`WZZ*`/`ZZZ*` | seed the bosons `{23,24,−24}` **+ keepProductionSiblings** |
 | `heavyflavor` | `Bs*`/`Bu*`/`B0*`/`Lb*`/`Upsilon*`/`Chib*`/`EtaB*` | seed by heavy-flavor content, beauty (`seedHadronFlavors=[5]`); a B decay to charmonium is beauty |
 | `heavyflavor` | `Jpsi*`/`Psi2S*`/`Chic*` | charm (`seedHadronFlavors=[4]`) |
 | `full` | QCD / MinBias / NuGun / **SUSY / LLP / DM / EFT / BSM** / unknown | keep the whole graph |
@@ -552,6 +553,10 @@ applyTruthPreset(process, preset="top")                        # the preset by n
 applyTruthPreset(process, fragment="TTbar_14TeV_TuneCP5_cfi")  # resolved from the fragment
 applyTruthPreset(process, preset="top", seedParentDepth=2)     # any field overridden
 ```
+
+A preset reaches only the modules that exist when it runs, so apply it last. A truth
+validation customise that runs after a preset raises an error. `--customise_commands`
+always runs last.
 
 From `cmsDriver.py`, which is the case of running the graph over a GEN-SIM sample that
 already exists:

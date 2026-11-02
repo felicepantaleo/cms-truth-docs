@@ -56,7 +56,7 @@ Each particle carries the levels it belongs to, as bits on the graph itself (`Pa
 | `reconstructableFromSignal` | the signal's **visible final state**: walk down from each signal root, stop at the first object a detector reconstructs. A pi0 is labelled, its two photons are not; an a1 or rho is walked through; neutrinos are dropped. A colour string that the signal shares with the beam remnant, the initial-state shower or the underlying event is not split: all its hadrons belong to the signal (see [Findings](findings.md)). TenTau gives 18.59 per event |
 | `underlyingEvent` | the stable legs of the underlying event, the counterpart of `stableLegsFromInitialState`. ttbar gives 103.17 per event, a particle gun 0 |
 | `partonJets` | one root per **parton-initiated jet**: the hard-scatter legs that are quarks or gluons, each standing for its whole descendant subgraph. No clustering. ttbar gives 4.80 per event with the b bin at exactly 2.00; QCD flat pT gives exactly 2.00 per event, 67% gluons |
-| `bHadrons`, `cHadrons` | the hadron of each heavy-flavour chain that **decays weakly**, the hadron CMS ghost association names: the generated b and c hadrons that do not have b and c hadrons as daughters (CMS-BTV-16-002). A B* to B chain counts once, as the B. Separate levels because a B decays to a D and one combined level would drop every charm member. ttbar: 2.0 b per event, one per top. These two also define the secondary-vertex truth below |
+| `bHadrons`, `cHadrons` | the hadron of each heavy-flavour chain that **decays weakly**, the hadron CMS ghost association names: the generated b and c hadrons that do not have b and c hadrons as daughters (CMS-BTV-16-002). A B* to B chain counts once, as the B. A quarkonium is no member, because it does not decay weakly: 500 ttbar events hold 61 against 2234 open-charm hadrons. Separate levels because a B decays to a D and one combined level would drop every charm member. ttbar: 2.0 b per event, one per top. These two also define the secondary-vertex truth below |
 | `reconstructableFinalState` | the `reconstructableFromSignal` walk seeded from **every GEN root**, so the pi0-as-one-object final state exists on samples with no resonance: QCD jets, the underlying event, every pileup interaction. On a tau gun it equals `reconstructableFromSignal` at 18.85 per event, the required identity when the signal is the whole event. A selection preset does not change its pi0 members: a preset keeps each pi0 outside the selection on the `UnderlyingEvent` vertex. Measured on 10 ttbar events with the `top` preset: 1057 pi0 members with and without the preset. The hitless pruning keeps both photons of every pi0 with a hit in its subgraph, so the association can find a pi0 resolved or merged. Its calo-entrance eta comes from the most energetic photon that crosses the calorimeter boundary. On the same events this adds 1 member to the `stableDecayProducts` and `caloBoundary` denominators, and the efficiencies change by 0.0005 or less. The pruning also removes a decayed GEN particle left with only invisible products, so the members are identical with no preset, `top` and `resonance` in 10/10 events |
 | `tauVisibleHadronic` | one entry per **hadronically decaying tau**: the last tau of each radiative chain, with a GEN decay record and no electron and no muon among the children (the `TauGenJetProducer` rule). 6.53 per event on a 10-tau gun, which is the 64.8% hadronic branching fraction |
 | `tauVisibleLeptonic` | the same taus that decay to an **electron or a muon**, by the same last-copy rule. The member is the tau itself, as in the hadronic level, so its visible part is the charged lepton. Together with `tauVisibleHadronic` it covers every tau that carries a GEN decay record |
@@ -358,7 +358,7 @@ makeBranchValidationPlots.sh /path/library /path/branch_plots
 The sections above describe the first-generation validators. `Validation/TruthInfo` is
 the current-generation package. It is in `CMSSW_20_1_X` from `CMSSW_20_1_X_2026-10-27-2300`
 (cms-sw/cmssw#51829), on top of the association layer. It holds one templated
-`TruthBranchRecoValidator` over tracks, vertices, secondary vertices and tracksters.
+`TruthBranchRecoValidator` over tracks, vertices, secondary vertices, tracksters and PF clusters.
 `DQMGenericClient` string configuration harvests all of it. Six metrics live on the
 reco side and they answer four different questions. The numbers below come from 200
 events per sample.
@@ -639,6 +639,9 @@ HGCalValidator, which books the plot. The split rate carries the calorimetric pa
 instead.
 
 ## TICL candidates on two channels (2026-10-08)
+
+This section is a development study. `TruthBranchCandidateValidator` and
+`truthBranchCandidateAssociators` are not in `CMSSW_20_1_X`.
 
 `TruthBranchCandidateValidator` validates `ticlCandidate` against the truth graph. It runs
 next to `TICLCandidateValidator`, which stays. `customiseTruthBranchValidation` schedules it

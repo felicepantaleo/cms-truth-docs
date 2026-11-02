@@ -102,7 +102,7 @@ choosing the right level.
 A picture of the history is the fastest way to understand what the graph holds.
 
 ```bash
-cmsRun $CMSSW_BASE/src/PhysicsTools/TruthInfo/test/dumpTruthGraphsFromGENSIMRECO_cfg.py \
+cmsRun $CMSSW_RELEASE_BASE/src/PhysicsTools/TruthInfo/test/dumpTruthGraphsFromGENSIMRECO_cfg.py \
     file:step3.root -n 1 -o dump --geometry ExtendedRun4D127
 dot -Tsvg dump/truthlogicalgraph_run1_lumi1_event*.dot -o event.svg
 ```
