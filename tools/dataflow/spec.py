@@ -8,7 +8,7 @@ STATUS = {
     "default": ["Default", "Runs in every Run4 workflow whose era applies enableTruth (C17 eras, not premix, not FastSim)."],
     "study": ["Study only", "Runs only with customiseTruthBranchValidation, for example in the runTheMatrix .88 workflows."],
     "hlt": ["HLT study", "Runs only with customiseTruthHltValidation."],
-    "pr": ["Open PR", "In an open pull request, not in the IB."],
+    "pr": ["After pre5", "Merged on 2026-11-02. Not in CMSSW_20_1_0_pre5."],
     "ext": ["Outside truth", "A product of another package that a truth module reads."],
 }
 
@@ -47,15 +47,15 @@ DOC = {
 
 PRS = [
     # [number, title, modules, state]
-    ["#52342", "Store TruthGraph::NodeRef kind in one byte", ["mix"], "Signed by dqm and generators. Core signature pending."],
-    ["#52343", "Truth graph: add isInTime() to particles and vertices", ["truthLogicalGraphProducer"], "Fully signed."],
-    ["#52344", "TruthInfo: small bug fixes", ["truthLogicalGraphProducer", "truthBranchTargets", "truthBranchTrackValidator"], "Generators signed. DQM pending."],
-    ["#52345", "Drop invisible members from the truth level efficiency denominators", ["truthBranchTargets"], "DQM and generators pending."],
-    ["#52346", "The hitless-subgraph pruning reads the MTD sim hits, and the DIGI hit index fills the MTD channel", ["truthLogicalGraphProducer", "truthLogicalGraphHitIndexProducer"], "Fully signed."],
-    ["#52348", "Optional hit requirement for the truth-to-reco denominators", ["truthBranchTargets"], "Generators signed. DQM pending."],
-    ["#52349", "A selection preset keeps the spectator pi0", ["truthLogicalGraphProducer"], "Fully signed."],
-    ["#52350", "Truth graph in a GEN-only job, and run metadata of the graph", ["truthGraphMetadata", "truthLogicalGraphProducer"], "Generators pending."],
-    ["#52319", "Truth: keep the calorimeter PFRecHits", ["eventContent"], "Fully signed."],
+    ["#52342", "Store TruthGraph::NodeRef kind in one byte", ["mix"], "Open. Tests pass. Core signature pending."],
+    ["#52343", "Truth graph: add isInTime() to particles and vertices", ["truthLogicalGraphProducer"], "Merged on 2026-11-02. Not in CMSSW_20_1_0_pre5."],
+    ["#52344", "TruthInfo: small bug fixes", ["truthLogicalGraphProducer", "truthBranchTargets", "truthBranchTrackValidator"], "Open. Tests pass. DQM signature pending."],
+    ["#52345", "Drop invisible members from the truth level efficiency denominators", ["truthBranchTargets"], "Open. Tests pass. DQM signature pending."],
+    ["#52346", "The hitless-subgraph pruning reads the MTD sim hits, and the DIGI hit index fills the MTD channel", ["truthLogicalGraphProducer", "truthLogicalGraphHitIndexProducer"], "Merged on 2026-11-02. Not in CMSSW_20_1_0_pre5."],
+    ["#52348", "Optional hit requirement for the truth-to-reco denominators", ["truthBranchTargets"], "Open. Tests pass. DQM signature pending."],
+    ["#52349", "A selection preset keeps the spectator pi0", ["truthLogicalGraphProducer"], "Merged on 2026-11-02. Not in CMSSW_20_1_0_pre5."],
+    ["#52350", "Truth graph in a GEN-only job, and run metadata of the graph", ["truthGraphMetadata", "truthLogicalGraphProducer"], "Merged on 2026-11-02. Not in CMSSW_20_1_0_pre5."],
+    ["#52319", "Truth: keep the calorimeter PFRecHits", ["eventContent"], "Merged on 2026-11-02. Not in CMSSW_20_1_0_pre5."],
 ]
 
 # Per module: text, algorithm steps, short parameter summary, doc link, open items.
@@ -79,7 +79,7 @@ NODES = {
                "Add the artificial vertices and particles (VertexRole, ParticleRole), then set ParticleData::levelFlags."],
         params="mergeGenSimVertices = True; postProcessing.collapseIntermediateGenParticles = True; reconstructablePdgIds = [111]; keepStableSpectators = True; seedPdgIds = []",
         doc=["logical", "selroots"],
-        issues=["In the IB the pruning does not read the MTD sim hits, so a SIM subgraph with MTD hits only is dropped (#52346 adds them).",
+        issues=["In CMSSW_20_1_0_pre5 the pruning does not read the MTD sim hits, so a SIM subgraph with MTD hits only is dropped. #52346, merged on 2026-11-02, adds them.",
                 "The pruning sees only the listed sim-hit collections. A particle whose hits are in a collection that is not listed is removed with no warning."]),
     "truthLogicalGraphHitIndexProducer": dict(stage="digi", status="default", type="TruthLogicalGraphHitIndexProducer",
         text="Stores the hit footprint of each logical particle: its own hits and the hits of its subgraph, per channel (Tracker, MTD, Calo, Muon).",
@@ -89,7 +89,7 @@ NODES = {
                "Store each hit once. A particle points to its direct hits and to the range of its subgraph."],
         params="subdetectors = [Calo, Muon, Tracker]; recHitMap = '' (no rechit index at DIGI); doHcalRelabelling = True",
         doc=["hitindex"],
-        issues=["The MTD channel is empty in the IB: the MTD is not in subdetectors (#52346 fills it).",
+        issues=["The MTD channel is empty in CMSSW_20_1_0_pre5: the MTD is not in subdetectors. #52346, merged on 2026-11-02, fills it.",
                 "recHitMap is empty at DIGI, so every Hit has recHitIndex = kInvalidRecHitIndex. A consumer matches by DetId."]),
     "simSiPixelDigis": dict(stage="digi", status="ext", type="Phase-2 tracker digitizer", text="The pixel and outer-tracker digi-sim links. The hit index uses them to key the tracker hits by cell."),
     "truthGraphMetadata": dict(stage="digi", status="pr", type="TruthGraphMetadataProducer",
@@ -162,4 +162,4 @@ COMMON = ["truthLogicalGraphProducer", "truthLogicalGraphHitIndexProducer"]
 FOOTER = ("Sources: the configuration of runTheMatrix workflow 34834.88 (TTbar 14 TeV, D122, no pile-up) in CMSSW_20_1_X_2026-10-27-2300: "
           "step2 (DIGI to HLT), step3 (RECO, VALIDATION, DQM) and step4 (HARVESTING). The HLT validation modules are defined in that configuration but not scheduled. "
           "Times: FastTimerService, mean real time per event of each module, on the same workflow and release, 20 events, 1 thread, 1 stream, one socket of patatrack-bg-01 (2026-11-01). The DIGI step takes 9464 ms/event and the RECO step 7471 ms/event in total. "
-          "Pull-request states: GitHub, 2026-11-01.")
+          "Pull-request states: GitHub, 2026-11-02.")

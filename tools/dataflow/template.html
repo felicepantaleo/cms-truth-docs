@@ -116,7 +116,7 @@ ol.how { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: .9re
 <div class="wrap">
 <header>
   <h1>Truth Graph Data Flow</h1>
-  <p>The modules that build the MC-truth graph at DIGI, keep it in the output, and use it at RECO to associate and validate the reconstruction. Module labels, types and inputs come from the configuration of the runTheMatrix workflow 34834.88 (TTbar, D122, no pile-up) in the IB. Select a module to see what it reads, what reads it, its main parameters, its open items and the documentation.</p>
+  <p>The modules that build the MC-truth graph at DIGI, keep it in the output, and use it at RECO to associate and validate the reconstruction. Module labels, types and inputs come from the configuration of the runTheMatrix workflow 34834.88 (TTbar, D122, no pile-up) in <code>CMSSW_20_1_X_2026-10-27-2300</code>. <code>CMSSW_20_1_0_pre5</code> has the same code in the four truth packages. Select a module to see what it reads, what reads it, its main parameters, its open items and the documentation.</p>
   <div class="controls">
     <div class="legend" id="legend"></div>
     <label class="toggle"><input type="checkbox" id="allInputs"> Draw the logical graph and the hit index as wires</label>
@@ -136,7 +136,7 @@ ol.how { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: .9re
     <li><b>Association maps and their plots.</b> <code>--customise SimGeneral/TruthGraphAssociatorProducers/customiseTruthGraphAssociators.customiseTruthBranchValidation</code> on the RECO and the HARVESTING steps, or the <code>.88</code> workflows of runTheMatrix.</li>
     <li><b>Association maps in the output file.</b> <code>customiseTruthGraphAssociators.customiseTruthGraphAssociators</code>.</li>
     <li><b>HLT collections.</b> <code>customiseTruthGraphAssociators.customiseTruthHltValidation</code>.</li>
-    <li><b>Run metadata.</b> <code>--customise PhysicsTools/TruthInfo/customiseTruthMetadata.addTruthMetadata</code> (#52350, not in the IB).</li>
+    <li><b>Run metadata.</b> <code>--customise PhysicsTools/TruthInfo/customiseTruthMetadata.addTruthMetadata</code> (#52350, merged on 2026-11-02, not in CMSSW_20_1_0_pre5).</li>
   </ol>
 </section>
 
@@ -153,7 +153,7 @@ ol.how { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: .9re
 </section>
 
 <section>
-  <h2>Open pull requests</h2>
+  <h2>Pull requests after CMSSW_20_1_0_pre5</h2>
   <p>The truth pull requests that change a module of this diagram.</p>
   <div class="tbl"><table id="prs"></table></div>
 </section>
@@ -279,7 +279,7 @@ $("#issues").innerHTML = Object.values(D.nodes).filter(n => n.issues.length)
 
 $("#products").innerHTML = `<tr><th>Type</th><th>Module label</th><th>Instances</th><th>Kept in</th></tr>` +
   D.products.map(([t, m, inst, node, kept]) => `<tr><td class="f">${esc(t)}</td><td>${D.nodes[node] && node === m ? nodeLink(node) : `<code>${esc(m)}</code>`}</td><td class="f">${esc(inst || "(none)")}</td><td>${esc(kept)}</td></tr>`).join("");
-$("#prs").innerHTML = `<tr><th>PR</th><th>Content</th><th>Modules</th><th>State on 2026-11-01</th></tr>` +
+$("#prs").innerHTML = `<tr><th>PR</th><th>Content</th><th>Modules</th><th>State on 2026-11-02</th></tr>` +
   D.prs.map(([p, title, mods, st]) => `<tr><td style="white-space:nowrap"><a href="${prUrl(p)}" target="_blank" rel="noopener">${esc(p)}</a></td><td>${esc(title)}</td><td>${mods.map(nodeLink).join(", ")}</td><td>${esc(st)}</td></tr>`).join("");
 $("#footer").innerHTML = D.footer;
 document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => {
