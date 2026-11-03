@@ -32,6 +32,8 @@ The HLT twins of each module are kept in separate sequences
 (`truthGraphHltAssociatorsSequence`, `truthBranchHltValidationSequence`), because they
 read HLT collections an offline reconstruction does not produce.
 `customiseTruthHltValidation` schedules those.
+The HLT ECAL PF-cluster map reads `hltParticleFlowClusterECAL`, which the HLT output does not
+keep, so the customises schedule it only in a job that runs the HLT menu.
 
 A job that wants the maps in its own output applies
 `SimGeneral/TruthGraphAssociatorProducers/customiseTruthGraphAssociators.customiseTruthGraphAssociators`,
