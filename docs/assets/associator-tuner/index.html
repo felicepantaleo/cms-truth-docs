@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Adaptive Associator Tuner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a control strip that stays on top, then the summary, the sweeps, and one trackster in the score plane. */
+:root {
+  --bg: #f6f7f8; --panel: #ffffff; --line: #dfe2e6; --grid: #e9ebee;
+  --ink: #14181d; --ink2: #4b535c; --ink3: #737c86;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --ref: #8a929b; --shade: #eef0f3;
+  --good: #1a7f4b; --bad: #c0322f;
+  --sans: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15181b; --panel: #1d2125; --line: #30363c; --grid: #2a2f34;
+  --ink: #eef0f2; --ink2: #b7bec6; --ink3: #8d959e;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --ref: #7f8790; --shade: #262b30;
+  --good: #4cc38a; --bad: #ef6b68; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #15181b; --panel: #1d2125; --line: #30363c; --grid: #2a2f34;
+  --ink: #eef0f2; --ink2: #b7bec6; --ink3: #8d959e;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --ref: #7f8790; --shade: #262b30;
+  --good: #4cc38a; --bad: #ef6b68; color-scheme: dark; }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 14px 40px; display: flex; flex-direction: column; gap: 14px; }
+h1 { font-size: 20px; font-weight: 600; margin: 0; }
+h2 { font-size: 14px; font-weight: 600; margin: 0; }
+p { margin: 0; }
+.sub { color: var(--ink2); max-width: 80ch; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; min-width: 0; }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px 22px; align-items: end; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+.ctl label { display: flex; justify-content: space-between; gap: 8px; color: var(--ink2); font-size: 12px; margin-bottom: 3px; }
+.ctl code, code, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.val { font: 500 15px var(--mono); color: var(--ink); }
+input[type=range] { width: 100%; accent-color: var(--s1); margin: 2px 0; height: 22px; }
+select, button { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; min-height: 30px; }
+button { cursor: pointer; }
+button:hover { border-color: var(--ink3); }
+:focus-visible { outline: 2px solid var(--s1); outline-offset: 1px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.selects { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.selects select { width: 100%; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 10px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; min-width: 0; }
+.tile .k { color: var(--ink2); font-size: 12px; }
+.tile .v { font: 500 21px var(--mono); margin-top: 1px; }
+.tile .d { font: 12px var(--mono); color: var(--ink3); }
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+.chart h2 { margin-bottom: 2px; }
+.chart .note { color: var(--ink3); font-size: 12px; margin-bottom: 4px; min-height: 18px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--ink2); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { fill: var(--ink3); font: 10.5px var(--sans); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 10px; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+th { text-align: right; color: var(--ink2); font-weight: 500; border-bottom: 1px solid var(--line); padding: 3px 7px; white-space: nowrap; }
+td { text-align: right; padding: 3px 7px; border-bottom: 1px solid var(--grid); font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+tr.click { cursor: pointer; }
+tr.click:hover td { background: var(--shade); }
+tr.sel td { background: var(--shade); font-weight: 500; }
+.pill { display: inline-block; font-size: 11px; font-family: var(--sans); padding: 0 6px; border-radius: 9px; border: 1px solid var(--line); color: var(--ink2); }
+.pill.pick { border-color: var(--s2); color: var(--ink); }
+.ok { color: var(--good); font-weight: 500; }
+.ko { color: var(--bad); font-weight: 500; }
+.listbox { max-height: 330px; overflow: auto; }
+#tip { position: fixed; z-index: 20; pointer-events: none; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 5px 8px; font: 12px var(--mono); box-shadow: 0 2px 8px rgba(0,0,0,.18); white-space: pre; }
+.mono { font-family: var(--mono); font-size: 12.5px; white-space: pre-wrap; word-break: break-word; }
+@media (max-width: 720px) { .controls { position: static; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Adaptive associator tuner</h1>
+    <p class="sub">Each trackster answers with the candidate that minimises <code>score + reverseWeight * reverseScore</code>, among candidates with <code>reverseScore</code> at or below the ceiling. If the ceiling rejects all candidates, the unconstrained minimum answers. The page runs this rule on the real candidates when you move a slider.</p>
+  </header>
+
+  <section class="panel controls" aria-label="Working point">
+    <div class="ctl">
+      <label for="wS"><span><code>adaptiveReverseWeight</code></span><span class="val" id="wV"></span></label>
+      <input type="range" id="wS" min="0" max="301" step="1">
+    </div>
+    <div class="ctl">
+      <label for="cS"><span><code>adaptiveMaxReverseScore</code></span><span class="val" id="cV"></span></label>
+      <input type="range" id="cS" min="0" max="1" step="0.01">
+    </div>
+    <div class="selects">
+      <div class="ctl"><label for="sample">Sample</label><select id="sample"></select></div>
+      <div class="ctl"><label for="col">Collection</label><select id="col"></select></div>
+      <div class="ctl"><label for="emin">Trackster energy</label><select id="emin"><option value="0">All</option><option value="1">Above 1 GeV</option><option value="5">Above 5 GeV</option><option value="10">Above 10 GeV</option><option value="50">Above 50 GeV</option></select></div>
+    </div>
+    <div class="row">
+      <button id="pTight">AdaptiveTight (1, 0.6)</button>
+      <button id="pNom">AdaptiveNominal (1, 1)</button>
+    </div>
+  </section>
+
+  <section class="tiles" id="tiles" aria-label="Summary at this working point"><div class="tile"><div class="k">Loading</div><div class="v">...</div><div class="d">Reading the candidates</div></div></section>
+
+  <section class="charts" id="sweeps" aria-label="Sweeps over the weight"></section>
+
+  <section class="two">
+    <div class="panel chart"><h2>Purity of the selected candidate</h2><div class="legend" id="hL1"></div><div id="h1"></div></div>
+    <div class="panel chart"><h2>Energy response: trackster raw energy over selected particle energy</h2><div class="legend" id="hL2"></div><div id="h2"></div></div>
+  </section>
+
+  <section class="two">
+    <div class="panel min0">
+      <div class="row" style="justify-content:space-between"><h2>One trackster</h2>
+        <div class="row"><label for="ev" style="font-size:12px;color:var(--ink2)">Event</label><select id="ev"></select>
+        <label style="font-size:12px;color:var(--ink2)"><input type="checkbox" id="onlyCh"> Only changed picks</label></div></div>
+      <div class="legend" style="margin:6px 0 4px" id="scL"></div>
+      <div id="scatter"></div>
+    </div>
+    <div class="panel min0">
+      <h2 id="listT">Tracksters with the highest energy in this event</h2>
+      <div class="listbox scroll"><table id="list"></table></div>
+    </div>
+  </section>
+
+  <section class="panel min0"><h2 id="candT">Candidates of the selected trackster</h2><div class="scroll"><table id="cands"></table></div></section>
+
+  <section class="two">
+    <div class="panel min0"><h2>Type of the selected particle</h2><div class="scroll"><table id="types"></table></div></div>
+    <div class="panel min0">
+      <h2>Configuration of this working point</h2>
+      <p class="mono" id="cfg" style="margin:6px 0"></p>
+      <button id="copy">Copy configuration</button> <span id="copied" style="color:var(--ink2);font-size:12px"></span>
+      <h2 style="margin-top:12px">Provenance and limits</h2>
+      <p id="prov" style="color:var(--ink2);margin-top:4px"></p>
+    </div>
+  </section>
+</div>
+<div id="tip" hidden></div>
+
+<script>
+"use strict";
+const SAMPLES = [
+  {id: "ttbar", label: "TTbar, no PU, D122, 20 events", cols: ["ticlCandidate", "ticlTracksterLinks", "ticlTracksterLinksSuperclusteringDNN", "ticlTrackstersCLUE3DHigh", "ticlTrackstersRecovery"]},
+  {id: "qcdpu200", label: "QCD, PU200, D127, 12 events", cols: ["ticlCandidate", "ticlTrackstersCLUE3DHigh"]},
+];
+const PDG = {22:"gamma",11:"e",13:"mu",15:"tau",12:"nu_e",14:"nu_mu",16:"nu_tau",211:"pi",111:"pi0",321:"K",130:"K0L",310:"K0S",311:"K0",2212:"p",2112:"n",3122:"Lambda",3222:"Sigma+",3112:"Sigma-",3312:"Xi-",3322:"Xi0",3334:"Omega",221:"eta",223:"omega",113:"rho0",213:"rho",313:"K*0",323:"K*",331:"eta'",333:"phi",411:"D",421:"D0",431:"Ds",511:"B0",521:"B",531:"Bs",4122:"Lambda_c",5122:"Lambda_b"};
+const pdgName = p => { const a = Math.abs(p); const n = PDG[a]; if (!n) return String(p); return n + (a === 111 || a === 22 || a === 130 || a === 310 || a === 2112 ? "" : (p < 0 ? " (-)" : "")); };
+const typeOf = p => { const a = Math.abs(p); if (a === 22) return "Photon"; if (a === 11) return "Electron"; if (a === 13) return "Muon"; if (a === 111 || a === 221) return "pi0 or eta"; if (a === 211 || a === 321 || a === 2212) return "Charged hadron"; if (a === 2112 || a === 130 || a === 310) return "Neutral hadron"; return "Other"; };
+const TYPES = ["Photon","Electron","Muon","pi0 or eta","Charged hadron","Neutral hadron","Other"];
+const F_CALO = 1 << 3;
+const $ = id => document.getElementById(id);
+const state = {w: 1, c: 1, sample: null, col: null, emin: 0, ev: 0, sel: -1, onlyCh: false};
+const cache = {};
+let D = null, P = null;
+
+const w2x = w => w <= 0 ? 0 : Math.max(1, Math.min(301, Math.round((Math.log10(w) + 1.7) * 100 + 1)));
+const x2w = x => x <= 0 ? 0 : +Math.pow(10, -1.7 + (x - 1) * 0.01).toPrecision(3);
+
+function prepare(data, name) {
+  const trs = data.collections[name].slice();
+  let nf = 0; for (const t of trs) nf += t.f.length;
+  const n = trs.length;
+  const p = {n, trs, off: new Int32Array(n + 1), E: new Float32Array(n), ev: new Int32Array(n), t: new Float64Array(n), nomi: new Float64Array(n),
+    root: new Int32Array(nf), score: new Float32Array(nf), rev: new Float32Array(nf), shared: new Float32Array(nf), frac: new Float32Array(nf),
+    pE: new Float32Array(nf), pdgc: new Uint8Array(nf), pu: new Uint8Array(nf), calo: new Uint8Array(nf), gen: new Uint16Array(nf), uid: new Int32Array(nf)};
+  const uids = new Map(); let k = 0;
+  trs.forEach((t, i) => {
+    p.off[i] = k; p.E[i] = t.E; p.ev[i] = t.e; p.t[i] = t.t; p.nomi[i] = t.n;
+    for (const c of t.f) {
+      p.root[k] = c[0]; p.score[k] = c[1]; p.rev[k] = c[2]; p.shared[k] = c[3]; p.frac[k] = c[4];
+      const q = data.particles[t.e][c[0]];
+      if (q) { p.pE[k] = q[1]; p.pdgc[k] = TYPES.indexOf(typeOf(q[0])); p.pu[k] = q[3]; p.calo[k] = (q[4] & F_CALO) ? 1 : 0; p.gen[k] = q[2]; }
+      const key = t.e * 1e8 + c[0]; let u = uids.get(key); if (u === undefined) { u = uids.size; uids.set(key, u); } p.uid[k] = u;
+      k++;
+    }
+  });
+  p.off[n] = k; p.nu = uids.size;
+  p.count = new Int32Array(p.nu); p.pick = new Int32Array(n);
+  // Closure of this page's rule against the maps of the job.
+  const diff = (w, c, field) => { let bad = 0, tot = 0; for (let i = 0; i < n; i++) { const j = argmin(p, i, w, c); const got = j < 0 ? -1 : p.root[j]; tot++; if (got !== p[field][i]) bad++; } return {bad, tot}; };
+  p.closure = {tight: diff(1, 0.6, "t"), nominal: diff(1, 1, "nomi")};
+  return p;
+}
+
+// BranchHitAssociator::bestAdaptiveBranch, in float arithmetic. Returns -1 for no candidate.
+function argmin(p, i, w, c) {
+  const a = p.off[i], b = p.off[i + 1];
+  if (a === b) return -1;
+  const fw = Math.fround(w), fc = Math.fround(c);
+  let best = -1, bestO = Infinity, fall = -1, fallO = Infinity;
+  for (let j = a; j < b; j++) {
+    const o = Math.fround(p.score[j] + Math.fround(fw * p.rev[j]));
+    if (p.rev[j] <= fc && o < bestO) { bestO = o; best = j; }
+    if (o < fallO) { fallO = o; fall = j; }
+  }
+  return best >= 0 ? best : fall;
+}
+function isFallback(p, i, j, c) { return j >= 0 && p.rev[j] > Math.fround(c); }
+
+function metrics(p, w, c, emin, full) {
+  let n = 0, none = 0, sumP = 0, sumF = 0, sumEP = 0, sumE = 0, strict = 0, pu = 0, ch = 0, fb = 0, calo = 0, gen = 0;
+  const count = p.count; count.fill(0);
+  const picks = p.pick;
+  const resp = full ? [] : null, types = full ? new Array(TYPES.length).fill(0) : null;
+  const rs = [];
+  for (let i = 0; i < p.n; i++) {
+    picks[i] = -1;
+    if (p.E[i] < emin) continue;
+    const j = argmin(p, i, w, c);
+    if (j < 0) { none++; continue; }
+    n++; picks[i] = j;
+    const s = p.score[j];
+    sumP += 1 - s; sumF += p.frac[j]; sumEP += (1 - s) * p.E[i]; sumE += p.E[i];
+    if (s < 0.6) strict++;
+    if (p.pu[j]) pu++;
+    if (p.root[j] !== p.nomi[i]) ch++;
+    if (isFallback(p, i, j, c)) fb++;
+    if (p.calo[j]) calo++;
+    gen += p.gen[j];
+    count[p.uid[j]]++;
+    if (p.pE[j] > 0) rs.push(p.E[i] / p.pE[j]);
+    if (full) types[p.pdgc[j]]++;
+  }
+  let shared = 0;
+  for (let i = 0; i < p.n; i++) { const j = picks[i]; if (j >= 0 && count[p.uid[j]] > 1) shared++; }
+  rs.sort((a, b) => a - b);
+  const q = f => rs.length ? rs[Math.min(rs.length - 1, Math.floor(f * rs.length))] : NaN;
+  const dv = x => n ? x / n : NaN;
+  return {n, none, purity: dv(sumP), cover: dv(sumF), ePurity: sumE ? sumEP / sumE : NaN, strict: dv(strict), pu: dv(pu), changed: dv(ch), fallback: dv(fb), calo: dv(calo), gen: dv(gen), shared: dv(shared), med: q(0.5), width: (q(0.84) - q(0.16)) / 2, rs: full ? rs : null, types};
+}
+
+function hist(p, w, c, emin, field, lo, hi, nb) {
+  const h = new Array(nb + 1).fill(0); let tot = 0;
+  for (let i = 0; i < p.n; i++) {
+    if (p.E[i] < emin) continue;
+    const j = argmin(p, i, w, c); if (j < 0) continue;
+    let v;
+    if (field === "purity") v = 1 - p.score[j]; else { if (!(p.pE[j] > 0)) continue; v = p.E[i] / p.pE[j]; }
+    let b = Math.floor((v - lo) / (hi - lo) * nb); if (b >= nb) b = v > hi ? nb : nb - 1; if (b < 0) b = 0;
+    h[b]++; tot++;
+  }
+  return h.map(x => tot ? x / tot : 0);
+}
+
+const fmt = {p: x => isNaN(x) ? "n/a" : (100 * x).toFixed(1) + " %", n3: x => isNaN(x) ? "n/a" : x.toFixed(3), n2: x => isNaN(x) ? "n/a" : x.toFixed(2)};
+function sign(x, f) { if (isNaN(x)) return ""; return (x >= 0 ? "+" : "") + f(x); }
+
+function drawTiles(m, r) {
+  const tile = (k, v, d) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`;
+  const dp = (a, b) => "vs nominal " + sign(100 * (a - b), x => x.toFixed(1)) + " pt";
+  $("tiles").innerHTML = [
+    tile("Mean purity (1 - score)", fmt.n3(m.purity), "vs nominal " + sign(m.purity - r.purity, x => x.toFixed(3))),
+    tile("Mean truth coverage", fmt.n3(m.cover), "vs nominal " + sign(m.cover - r.cover, x => x.toFixed(3))),
+    tile("Strict match (score < 0.6)", fmt.p(m.strict), dp(m.strict, r.strict)),
+    tile("Pick differs from nominal", fmt.p(m.changed), m.n + " tracksters"),
+    tile("Tracksters sharing a pick", fmt.p(m.shared), dp(m.shared, r.shared)),
+    tile("Pick at caloBoundary", fmt.p(m.calo), dp(m.calo, r.calo)),
+    tile("Pick from pileup", fmt.p(m.pu), dp(m.pu, r.pu)),
+    tile("Median energy response", fmt.n2(m.med), "half width 16-84: " + fmt.n2(m.width)),
+    tile("Ceiling rejected all", fmt.p(m.fallback), "unconstrained minimum answers"),
+  ].join("");
+}
+
+// One y scale per chart, log x. Marks: current weight (solid), weight 1 (dashed).
+const SW = [];
+for (let x = 1; x <= 301; x += 5) SW.push(+Math.pow(10, -1.7 + (x - 1) * 0.01).toPrecision(3));
+const X = {l: 34, r: 8, t: 8, b: 32, w: 340, h: 182};
+function xPos(w) { return X.l + (Math.log10(w) + 1.7) / 3 * (X.w - X.l - X.r); }
+function lineChart(el, series, ymin, ymax, fy, wNow) {
+  const y = v => X.h - X.b - (v - ymin) / (ymax - ymin) * (X.h - X.b - X.t);
+  let s = `<svg viewBox="0 0 ${X.w} ${X.h}" role="img">`;
+  for (let i = 0; i <= 4; i++) { const v = ymin + (ymax - ymin) * i / 4; s += `<line x1="${X.l}" x2="${X.w - X.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${X.l - 4}" y="${y(v) + 3.5}" text-anchor="end">${fy(v)}</text>`; }
+  for (const t of [0.02, 0.1, 0.5, 1, 5, 20]) s += `<text x="${xPos(t)}" y="${X.h - 18}" text-anchor="middle">${t}</text>`;
+  s += `<text x="${X.w - X.r}" y="${X.h - 3}" text-anchor="end">adaptiveReverseWeight</text>`;
+  s += `<line x1="${xPos(1)}" x2="${xPos(1)}" y1="${X.t}" y2="${X.h - X.b}" stroke="var(--ref)" stroke-dasharray="3 3"/>`;
+  for (const se of series) {
+    const d = se.v.map((v, i) => (i ? "L" : "M") + xPos(SW[i]).toFixed(1) + " " + (isNaN(v) ? y(ymin) : y(Math.max(ymin, Math.min(ymax, v)))).toFixed(1)).join("");
+    s += `<path d="${d}" fill="none" stroke="${se.color}" stroke-width="2" stroke-linejoin="round"/>`;
+  }
+  if (wNow > 0) {
+    const idx = SW.reduce((b, v, i) => Math.abs(Math.log(v / wNow)) < Math.abs(Math.log(SW[b] / wNow)) ? i : b, 0);
+    s += `<line x1="${xPos(wNow)}" x2="${xPos(wNow)}" y1="${X.t}" y2="${X.h - X.b}" stroke="var(--ink)"/>`;
+    for (const se of series) s += `<circle cx="${xPos(SW[idx])}" cy="${y(Math.max(ymin, Math.min(ymax, se.v[idx])))}" r="4" fill="${se.color}" stroke="var(--panel)" stroke-width="2"/>`;
+  }
+  s += `<rect x="${X.l}" y="${X.t}" width="${X.w - X.l - X.r}" height="${X.h - X.t - X.b}" fill="transparent" class="hit"/></svg>`;
+  el.innerHTML = s;
+  const r = el.querySelector(".hit");
+  r.addEventListener("mousemove", ev => {
+    const b = el.querySelector("svg").getBoundingClientRect();
+    const px = (ev.clientX - b.left) / b.width * X.w;
+    const lw = (px - X.l) / (X.w - X.l - X.r) * 3 - 1.7;
+    const idx = SW.reduce((bb, v, i) => Math.abs(Math.log10(v) - lw) < Math.abs(Math.log10(SW[bb]) - lw) ? i : bb, 0);
+    showTip(ev, "weight " + SW[idx] + "\n" + series.map(se => se.name + ": " + se.f(se.v[idx])).join("\n"));
+  });
+  r.addEventListener("mouseleave", hideTip);
+}
+function showTip(ev, text) { const t = $("tip"); t.textContent = text; t.hidden = false; const x = Math.min(window.innerWidth - t.offsetWidth - 8, ev.clientX + 12); t.style.left = Math.max(8, x) + "px"; t.style.top = Math.max(8, ev.clientY - t.offsetHeight - 10) + "px"; }
+function hideTip() { $("tip").hidden = true; }
+
+let sweepData = null, sweepKey = "";
+function computeSweep() {
+  const key = [state.sample, state.col, state.c, state.emin].join("|");
+  if (key === sweepKey) return;
+  sweepKey = key;
+  const r = SW.map(w => metrics(P, w, state.c, state.emin, false));
+  sweepData = r;
+}
+function drawSweeps() {
+  computeSweep();
+  const r = sweepData, g = f => r.map(f);
+  const defs = [
+    {t: "Purity and truth coverage", note: "A higher weight moves the pick to a tighter branch: coverage rises and purity falls.", ser: [{name: "Purity", color: "var(--s1)", v: g(x => x.purity), f: fmt.n3}, {name: "Coverage", color: "var(--s2)", v: g(x => x.cover), f: fmt.n3}], lo: 0, hi: 1, fy: v => v.toFixed(2)},
+    {t: "Pick differs from nominal", note: "Fraction of tracksters that change particle against (1, 1).", ser: [{name: "Changed", color: "var(--s1)", v: g(x => x.changed), f: fmt.p}], lo: 0, hi: null, fy: v => (100 * v).toFixed(0) + "%"},
+    {t: "Merge and level", note: "Tracksters that share a pick, and picks at caloBoundary.", ser: [{name: "Sharing a pick", color: "var(--s1)", v: g(x => x.shared), f: fmt.p}, {name: "At caloBoundary", color: "var(--s2)", v: g(x => x.calo), f: fmt.p}], lo: 0, hi: 1, fy: v => (100 * v).toFixed(0) + "%"},
+    {t: "Median energy response", note: "Raw trackster energy over the energy of the selected particle.", ser: [{name: "Median", color: "var(--s1)", v: g(x => x.med), f: fmt.n2}], lo: 0, hi: null, fy: v => v.toFixed(2)},
+  ];
+  $("sweeps").innerHTML = defs.map((d, i) => `<div class="panel chart"><h2>${d.t}</h2><div class="note">${d.note}</div>${d.ser.length > 1 ? '<div class="legend">' + d.ser.map(s => `<span><span class="sw" style="background:${s.color}"></span>${s.name}</span>`).join("") + "</div>" : ""}<div id="sw${i}"></div></div>`).join("");
+  defs.forEach((d, i) => {
+    let hi = d.hi;
+    if (hi === null) { hi = Math.max(0.01, ...d.ser[0].v.filter(x => !isNaN(x))) * 1.1; }
+    lineChart($("sw" + i), d.ser, d.lo, hi, d.fy, state.w);
+  });
+}
+
+function stepHist(el, legendEl, cur, ref, lo, hi, nb, xlab) {
+  const W = 520, H = 180, L = 36, R = 8, T = 8, B = 28;
+  const x = v => L + (v - lo) / (hi - lo) * (W - L - R);
+  const m = Math.max(0.01, ...cur.slice(0, nb), ...ref.slice(0, nb)) * 1.08;
+  const y = v => H - B - v / m * (H - B - T);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  for (let i = 0; i <= 4; i++) { const v = m * i / 4; s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L - 4}" y="${y(v) + 3.5}" text-anchor="end">${(100 * v).toFixed(0)}%</text>`; }
+  for (let i = 0; i <= 5; i++) { const v = lo + (hi - lo) * i / 5; s += `<text x="${x(v)}" y="${H - 14}" text-anchor="middle">${v.toFixed(1)}</text>`; }
+  s += `<text x="${W - R}" y="${H - 2}" text-anchor="end">${xlab}</text>`;
+  const path = h => { let d = ""; for (let i = 0; i < nb; i++) { const a = lo + (hi - lo) * i / nb, b = lo + (hi - lo) * (i + 1) / nb; d += (i ? "L" : "M") + x(a).toFixed(1) + " " + y(h[i]).toFixed(1) + "L" + x(b).toFixed(1) + " " + y(h[i]).toFixed(1); } return d; };
+  s += `<path d="${path(ref)}" fill="none" stroke="var(--ref)" stroke-width="2" stroke-dasharray="4 3"/><path d="${path(cur)}" fill="none" stroke="var(--s1)" stroke-width="2"/>`;
+  s += `<rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent" class="hit"/></svg>`;
+  el.innerHTML = s;
+  legendEl.innerHTML = `<span><span class="sw" style="background:var(--s1)"></span>This working point</span><span><span class="sw" style="background:var(--ref)"></span>AdaptiveNominal</span>` + (cur[nb] ? `<span>Overflow: ${(100 * cur[nb]).toFixed(1)}%</span>` : "");
+  const r = el.querySelector(".hit");
+  r.addEventListener("mousemove", ev => {
+    const b = el.querySelector("svg").getBoundingClientRect();
+    const px = (ev.clientX - b.left) / b.width * W;
+    const i = Math.max(0, Math.min(nb - 1, Math.floor((px - L) / (W - L - R) * nb)));
+    const a = lo + (hi - lo) * i / nb, c = lo + (hi - lo) * (i + 1) / nb;
+    showTip(ev, `${a.toFixed(2)} to ${c.toFixed(2)}\nthis point: ${(100 * cur[i]).toFixed(1)} %\nnominal: ${(100 * ref[i]).toFixed(1)} %`);
+  });
+  r.addEventListener("mouseleave", hideTip);
+}
+
+function particleOf(t, id) { return D.particles[t.e][id]; }
+function displayTrs() {
+  const out = [];
+  for (let i = 0; i < P.n; i++) { const t = P.trs[i]; if (t.all && t.e === state.ev && t.E >= state.emin) out.push(i); }
+  out.sort((a, b) => P.E[b] - P.E[a]);
+  return out;
+}
+function drawList() {
+  const ids = displayTrs();
+  let rows = ids.map(i => { const j = argmin(P, i, state.w, state.c); return {i, j, root: j < 0 ? -1 : P.root[j], ch: j >= 0 && P.root[j] !== P.nomi[i]}; });
+  if (state.onlyCh) rows = rows.filter(r => r.ch);
+  if (state.sel < 0 || P.trs[state.sel].e !== state.ev || !P.trs[state.sel].all || P.E[state.sel] < state.emin) {
+    const best = ids.slice().sort((a, b) => (P.off[b + 1] - P.off[b]) - (P.off[a + 1] - P.off[a]))[0];
+    state.sel = best === undefined ? -1 : best;
+  }
+  let h = "<tr><th>E (GeV)</th><th>eta</th><th>Candidates</th><th>Pick</th><th>Purity</th><th>Coverage</th><th>Pick E</th><th></th></tr>";
+  for (const r of rows) {
+    const t = P.trs[r.i], q = r.j >= 0 ? particleOf(t, P.root[r.j]) : null;
+    h += `<tr class="click${r.i === state.sel ? " sel" : ""}" data-i="${r.i}"><td>${t.E.toFixed(1)}</td><td>${t.eta.toFixed(2)}</td><td>${t.all.length}</td><td>${q ? pdgName(q[0]) : "none"}</td><td>${r.j >= 0 ? (1 - P.score[r.j]).toFixed(2) : ""}</td><td>${r.j >= 0 ? P.frac[r.j].toFixed(2) : ""}</td><td>${q ? q[1].toFixed(1) : ""}</td><td>${r.ch ? '<span class="pill pick">changed</span>' : ""}</td></tr>`;
+  }
+  if (!rows.length) h += `<tr><td colspan="8" style="text-align:left;color:var(--ink2)">No trackster in this list changes its pick at this working point.</td></tr>`;
+  $("list").innerHTML = h;
+  $("list").querySelectorAll("tr.click").forEach(tr => tr.addEventListener("click", () => { state.sel = +tr.dataset.i; drawList(); drawScatter(); }));
+}
+function drawScatter() {
+  const el = $("scatter");
+  if (state.sel < 0) { el.innerHTML = `<p style="color:var(--ink2)">No trackster in this event passes the energy filter.</p>`; $("cands").innerHTML = ""; return; }
+  const t = P.trs[state.sel], j = argmin(P, state.sel, state.w, state.c), pickRoot = j < 0 ? -1 : P.root[j], nomRoot = P.nomi[state.sel];
+  const W = 560, H = 380, L = 44, R = 14, T = 12, B = 38;
+  const x = v => L + v * (W - L - R), y = v => H - B - v * (H - B - T);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  s += `<rect x="${x(state.c)}" y="${T}" width="${Math.max(0, x(1) - x(state.c))}" height="${H - B - T}" fill="var(--shade)"/>`;
+  for (let i = 0; i <= 5; i++) { const v = i / 5; s += `<line x1="${x(0)}" x2="${x(1)}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><line x1="${x(v)}" x2="${x(v)}" y1="${T}" y2="${H - B}" stroke="var(--grid)"/><text x="${L - 5}" y="${y(v) + 3.5}" text-anchor="end">${v.toFixed(1)}</text><text x="${x(v)}" y="${H - B + 14}" text-anchor="middle">${v.toFixed(1)}</text>`; }
+  s += `<text x="${x(0.5)}" y="${H - 6}" text-anchor="middle">reverseScore: branch energy the trackster does not cover</text><text transform="translate(11 ${y(0.5)}) rotate(-90)" text-anchor="middle">score: trackster energy the branch does not cover</text>`;
+  s += `<line x1="${x(state.c)}" x2="${x(state.c)}" y1="${T}" y2="${H - B}" stroke="var(--ink3)" stroke-dasharray="3 3"/>`;
+  if (j >= 0) {
+    const o = P.score[j] + state.w * P.rev[j];
+    const y0 = o, y1 = o - state.w;
+    s += `<clipPath id="plot"><rect x="${x(0)}" y="${T}" width="${x(1) - x(0)}" height="${H - B - T}"/></clipPath><line clip-path="url(#plot)" x1="${x(0)}" y1="${y(y0)}" x2="${x(1)}" y2="${y(y1)}" stroke="var(--s2)" stroke-width="2"/>`;
+  }
+  const pts = t.all.slice().sort((a, b) => (a[0] === pickRoot) - (b[0] === pickRoot));
+  for (const c of pts) {
+    const isPick = c[0] === pickRoot, isNom = c[0] === nomRoot;
+    const col = isPick ? "var(--s2)" : c[5] ? "var(--s1)" : "none";
+    const stroke = isPick ? "var(--panel)" : c[5] ? "var(--panel)" : "var(--ref)";
+    if (isNom && !isPick) s += `<circle cx="${x(c[2])}" cy="${y(c[1])}" r="9" fill="none" stroke="var(--ink)" stroke-width="1.5"/>`;
+    s += `<circle cx="${x(c[2])}" cy="${y(c[1])}" r="${isPick ? 7.5 : 5}" fill="${col}" stroke="${stroke}" stroke-width="${c[5] || isPick ? 2 : 1.5}" data-r="${c[0]}" class="pt"/>`;
+    s += `<circle cx="${x(c[2])}" cy="${y(c[1])}" r="11" fill="transparent" data-r="${c[0]}" class="pt"/>`;
+  }
+  s += "</svg>";
+  el.innerHTML = s;
+  $("scL").innerHTML = `<span><span class="sw" style="background:var(--s2)"></span>Selected, with its line of equal objective</span><span><span class="sw" style="background:var(--s1)"></span>Assignable</span><span><span class="sw" style="background:none;border:1.5px solid var(--ref)"></span>Barred, never selected</span><span><span class="sw" style="background:none;border:1.5px solid var(--ink);border-radius:50%"></span>Nominal pick</span><span><span class="sw" style="background:var(--shade);border:1px solid var(--line)"></span>Rejected by the ceiling</span>`;
+  el.querySelectorAll(".pt").forEach(n => {
+    n.addEventListener("mousemove", ev => { const c = t.all.find(a => a[0] === +n.dataset.r), q = particleOf(t, c[0]); showTip(ev, `${q ? pdgName(q[0]) : "?"}  E ${q ? q[1].toFixed(2) : "?"} GeV  gen ${q ? q[2] : "?"}\nscore ${c[1].toFixed(4)}\nreverseScore ${c[2].toFixed(4)}\nobjective ${(c[1] + state.w * c[2]).toFixed(4)}`); });
+    n.addEventListener("mouseleave", hideTip);
+  });
+  $("candT").textContent = `Candidates of the trackster with E = ${t.E.toFixed(1)} GeV, eta = ${t.eta.toFixed(2)}, ordered by objective`;
+  const rows = t.all.map(c => ({c, o: c[1] + state.w * c[2]})).sort((a, b) => (b.c[5] - a.c[5]) || (a.o - b.o));
+  let h = "<tr><th>Particle</th><th>Id</th><th>E (GeV)</th><th>Generation</th><th>Pileup</th><th>score</th><th>reverseScore</th><th>Shared E</th><th>Shared fraction</th><th>Objective</th><th></th></tr>";
+  rows.slice(0, 40).forEach(({c, o}) => {
+    const q = particleOf(t, c[0]);
+    const flag = c[0] === pickRoot ? '<span class="pill pick">selected</span>' : c[0] === nomRoot ? '<span class="pill">nominal</span>' : !c[5] ? '<span class="pill">barred</span>' : c[2] > state.c ? '<span class="pill">over ceiling</span>' : "";
+    h += `<tr><td>${q ? pdgName(q[0]) : "?"}</td><td>${c[0]}</td><td>${q ? q[1].toFixed(2) : ""}</td><td>${q ? q[2] : ""}</td><td>${q && q[3] ? "yes" : "no"}</td><td>${c[1].toFixed(4)}</td><td>${c[2].toFixed(4)}</td><td>${c[3].toFixed(2)}</td><td>${c[4].toFixed(3)}</td><td>${o.toFixed(4)}</td><td>${flag}</td></tr>`;
+  });
+  if (rows.length > 40) h += `<tr><td colspan="11" style="text-align:left;color:var(--ink2)">${rows.length - 40} more candidates are in the plot.</td></tr>`;
+  $("cands").innerHTML = h;
+}
+
+function drawTypes(m, r) {
+  let h = "<tr><th>Type</th><th>This working point</th><th>AdaptiveNominal</th><th>Change</th></tr>";
+  TYPES.forEach((n, i) => { const a = m.n ? m.types[i] / m.n : 0, b = r.n ? r.types[i] / r.n : 0; h += `<tr><td>${n}</td><td>${fmt.p(a)}</td><td>${fmt.p(b)}</td><td>${sign(100 * (a - b), x => x.toFixed(1))} pt</td></tr>`; });
+  h += `<tr><td>Mean generation</td><td>${fmt.n2(m.gen)}</td><td>${fmt.n2(r.gen)}</td><td>${sign(m.gen - r.gen, x => x.toFixed(2))}</td></tr>`;
+  $("types").innerHTML = h;
+}
+function configText() {
+  return `names=cms.vstring("Fixed", "AdaptiveTuned"),\nadaptiveReverseWeight=cms.vfloat(0.0, ${state.w}),\nadaptiveMaxReverseScore=cms.vfloat(0.0, ${state.c}),`;
+}
+function drawProv() {
+  const cl = P.closure;
+  const fmtC = c => c.bad === 0 ? `<span class="ok">Match</span>: 0 of ${c.tot} differ` : `<span class="ko">Mismatch</span>: ${c.bad} of ${c.tot} differ`;
+  const st = D.stats[state.col];
+  $("prov").innerHTML = `Sample: ${D.label}. On the PU200 sample this page holds two collections to limit its size; the three others passed the same check. Code: CMSSW_20_1_X_2026-11-02-1100 with branch head 49aa56bff1d, default TICL configuration.<br>` +
+    `Check of this page against the maps of the same job, ${state.col}. AdaptiveTight: ${fmtC(cl.tight)}. AdaptiveNominal: ${fmtC(cl.nominal)}.<br>` +
+    `The page keeps ${st.front} of ${st.assignable} assignable candidates for the sliders. A removed candidate has an earlier candidate with both scores lower or equal, so it can never answer. The plot shows every candidate for the 12 tracksters with the highest energy per event.<br>` +
+    `<code>fakerate</code> and <code>nocandidate</code> read the Fixed map, so they do not depend on the working point and are not here. Few events: treat small differences as statistical noise. Purity is a property of the truth definition, not a figure of merit by itself.`;
+  $("cfg").textContent = configText();
+}
+
+function drawAll() {
+  if (!P) return;
+  $("wV").textContent = state.w; $("cV").textContent = state.c.toFixed(2);
+  const m = metrics(P, state.w, state.c, state.emin, true);
+  const r = metrics(P, 1, 1, state.emin, true);
+  drawTiles(m, r);
+  drawSweeps();
+  const nb = 25;
+  stepHist($("h1"), $("hL1"), hist(P, state.w, state.c, state.emin, "purity", 0, 1, nb), hist(P, 1, 1, state.emin, "purity", 0, 1, nb), 0, 1, nb, "1 - score");
+  stepHist($("h2"), $("hL2"), hist(P, state.w, state.c, state.emin, "resp", 0, 2.5, nb), hist(P, 1, 1, state.emin, "resp", 0, 2.5, nb), 0, 2.5, nb, "E(trackster) / E(particle)");
+  drawTypes(m, r);
+  drawList(); drawScatter(); drawProv();
+}
+let raf = 0;
+function schedule() { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; drawAll(); }); }
+
+async function loadCollection(id, name) {
+  const key = id + "/" + name;
+  if (!cache[key]) {
+    const res = await fetch("data/" + key + ".json");
+    if (!res.ok) throw new Error("HTTP " + res.status + " for " + key);
+    const data = await res.json();
+    cache[key] = {data, prep: prepare(data, name)};
+  }
+  D = cache[key].data; P = cache[key].prep;
+  state.col = name; state.sel = -1; sweepKey = "";
+  schedule();
+}
+async function loadSample(id) {
+  const s = SAMPLES.find(x => x.id === id);
+  state.sample = id;
+  const keep = s.cols.includes(state.col) ? state.col : "ticlCandidate";
+  $("col").innerHTML = s.cols.map(n => `<option value="${n}">${n}</option>`).join("");
+  $("col").value = keep;
+  await loadCollection(id, keep);
+  $("ev").innerHTML = D.events.map((e, i) => `<option value="${i}">${e}</option>`).join("");
+  state.ev = 0; $("ev").value = "0";
+  schedule();
+}
+function setWP(w, c) { state.w = w; state.c = c; $("wS").value = w2x(w); $("cS").value = c; schedule(); }
+
+function init() {
+  $("sample").innerHTML = SAMPLES.map(s => `<option value="${s.id}">${s.label}</option>`).join("");
+  $("wS").value = w2x(state.w); $("cS").value = state.c;
+  $("wS").addEventListener("input", e => { state.w = x2w(+e.target.value); schedule(); });
+  $("cS").addEventListener("input", e => { state.c = +e.target.value; schedule(); });
+  $("pTight").addEventListener("click", () => setWP(1, 0.6));
+  $("pNom").addEventListener("click", () => setWP(1, 1));
+  $("sample").addEventListener("change", e => loadSample(e.target.value).catch(fail));
+  $("col").addEventListener("change", e => loadCollection(state.sample, e.target.value).catch(fail));
+  $("emin").addEventListener("change", e => { state.emin = +e.target.value; state.sel = -1; schedule(); });
+  $("ev").addEventListener("change", e => { state.ev = +e.target.value; state.sel = -1; schedule(); });
+  $("onlyCh").addEventListener("change", e => { state.onlyCh = e.target.checked; schedule(); });
+  $("copy").addEventListener("click", () => {
+    const done = () => { $("copied").textContent = "Copied"; };
+    const fb = () => { const r = document.createRange(); r.selectNodeContents($("cfg")); const g = getSelection(); g.removeAllRanges(); g.addRange(r); $("copied").textContent = "Text selected. Copy it by hand."; };
+    if (navigator.clipboard) navigator.clipboard.writeText(configText()).then(done, fb); else fb();
+  });
+  const start = SAMPLES.find(s => "#" + s.id === location.hash) || SAMPLES[0];
+  $("sample").value = start.id;
+  loadSample(start.id).catch(fail);
+}
+function fail(e) { $("tiles").innerHTML = `<div class="tile"><div class="k">The data did not load</div><div class="d">${e.message}. Reload the page to try again.</div></div>`; }
+init();
+</script>
+</body>
+</html>

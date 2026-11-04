@@ -190,6 +190,8 @@ adaptiveMaxReverseScore = (0.0, 0.6, 1.0)
 - `Fixed` is not a climb. Its map keeps every candidate root, best first, and its two
   numbers are unused.
 
+To see what a value does before you run a job, use the [tuner](associator-tuner.md). It runs the rule again on real candidates when you move a slider.
+
 To change them for a study, override the PSet before the associator cff is imported.
 The collections come from the label lists in the same file, so a new trackster
 collection is added there rather than per job.
