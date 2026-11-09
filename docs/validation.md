@@ -753,3 +753,7 @@ Cost, TimeReport of the same PU200 job (8 threads, 4 streams): the candidate ass
   `truthGraphSelections_t` and `testTruthHistoryGuard` tests.
 - `Validation/TruthInfo`: `testCandidateTruthMatching` (catch2, 59 assertions) checks the
   level projection, the ancestor test, the classes and the ladder.
+
+## HGCAL-only jobs
+
+A job that reconstructs only HGCAL has no tracks, vertices or candidates. `customiseTruthBranchValidationHGCalOnly` in `SimGeneral/TruthGraphAssociatorProducers/customiseTruthGraphAssociators.py` schedules `truthBranchTargets`, `truthBranchTracksterAssociators`, `truthBranchTracksterValidator` and the three trackster harvesters. The barrel PF rechit list of the associator is empty, because the trackster denominator covers HGCAL only. The plots are in `TruthInfo/Offline/Calorimetry/`. The runTheMatrix offset `.432`, on branch `hgcalOnly-workflow` of felicepantaleo/cmssw, uses this customise.
